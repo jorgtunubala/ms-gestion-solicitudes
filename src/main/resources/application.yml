@@ -1,0 +1,28 @@
+#Configurar puerto
+server:
+    port: 8095
+    servlet:
+        context-path: /msmaestriac
+
+
+# Configuración de la base de datos
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/maestriacomputacion
+    username: root
+    password: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 50000
+        readTimeout: 50000
+        loggerLevel: basic
+
+gestion-estudiantes-docentes:
+  url: http://localhost:8091/api/
+  resources:
+    docentes-activos: docentes/listar/{estado}
+    obtener-estudiante: estudiantes/informacion-personal/{correo}
