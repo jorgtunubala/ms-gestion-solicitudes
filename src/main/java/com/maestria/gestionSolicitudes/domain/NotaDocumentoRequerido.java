@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="nota_documento_requerido")
+@Table(name="notas_documentos_requerido")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
