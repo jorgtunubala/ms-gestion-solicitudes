@@ -11,26 +11,30 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Table(name="notas_documentos_requerido")
+@Table(name="homologaciones")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotaDocumentoRequerido extends EntidadPrincipal {
-    
+public class Homologaciones {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(name = "nota")
-    private String nota;
+    
+    @Column(name = "id_estudiante")
+    private Integer idEstudiante;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_req_solicitud")
-    private RequisitoSolicitud requisitoSolicitud;      
+    @JoinColumn(name = "id_solicitud")
+    private Solicitud solicitud;
+
+    @Column(name = "id_tutor")
+    private Integer idTutor;
+
+    @Column(name = "estado")
+    private String estado;
 }

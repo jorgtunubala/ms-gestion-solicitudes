@@ -2,8 +2,8 @@ package com.maestria.gestionSolicitudes.service.rest;
 
 import java.util.List;
 
+import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.DocumentoRequeridoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.TipoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.TutorDto;
 

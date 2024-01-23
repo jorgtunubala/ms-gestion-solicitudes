@@ -1,6 +1,6 @@
 package com.maestria.gestionSolicitudes.dto.rest.response;
 
-import com.maestria.gestionSolicitudes.dto.rest.InformacionPersonalDto;
+import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

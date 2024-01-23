@@ -1,4 +1,4 @@
-package com.maestria.gestionSolicitudes.dto.rest;
+package com.maestria.gestionSolicitudes.dto.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class InformacionPersonalDto {
+    private Integer id;
     private String nombres;
     private String apellidos;
     private String correo;

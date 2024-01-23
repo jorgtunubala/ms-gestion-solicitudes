@@ -14,6 +14,6 @@ public interface TipoSolicitudMapper {
 
     @Mapping(source = "id", target = "idSolicitud")
     @Mapping(source = "codigo", target = "codigoSolicitud")
-    @Mapping(source = "tipoSolicitud", target = "nombreSolicitud")
+    @Mapping(source = "nombre", target = "nombreSolicitud")
     TipoSolicitudDto solicitudToTipoSolicitudDTO(Solicitud solicitud);
 }

@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.DocumentoRequeridoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.TipoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.TutorDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentosRequeridosResponse;

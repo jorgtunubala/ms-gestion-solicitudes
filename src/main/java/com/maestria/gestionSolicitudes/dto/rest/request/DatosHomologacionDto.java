@@ -1,4 +1,4 @@
-package com.maestria.gestionSolicitudes.dto.rest;
+package com.maestria.gestionSolicitudes.dto.rest.request;
 
 import java.util.List;
 

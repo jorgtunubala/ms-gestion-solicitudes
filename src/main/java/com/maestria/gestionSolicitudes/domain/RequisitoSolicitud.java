@@ -24,8 +24,7 @@ public class RequisitoSolicitud extends EntidadPrincipal {
     
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REQUISITO_SOLICITUD_GENERATOR")
-    @SequenceGenerator(sequenceName = "SEQ_ID_REQUISITO_SOLICITUD", name = "REQUISITO_SOLICITUD_GENERATOR", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "titulo_documento")

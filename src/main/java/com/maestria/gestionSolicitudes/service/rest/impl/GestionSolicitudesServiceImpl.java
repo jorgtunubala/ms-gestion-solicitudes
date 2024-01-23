@@ -1,7 +1,6 @@
 package com.maestria.gestionSolicitudes.service.rest.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,8 +12,8 @@ import com.maestria.gestionSolicitudes.domain.DocumentoRequisitoSolicitud;
 import com.maestria.gestionSolicitudes.domain.NotaDocumentoRequerido;
 import com.maestria.gestionSolicitudes.domain.RequisitoSolicitud;
 import com.maestria.gestionSolicitudes.domain.Solicitud;
+import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.DocumentoRequeridoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.TipoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.TutorDto;
 import com.maestria.gestionSolicitudes.mapper.TipoSolicitudMapper;
@@ -65,7 +64,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             dSolicitudDto.setDescripcion(requisitoSolicitud.getDescripcion());
             dSolicitudDto.setTenerEnCuenta(requisitoSolicitud.getTenerEnCuenta());
             dSolicitudDto.setArticulo(requisitoSolicitud.getArticulo());
-            List<DocumentoRequisitoSolicitud> lRequisitoSolicituds = dSolicitudRepository.findByRequisitoSolicitudId(requisitoSolicitud.getSolicitud().getId());
+            List<DocumentoRequisitoSolicitud> lRequisitoSolicituds = dSolicitudRepository.findByRequisitoSolicitudId(requisitoSolicitud.getId());
             List<String> lDocumentos = new ArrayList<>();
             for (DocumentoRequisitoSolicitud documentoRequisitoSolicitud : lRequisitoSolicituds) {
                 lDocumentos.add(documentoRequisitoSolicitud.getNombreDocumento());
@@ -94,6 +93,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         .stream()
         .map(docente -> {
             TutorDto tutorDto = new TutorDto();
+            tutorDto.setId(docente.getId());
             tutorDto.setCodigoTutor(docente.getCodigoAcademico());
             tutorDto.setNombreTutor(docente.obtenerNombreCompleto());
             return tutorDto;

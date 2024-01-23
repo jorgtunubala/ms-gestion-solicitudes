@@ -26,29 +26,15 @@ public class Solicitud extends EntidadPrincipal {
     
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SOLICITUDES_GENERATOR")
-    @SequenceGenerator(sequenceName = "SEQ_ID_SOLICITUDES", name = "SOLICITUDES_GENERATOR", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(name = "tiposolicitud")
-    private String tipoSolicitud;
-
-    @Column(name = "documentoasociado")
-    private String documentoAsociado;
-
-    @Column(name = "respuestasolicitud")
-    private String respuestaSolicitud;
-
-    @Column(name = "fechaactasolic")
-    private LocalDate fechaActaSolic;
-
-    @Column(name = "observacionsolic")
-    private String observaciones;
-
-    @Column(name = "estado")
-    @Convert(converter = BooleanConverter.class)
-    private String estado;
 
     @Column(name = "codigo")
     private String codigo;
+    
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Column(name = "estado")
+    private String estado;
 }

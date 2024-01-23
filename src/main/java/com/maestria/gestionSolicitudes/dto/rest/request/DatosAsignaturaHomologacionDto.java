@@ -1,11 +1,11 @@
-package com.maestria.gestionSolicitudes.dto.rest;
+package com.maestria.gestionSolicitudes.dto.rest.request;
 
 import lombok.Data;
 
 @Data
 public class DatosAsignaturaHomologacionDto {
     private String nombreAsignatura;
-    private String numeroCreditos;
+    private Integer numeroCreditos;
     private Integer intensidadHoraria;
     private Double calificacion;
     private String contenidoProgramatico;
