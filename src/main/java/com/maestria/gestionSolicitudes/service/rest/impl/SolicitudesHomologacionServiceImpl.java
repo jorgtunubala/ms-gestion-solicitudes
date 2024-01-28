@@ -1,5 +1,6 @@
 package com.maestria.gestionSolicitudes.service.rest.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +13,19 @@ import com.maestria.gestionSolicitudes.domain.Homologaciones;
 import com.maestria.gestionSolicitudes.domain.Solicitud;
 import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaDto;
 import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
+import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.DatosAsignaturaHomologacionDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.DatosHomologacionDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.DatosSolicitudHomologacionDto;
+import com.maestria.gestionSolicitudes.dto.rest.response.DatosAsignaturaHomologar;
+import com.maestria.gestionSolicitudes.dto.rest.response.DatosComunSolicitud;
+import com.maestria.gestionSolicitudes.dto.rest.response.DatosSolicitudHomologacion;
 import com.maestria.gestionSolicitudes.repository.AsignaturasHomologadasRepository;
 import com.maestria.gestionSolicitudes.repository.DocumentosAdjuntosHomologacionRepository;
 import com.maestria.gestionSolicitudes.repository.HomologacionesRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudRepository;
 import com.maestria.gestionSolicitudes.service.client.GestionAsignaturasService;
+import com.maestria.gestionSolicitudes.service.client.GestionDocentesEstudiantesService;
 import com.maestria.gestionSolicitudes.service.rest.SolicitudesHomologacionService;
 
 @Service
@@ -35,6 +41,8 @@ public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologaci
     private AsignaturasHomologadasRepository asignaturasHomologadasRepository;
     @Autowired
     private DocumentosAdjuntosHomologacionRepository documentosAdjuntosHomologacionRepository;
+    @Autowired
+    private GestionDocentesEstudiantesService gestionDocentesEstudiantesService;    
     
 
     @Override
@@ -72,6 +80,8 @@ public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologaci
             asignaturaExternaDto.setCalificacion(datosAsignatura.getCalificacion());            
             return gestionAsignaturasService.registrarAsignaturasExternas(asignaturaExternaDto);
         } catch (Exception e) {
+            System.out.println("Ocurrió un error al registrar la solicitud de asignaturas a homologar, ");
+            e.printStackTrace();
             return null;
         }
     }
@@ -92,6 +102,8 @@ public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologaci
             }
             return Boolean.TRUE;
         } catch (Exception e) {
+            System.out.println("Ocurrió un error al registrar la solicitud de asignaturas a homologar, ");
+            e.printStackTrace();
             return Boolean.FALSE;
         }        
     }
@@ -108,5 +120,53 @@ public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologaci
         } catch (Exception e) {
             return Boolean.FALSE;
         }
+    }
+
+    @Override
+    public List<DatosSolicitudHomologacion> obtenerTodasHomologaciones() {
+        List<DatosSolicitudHomologacion> datosHomologacion = new ArrayList<>();
+        List<Homologaciones> homologacionesPendientes = homologacionesRepository.findAllByOrderByFechaCreacionAsc();
+        for (Homologaciones homologaciones : homologacionesPendientes) {
+            DatosSolicitudHomologacion datos = new DatosSolicitudHomologacion();
+            DatosComunSolicitud datosComun = new DatosComunSolicitud();
+            Solicitud solicitud = solicitudRepository.findById(homologaciones.getSolicitud().getId()).get();
+            InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
+                    .obtenerInformacionEstudiantePorId(homologaciones.getIdEstudiante());
+            InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(homologaciones.getIdTutor());            
+            List<AsignaturasHomologadas> asignaturasHomologadas = asignaturasHomologadasRepository
+                .findAllByHomologacion(homologaciones);
+            List<DatosAsignaturaHomologar> datosAsignaturaHomologar = new ArrayList<>();
+
+            String programa = "";
+            String institucion = "";
+            for (AsignaturasHomologadas asignatura : asignaturasHomologadas) {
+                DatosAsignaturaHomologar datosAsignatura = new DatosAsignaturaHomologar();
+                AsignaturaExternaResponseDto asignaturaExternaDto = gestionAsignaturasService
+                    .obtenerAsignaturaExterna(asignatura.getAsignaturaExterna());
+                datosAsignatura.setCalificacion(asignatura.getCalificacionObtenida());
+                datosAsignatura.setCreditos(asignaturaExternaDto.getCreditos());
+                datosAsignatura.setIntensidadHoraria(asignaturaExternaDto.getIntensidadHoraria());
+                datosAsignatura.setNombreAsignatura(asignaturaExternaDto.getNombre());
+                programa = asignaturaExternaDto.getPrograma();
+                institucion = asignaturaExternaDto.getInstitucion();
+                datosAsignaturaHomologar.add(datosAsignatura);
+            }
+            List<String> datosAdjuntos = documentosAdjuntosHomologacionRepository
+                .findDocumentosByHomologacion(homologaciones);
+            datos.setDocumentosAdjuntos(datosAdjuntos);
+            datosComun.setCelular(estudiante.getCelular());
+            datosComun.setCodigoEstudiante(estudiante.getCodigoAcademico());
+            datosComun.setEmailEstudiante(estudiante.getCorreo());
+            datosComun.setNombreEstudiante(estudiante.obtenerNombreCompleto());
+            datosComun.setNombreTutor(tutor.obtenerNombreCompleto());
+            datosComun.setTipoSolicitud(solicitud.getNombre());
+            datos.setDatosComunSolicitud(datosComun);
+            datos.setEstadoSolicitud(homologaciones.getEstado());
+            datos.setDatosAsignatura(datosAsignaturaHomologar);
+            datos.setInstitutoProcedencia(institucion);
+            datos.setProgramaProcedencia(programa);
+            datosHomologacion.add(datos);
+        }                
+        return datosHomologacion;
     }
 }

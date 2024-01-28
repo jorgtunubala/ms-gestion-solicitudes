@@ -29,8 +29,11 @@ gestion-estudiantes-docentes:
   resources:
     docentes-activos: docentes/listar/{estado}
     obtener-estudiante: estudiantes/informacion-personal/{correo}
+    obtener-docente: docentes/obtener-docente/{idDocente}
+    obtener-estudiante-por-id: estudiantes/informacion-personal-estudiante/{idEstudiante}
 
 gestion-asignaturas:
   url: http://localhost:8021/api/
   resources:
     crear-asignaturas-externas: asignaturasExternas
+    obtener-asignatura: asignaturasExternas/obtener-asignatura/{idAsignatura}

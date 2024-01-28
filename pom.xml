@@ -69,6 +69,11 @@
         	<version>1.4.2.Final</version>
         	<scope>provided</scope>
     	</dependency>
+		<dependency>
+      		<groupId>org.springdoc</groupId>
+      		<artifactId>springdoc-openapi-ui</artifactId>
+      		<version>1.6.12</version>
+   		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

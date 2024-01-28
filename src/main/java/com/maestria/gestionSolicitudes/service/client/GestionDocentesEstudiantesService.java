@@ -16,4 +16,10 @@ public interface GestionDocentesEstudiantesService {
 
     @GetMapping("${gestion-estudiantes-docentes.resources.obtener-estudiante}")
     InformacionPersonalDto obtenerInformacionEstudiante(@PathVariable String correo);
+
+    @GetMapping("${gestion-estudiantes-docentes.resources.obtener-docente}")
+    InformacionPersonalDto obtenerTutor(@PathVariable Integer idDocente);
+
+    @GetMapping("${gestion-estudiantes-docentes.resources.obtener-estudiante-por-id}")
+    InformacionPersonalDto obtenerInformacionEstudiantePorId(@PathVariable Integer idEstudiante);
 }
