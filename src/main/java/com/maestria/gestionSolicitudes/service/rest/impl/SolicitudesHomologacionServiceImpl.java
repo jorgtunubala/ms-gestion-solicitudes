@@ -123,16 +123,16 @@ public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologaci
     }
 
     @Override
-    public List<DatosSolicitudHomologacion> obtenerTodasHomologaciones() {
+    public List<DatosSolicitudHomologacion> obtenerTodasHomologaciones(String correo) {
         List<DatosSolicitudHomologacion> datosHomologacion = new ArrayList<>();
-        List<Homologaciones> homologacionesPendientes = homologacionesRepository.findAllByOrderByFechaCreacionAsc();
+        InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(correo);
+        List<Homologaciones> homologacionesPendientes = homologacionesRepository.findAllByIdTutorOrderByFechaCreacionAsc(infoTutor.getId());
         for (Homologaciones homologaciones : homologacionesPendientes) {
             DatosSolicitudHomologacion datos = new DatosSolicitudHomologacion();
             DatosComunSolicitud datosComun = new DatosComunSolicitud();
             Solicitud solicitud = solicitudRepository.findById(homologaciones.getSolicitud().getId()).get();
             InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
                     .obtenerInformacionEstudiantePorId(homologaciones.getIdEstudiante());
-            InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(homologaciones.getIdTutor());            
             List<AsignaturasHomologadas> asignaturasHomologadas = asignaturasHomologadasRepository
                 .findAllByHomologacion(homologaciones);
             List<DatosAsignaturaHomologar> datosAsignaturaHomologar = new ArrayList<>();
@@ -158,7 +158,7 @@ public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologaci
             datosComun.setCodigoEstudiante(estudiante.getCodigoAcademico());
             datosComun.setEmailEstudiante(estudiante.getCorreo());
             datosComun.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-            datosComun.setNombreTutor(tutor.obtenerNombreCompleto());
+            datosComun.setNombreTutor(infoTutor.obtenerNombreCompleto());
             datosComun.setTipoSolicitud(solicitud.getNombre());
             datos.setDatosComunSolicitud(datosComun);
             datos.setEstadoSolicitud(homologaciones.getEstado());

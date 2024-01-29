@@ -29,7 +29,7 @@ gestion-estudiantes-docentes:
   resources:
     docentes-activos: docentes/listar/{estado}
     obtener-estudiante: estudiantes/informacion-personal/{correo}
-    obtener-docente: docentes/obtener-docente/{idDocente}
+    obtener-docente: docentes/obtener-docente/{identificador}
     obtener-estudiante-por-id: estudiantes/informacion-personal-estudiante/{idEstudiante}
 
 gestion-asignaturas:

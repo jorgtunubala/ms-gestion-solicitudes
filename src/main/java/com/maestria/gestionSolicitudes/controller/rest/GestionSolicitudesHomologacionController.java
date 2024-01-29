@@ -12,6 +12,7 @@ import com.maestria.gestionSolicitudes.dto.rest.request.DatosSolicitudHomologaci
 import com.maestria.gestionSolicitudes.dto.rest.response.DatosSolicitudHomologacion;
 import com.maestria.gestionSolicitudes.service.rest.SolicitudesHomologacionService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
@@ -25,9 +26,9 @@ public class GestionSolicitudesHomologacionController {
         return solicitudesHomologacionService.registrarSolicitudHomologacion(dHomologacionDto);
     }
 
-    @GetMapping("/obtener-homologaciones")
-    public List<DatosSolicitudHomologacion> obtenerTodasHomologaciones() {
-        return solicitudesHomologacionService.obtenerTodasHomologaciones();
+    @GetMapping("/obtener-homologaciones/{identificador}")
+    public List<DatosSolicitudHomologacion> obtenerTodasHomologaciones(@PathVariable String identificador) {
+        return solicitudesHomologacionService.obtenerTodasHomologaciones(identificador);
     }
     
 }

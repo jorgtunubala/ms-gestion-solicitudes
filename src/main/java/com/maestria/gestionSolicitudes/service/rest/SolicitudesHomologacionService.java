@@ -9,5 +9,5 @@ public interface SolicitudesHomologacionService {
     
     boolean registrarSolicitudHomologacion(DatosSolicitudHomologacionDto dHomologacionDto);
 
-    List<DatosSolicitudHomologacion> obtenerTodasHomologaciones();
+    List<DatosSolicitudHomologacion> obtenerTodasHomologaciones(String correo);
 }

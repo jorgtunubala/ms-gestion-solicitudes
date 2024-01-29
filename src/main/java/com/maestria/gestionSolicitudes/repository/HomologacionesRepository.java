@@ -12,7 +12,8 @@ public interface HomologacionesRepository extends JpaRepository<Homologaciones, 
     @Query("""
         SELECT h FROM Homologaciones h 
         INNER JOIN h.solicitud s
+        WHERE h.idTutor = ?1
         ORDER BY h.fechaCreacion ASC
         """)           
-    List<Homologaciones> findAllByOrderByFechaCreacionAsc();
+    List<Homologaciones> findAllByIdTutorOrderByFechaCreacionAsc(Integer idTutor);
 }
