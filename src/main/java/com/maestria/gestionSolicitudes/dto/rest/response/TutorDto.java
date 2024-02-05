@@ -1,4 +1,4 @@
-package com.maestria.gestionSolicitudes.dto.rest;
+package com.maestria.gestionSolicitudes.dto.rest.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

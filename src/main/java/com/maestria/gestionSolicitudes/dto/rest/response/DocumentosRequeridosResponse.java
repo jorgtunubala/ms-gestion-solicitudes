@@ -1,7 +1,5 @@
 package com.maestria.gestionSolicitudes.dto.rest.response;
 
-import com.maestria.gestionSolicitudes.dto.rest.DocumentoRequeridoSolicitudDto;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

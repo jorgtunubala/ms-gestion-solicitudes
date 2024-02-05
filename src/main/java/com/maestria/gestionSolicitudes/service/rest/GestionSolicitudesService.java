@@ -3,9 +3,11 @@ package com.maestria.gestionSolicitudes.service.rest;
 import java.util.List;
 
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
-import com.maestria.gestionSolicitudes.dto.rest.DocumentoRequeridoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.TipoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.TutorDto;
+import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
+import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
+import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoRequeridoSolicitudDto;
+import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudPendientesAval;
+import com.maestria.gestionSolicitudes.dto.rest.response.TutorDto;
 
 public interface GestionSolicitudesService {
     
@@ -16,4 +18,8 @@ public interface GestionSolicitudesService {
     InformacionPersonalDto obtenerInformacionPersonal(String correo) throws Exception;
 
     List<TutorDto> obtenerTutotes() throws Exception;
+
+    Boolean registrarSolicitud(SolicitudRequestDto datosSolicitud) throws Exception;
+
+    List<SolicitudPendientesAval> obtenerSolicitudesPendientes(String correo) throws Exception;
 }

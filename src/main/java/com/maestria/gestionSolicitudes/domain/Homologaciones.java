@@ -23,17 +23,9 @@ public class Homologaciones extends EntidadPrincipal {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
-    @Column(name = "id_estudiante")
-    private Integer idEstudiante;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_solicitud")
-    private Solicitud solicitud;
+    private TiposSolicitud solicitud;
 
-    @Column(name = "id_tutor")
-    private Integer idTutor;
-
-    @Column(name = "estado")
-    private String estado;
 }

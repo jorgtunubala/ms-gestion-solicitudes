@@ -5,16 +5,21 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
-import com.maestria.gestionSolicitudes.dto.rest.DocumentoRequeridoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.TipoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.TutorDto;
+import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
+import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
+import com.maestria.gestionSolicitudes.dto.rest.response.DatosSolicitudHomologacion;
+import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoRequeridoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentosRequeridosResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.InformacionPersonalResponse;
+import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudPendientesAval;
 import com.maestria.gestionSolicitudes.dto.rest.response.TipoSolicitudResponse;
+import com.maestria.gestionSolicitudes.dto.rest.response.TutorDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.TutorResponse;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
 
@@ -71,5 +76,15 @@ public class GestionSolicitudesController {
             response.setMensaje(e.getMessage());
         }
         return response;
+    }
+
+    @PostMapping("/save")
+    public Boolean registrarSolicitud(@RequestBody SolicitudRequestDto datosSolicitud) throws Exception {
+        return gestionSolicitudesService.registrarSolicitud(datosSolicitud);
+    }
+
+    @GetMapping("/obtener-solicitudes-pendientes/{identificador}")
+    public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(@PathVariable String identificador) throws Exception {
+        return gestionSolicitudesService.obtenerSolicitudesPendientes(identificador);
     }
 }

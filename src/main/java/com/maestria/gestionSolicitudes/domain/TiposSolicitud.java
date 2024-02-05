@@ -18,11 +18,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="solicitudes")
+@Table(name="tipos_solicitudes")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Solicitud extends EntidadPrincipal {
+public class TiposSolicitud extends EntidadPrincipal {
     
     @Id
     @Column(name = "id")

@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequisitoSolicitud extends EntidadPrincipal {
+public class RequisitoSolicitud extends EntidadPrincipal{
     
     @Id
     @Column(name = "id")
@@ -40,7 +40,7 @@ public class RequisitoSolicitud extends EntidadPrincipal {
     private String tenerEnCuenta;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_solicitud")
-    private Solicitud solicitud;
+    @JoinColumn(name = "id_tipo_solicitud")
+    private TiposSolicitud tipoSolicitud;
 
 }

@@ -2,7 +2,7 @@ package com.maestria.gestionSolicitudes.dto.rest.response;
 
 import java.util.List;
 
-import com.maestria.gestionSolicitudes.dto.rest.TipoSolicitudDto;
+import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
