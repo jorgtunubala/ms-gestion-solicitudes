@@ -10,6 +10,5 @@ public class DatosSolicitudHomologacion {
     private String institutoProcedencia;
     private List<DatosAsignaturaHomologar> datosAsignatura;
     private List<String> documentosAdjuntos;
-    private DatosComunSolicitud datosComunSolicitud;
     private String estadoSolicitud;
 }

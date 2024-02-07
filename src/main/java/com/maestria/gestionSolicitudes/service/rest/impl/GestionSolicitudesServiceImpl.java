@@ -11,16 +11,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.maestria.gestionSolicitudes.comun.enums.ABREVIATURA_SOLICITUD;
-import com.maestria.gestionSolicitudes.comun.enums.ESTADO_SOLICITUD;
+import com.maestria.gestionSolicitudes.comun.enums.*;
 import com.maestria.gestionSolicitudes.domain.*;
+import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
 import com.maestria.gestionSolicitudes.repository.*;
+import com.maestria.gestionSolicitudes.service.client.GestionAsignaturasService;
 import com.maestria.gestionSolicitudes.service.client.GestionDocentesEstudiantesService;
-import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
-import com.maestria.gestionSolicitudes.service.rest.SolicitudesHomologacionService;
+import com.maestria.gestionSolicitudes.service.rest.*;
 
 @Service
 public class GestionSolicitudesServiceImpl implements GestionSolicitudesService {
@@ -41,6 +41,14 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private GestionDocentesEstudiantesService gestionDocentesEstudiantesService;
     @Autowired
     private SolicitudesHomologacionService solicitudesHomologacionService;
+    @Autowired
+    private HomologacionesRepository homologacionRepository;
+    @Autowired
+    private AsignaturasHomologadasRepository asignaturasHomologadasRepository;
+    @Autowired
+    private DocumentosAdjuntosHomologacionRepository documentosAdjuntosHomologacionRepository;
+    @Autowired
+    private GestionAsignaturasService gestionAsignaturasService;
 
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
@@ -116,8 +124,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitud.setTipoSolicitud(tipoSolicitud);
             solicitud.setIdTutor(datosSolicitud.getIdTutor());
             solicitud.setEstado(ESTADO_SOLICITUD.EN_PROGRESO.getDescripcion());
-            solicitudesRepository.save(solicitud);
-            registrarDatosTipoSolicitud(datosSolicitud, tipoSolicitud);
+            Solicitudes registroSolicitud = solicitudesRepository.save(solicitud);
+            registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
             logger.info("Se registró correctamente la solicitud.");
             registro = true;
 
@@ -127,13 +135,13 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         return registro;
     }
 
-    private boolean registrarDatosTipoSolicitud(SolicitudRequestDto datosSolicitud, TiposSolicitud tipoSolicitud){
+    private boolean registrarDatosTipoSolicitud(SolicitudRequestDto datosSolicitud, Integer idSolicitud, String tipoSolicitud){
         boolean registro = false;
-        switch (tipoSolicitud.getCodigo()) {
+        switch (tipoSolicitud) {
             case "HO_ASIG_POS":
                 try {
                     boolean registroHomologacion = solicitudesHomologacionService.
-                        registrarSolicitudHomologacion(datosSolicitud.getIdTipoSolicitud(), datosSolicitud.getDatosHomologacion());
+                        registrarSolicitudHomologacion(idSolicitud, datosSolicitud.getDatosHomologacion());
                     if (registroHomologacion) {
                         logger.info("Se registraron los datos de la homologación satisfactoriamente.");
                         registro = true;
@@ -172,6 +180,71 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitudes.add(solicitudPendiente);
         }
         return solicitudes;
+    }
+
+    @Override
+    public DatosGestionSolicitudResponse obtenerDatosSolicitud(Integer idSolicitud) throws Exception {
+        DatosGestionSolicitudResponse response = new DatosGestionSolicitudResponse();
+        try {
+            Optional<Solicitudes> solicitudOpt = solicitudesRepository.findById(idSolicitud);
+            if (solicitudOpt.isPresent()){
+                Solicitudes solicitud = solicitudOpt.get();
+                DatosComunSolicitud datosComun = new DatosComunSolicitud();
+                datosComun.setTipoSolicitud(solicitud.getTipoSolicitud().getNombre());
+                InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdTutor().toString());
+                InformacionPersonalDto estudiante = gestionDocentesEstudiantesService.obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
+                datosComun.setNombreTutor(tutor.obtenerNombreCompleto());
+                datosComun.setNombreEstudiante(estudiante.obtenerNombreCompleto());
+                datosComun.setEmailEstudiante(estudiante.getCorreo());
+                datosComun.setCodigoEstudiante(estudiante.getCodigoAcademico());
+                datosComun.setCelular(estudiante.getCelular());
+                response.setDatosComunSolicitud(datosComun);
+                switch (solicitud.getTipoSolicitud().getCodigo()) {
+                    case "HO_ASIG_POS":
+                        DatosSolicitudHomologacion datosHomologacion = new DatosSolicitudHomologacion();
+                        Homologaciones homologacion = homologacionRepository.findBySolicitud(solicitud);
+                        if (homologacion != null) {
+                            List<AsignaturasHomologadas> asignaturasHomologadas = asignaturasHomologadasRepository
+                                .findAllByHomologacion(homologacion);
+                                List<DatosAsignaturaHomologar> datosAsignaturaHomologar = new ArrayList<>();
+
+                                String programa = "";
+                                String institucion = "";
+                                for (AsignaturasHomologadas asignatura : asignaturasHomologadas) {
+                                    DatosAsignaturaHomologar datosAsignatura = new DatosAsignaturaHomologar();
+                                    AsignaturaExternaResponseDto asignaturaExternaDto = gestionAsignaturasService
+                                        .obtenerAsignaturaExterna(asignatura.getAsignaturaExterna());
+                                    datosAsignatura.setCalificacion(asignatura.getCalificacionObtenida());
+                                    datosAsignatura.setCreditos(asignaturaExternaDto.getCreditos());
+                                    datosAsignatura.setIntensidadHoraria(asignaturaExternaDto.getIntensidadHoraria());
+                                    datosAsignatura.setNombreAsignatura(asignaturaExternaDto.getNombre());
+                                    programa = asignaturaExternaDto.getPrograma();
+                                    institucion = asignaturaExternaDto.getInstitucion();
+                                    datosAsignaturaHomologar.add(datosAsignatura);
+                                }
+                                List<String> datosAdjuntos = documentosAdjuntosHomologacionRepository
+                                    .findDocumentosByHomologacion(homologacion);
+                                datosHomologacion.setInstitutoProcedencia(institucion);
+                                datosHomologacion.setProgramaProcedencia(programa);
+                                datosHomologacion.setDatosAsignatura(datosAsignaturaHomologar);
+                                datosHomologacion.setDocumentosAdjuntos(datosAdjuntos);
+                                datosHomologacion.setEstadoSolicitud(solicitud.getEstado());
+                                response.setDatosSolicitudHomologacion(datosHomologacion);
+                        }
+                        break;
+                
+                    default:
+                        logger.info("No se encontró tipo de solicitud para retornar la información de la solicitud.");
+                        break;
+                }
+                logger.info("Se obtienen los datos de la solicitud satisfactoriamente.");
+            } else {
+                logger.info("No se obtuvo ningun dato para la solicitud con id: " + idSolicitud);
+            }
+        } catch (Exception e) {
+            logger.error("Ocurrió un error al obtener los datos de la solicitud. ", e);
+        }
+        return response;
     }
 
 }

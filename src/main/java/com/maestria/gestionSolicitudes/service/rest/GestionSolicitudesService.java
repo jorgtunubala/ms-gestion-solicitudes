@@ -5,9 +5,7 @@ import java.util.List;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoRequeridoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudPendientesAval;
-import com.maestria.gestionSolicitudes.dto.rest.response.TutorDto;
+import com.maestria.gestionSolicitudes.dto.rest.response.*;
 
 public interface GestionSolicitudesService {
     
@@ -22,4 +20,6 @@ public interface GestionSolicitudesService {
     Boolean registrarSolicitud(SolicitudRequestDto datosSolicitud) throws Exception;
 
     List<SolicitudPendientesAval> obtenerSolicitudesPendientes(String correo) throws Exception;
+
+    DatosGestionSolicitudResponse obtenerDatosSolicitud(Integer idSolicitud) throws Exception;
 }

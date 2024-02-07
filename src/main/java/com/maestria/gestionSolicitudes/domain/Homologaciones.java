@@ -26,6 +26,6 @@ public class Homologaciones extends EntidadPrincipal {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_solicitud")
-    private TiposSolicitud solicitud;
+    private Solicitudes solicitud;
 
 }

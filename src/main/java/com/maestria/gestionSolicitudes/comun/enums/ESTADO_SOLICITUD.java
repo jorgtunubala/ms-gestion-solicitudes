@@ -1,7 +1,8 @@
 package com.maestria.gestionSolicitudes.comun.enums;
 
 public enum ESTADO_SOLICITUD {
-    PENDIENTE("Pendiente"),
+    PENDIENTE_AVAL("Pendiente Aval"),
+    RECIBIDO("Recibido"),
     EN_PROGRESO("En progreso"),
     COMPLETADO("Completado"),
     CANCELADO("Cancelado");

@@ -1,41 +1,23 @@
 package com.maestria.gestionSolicitudes.service.rest.impl;
 
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.maestria.gestionSolicitudes.comun.enums.ABREVIATURA_SOLICITUD;
 import com.maestria.gestionSolicitudes.comun.enums.ESTADO_SOLICITUD;
-import com.maestria.gestionSolicitudes.domain.AsignaturasHomologadas;
-import com.maestria.gestionSolicitudes.domain.DocumentosAdjuntosHomologacion;
-import com.maestria.gestionSolicitudes.domain.Homologaciones;
-import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
-import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaDto;
-import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
-import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
-import com.maestria.gestionSolicitudes.dto.rest.request.DatosAsignaturaHomologacionDto;
-import com.maestria.gestionSolicitudes.dto.rest.request.DatosHomologacionDto;
-import com.maestria.gestionSolicitudes.dto.rest.request.DatosSolicitudHomologacionDto;
-import com.maestria.gestionSolicitudes.dto.rest.response.DatosAsignaturaHomologar;
-import com.maestria.gestionSolicitudes.dto.rest.response.DatosComunSolicitud;
-import com.maestria.gestionSolicitudes.dto.rest.response.DatosSolicitudHomologacion;
-import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudPendientesAval;
-import com.maestria.gestionSolicitudes.repository.AsignaturasHomologadasRepository;
-import com.maestria.gestionSolicitudes.repository.DocumentosAdjuntosHomologacionRepository;
-import com.maestria.gestionSolicitudes.repository.HomologacionesRepository;
-import com.maestria.gestionSolicitudes.repository.TiposSolicitudRepository;
-import com.maestria.gestionSolicitudes.service.client.GestionAsignaturasService;
-import com.maestria.gestionSolicitudes.service.client.GestionDocentesEstudiantesService;
+import com.maestria.gestionSolicitudes.domain.*;
+import com.maestria.gestionSolicitudes.dto.client.*;
+import com.maestria.gestionSolicitudes.dto.rest.request.*;
+import com.maestria.gestionSolicitudes.repository.*;
+import com.maestria.gestionSolicitudes.service.client.*;
 import com.maestria.gestionSolicitudes.service.rest.SolicitudesHomologacionService;
 
 @Service
 public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologacionService {
 
     @Autowired
-    private TiposSolicitudRepository solicitudRepository;
+    private SolicitudesRepository solicitudRepository;
     @Autowired
     private HomologacionesRepository homologacionesRepository;
     @Autowired
@@ -44,14 +26,12 @@ public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologaci
     private AsignaturasHomologadasRepository asignaturasHomologadasRepository;
     @Autowired
     private DocumentosAdjuntosHomologacionRepository documentosAdjuntosHomologacionRepository;
-    @Autowired
-    private GestionDocentesEstudiantesService gestionDocentesEstudiantesService;    
     
 
     @Override
-    public boolean registrarSolicitudHomologacion(Integer tipoSolicitud, DatosSolicitudHomologacionDto dHomologacionDto) {
+    public boolean registrarSolicitudHomologacion(Integer idSolicitud, DatosSolicitudHomologacionDto dHomologacionDto) {
         try {
-            TiposSolicitud solicitud = solicitudRepository.findById(tipoSolicitud).get();
+            Solicitudes solicitud = solicitudRepository.findById(idSolicitud).get();
             Homologaciones homologacion = new Homologaciones();
             homologacion.setSolicitud(solicitud);
             Homologaciones registroHomologacion = homologacionesRepository.save(homologacion); 
@@ -97,7 +77,7 @@ public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologaci
                 asignaturasHomologadas.setAsignaturaHomologar(null);
                 asignaturasHomologadas.setAsignaturaExterna(asignaturaExternaResponseDto.getIdAsignatura());
                 asignaturasHomologadas.setCalificacionObtenida(datosAsignaturaHomologacionDto.getCalificacion());
-                asignaturasHomologadas.setEstado(ESTADO_SOLICITUD.PENDIENTE.getDescripcion());
+                asignaturasHomologadas.setEstado(ESTADO_SOLICITUD.PENDIENTE_AVAL.getDescripcion());
                 asignaturasHomologadasRepository.save(asignaturasHomologadas);
             }
             return Boolean.TRUE;

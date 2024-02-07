@@ -3,7 +3,7 @@ package com.maestria.gestionSolicitudes.dto.rest.response;
 import lombok.Data;
 
 @Data
-public class DatosGestionSolicitud {
+public class DatosGestionSolicitudResponse {
     
     private DatosComunSolicitud datosComunSolicitud;
     private DatosSolicitudHomologacion datosSolicitudHomologacion;

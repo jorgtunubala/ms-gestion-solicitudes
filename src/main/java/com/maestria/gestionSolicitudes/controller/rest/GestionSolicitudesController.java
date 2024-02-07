@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
+import com.maestria.gestionSolicitudes.dto.rest.response.DatosGestionSolicitudResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.DatosSolicitudHomologacion;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoRequeridoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentosRequeridosResponse;
@@ -86,5 +87,10 @@ public class GestionSolicitudesController {
     @GetMapping("/obtener-solicitudes-pendientes/{identificador}")
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(@PathVariable String identificador) throws Exception {
         return gestionSolicitudesService.obtenerSolicitudesPendientes(identificador);
+    }
+
+    @GetMapping("/obtener-datos-solicitud/{idSolicitud}")
+    public DatosGestionSolicitudResponse obtenerDatosSolicitud(@PathVariable Integer idSolicitud) throws Exception {
+        return gestionSolicitudesService.obtenerDatosSolicitud(idSolicitud);
     }
 }
