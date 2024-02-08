@@ -190,14 +190,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             if (solicitudOpt.isPresent()){
                 Solicitudes solicitud = solicitudOpt.get();
                 DatosComunSolicitud datosComun = new DatosComunSolicitud();
-                datosComun.setTipoSolicitud(solicitud.getTipoSolicitud().getNombre());
                 InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdTutor().toString());
                 InformacionPersonalDto estudiante = gestionDocentesEstudiantesService.obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
+                datosComun.setTipoSolicitud(solicitud.getTipoSolicitud().getNombre());
+                // Formatear la fecha y hora en el formato deseado
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                datosComun.setFechaEnvioSolicitud(solicitud.getFechaCreacion().format(formatter));
+                datosComun.setNombreSolicitante(estudiante.getNombres());
+                datosComun.setApellidoSolicitante(estudiante.getApellidos());
+                datosComun.setCodigoSolicitante(estudiante.getCodigoAcademico());
+                datosComun.setEmailSolicitante(estudiante.getCorreo());
+                datosComun.setCelularSolicitante(estudiante.getCelular());
+                datosComun.setTipoIdentSolicitante(estudiante.getTipoDocumento());
+                datosComun.setNumeroIdentSolicitante(estudiante.getNumeroDocumento());
                 datosComun.setNombreTutor(tutor.obtenerNombreCompleto());
-                datosComun.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-                datosComun.setEmailEstudiante(estudiante.getCorreo());
-                datosComun.setCodigoEstudiante(estudiante.getCodigoAcademico());
-                datosComun.setCelular(estudiante.getCelular());
                 response.setDatosComunSolicitud(datosComun);
                 switch (solicitud.getTipoSolicitud().getCodigo()) {
                     case "HO_ASIG_POS":
