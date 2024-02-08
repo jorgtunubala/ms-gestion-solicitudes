@@ -194,7 +194,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 InformacionPersonalDto estudiante = gestionDocentesEstudiantesService.obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
                 datosComun.setTipoSolicitud(solicitud.getTipoSolicitud().getNombre());
                 // Formatear la fecha y hora en el formato deseado
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 datosComun.setFechaEnvioSolicitud(solicitud.getFechaCreacion().format(formatter));
                 datosComun.setNombreSolicitante(estudiante.getNombres());
                 datosComun.setApellidoSolicitante(estudiante.getApellidos());
