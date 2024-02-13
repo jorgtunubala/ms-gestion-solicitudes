@@ -49,6 +49,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private DocumentosAdjuntosHomologacionRepository documentosAdjuntosHomologacionRepository;
     @Autowired
     private GestionAsignaturasService gestionAsignaturasService;
+    @Autowired
+    private FirmaSolicitudRepository firmaSolicitudRepository;
 
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
@@ -124,8 +126,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitud.setTipoSolicitud(tipoSolicitud);
             solicitud.setIdTutor(datosSolicitud.getIdTutor());
             solicitud.setEstado(ESTADO_SOLICITUD.EN_PROGRESO.getDescripcion());
+            solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
             Solicitudes registroSolicitud = solicitudesRepository.save(solicitud);
             registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
+            registrarFirmaEstudiante(registroSolicitud, datosSolicitud.getFirmaEstudiante());
             logger.info("Se registró correctamente la solicitud.");
             registro = true;
 
@@ -177,6 +181,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitudPendiente.setNombreEstudiante(estudiante.obtenerNombreCompleto());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             solicitudPendiente.setFecha(solicitud.getFechaCreacion().format(formatter));
+            solicitudPendiente.setRequiereFirmaDirector(solicitud.getRequiereFirmaDirector());
             solicitudes.add(solicitudPendiente);
         }
         return solicitudes;
@@ -251,6 +256,17 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             logger.error("Ocurrió un error al obtener los datos de la solicitud. ", e);
         }
         return response;
+    }
+
+    private void registrarFirmaEstudiante(Solicitudes solicitud, String firmaEstudiante){
+        try {
+            FirmaSolicitud firmaSolicitud = new FirmaSolicitud();
+            firmaSolicitud.setSolicitud(solicitud);
+            firmaSolicitud.setFirmaEstudiante(firmaEstudiante);
+            firmaSolicitudRepository.save(firmaSolicitud);
+        } catch (Exception e) {
+            logger.error("Ocurrió un error inesperado al guardar los datos de la homologación.", e);            
+        }
     }
 
 }

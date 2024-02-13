@@ -8,4 +8,6 @@ public class SolicitudRequestDto {
     private Integer idEstudiante;
     private Integer idTutor;
     private DatosSolicitudHomologacionDto datosHomologacion;
+    private Boolean requiereFirmaDirector;
+    private String firmaEstudiante;
 }

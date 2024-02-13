@@ -19,31 +19,27 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="solicitudes")
+@Table(name="firmas_solicitud")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Solicitudes extends EntidadPrincipal {
+public class FirmaSolicitud {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "id_estudiante")
-    private Integer idEstudiante;
-
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_tipo_solicitud")
-    private TiposSolicitud tipoSolicitud;
+    @JoinColumn(name = "id_solicitud")
+    private Solicitudes solicitud;
 
-    @Column(name = "id_tutor")
-    private Integer idTutor;
+    @Column(name = "firma_tutor")
+    private String firmaTutor;
 
-    @Column(name = "estado")
-    private String estado;
+    @Column(name = "firma_estudiante")
+    private String firmaEstudiante;
 
-    @Column(name = "requiere_firma_director")
-    @Convert(converter = BooleanConverter.class)
-    private Boolean requiereFirmaDirector;
+    @Column(name = "firma_director")
+    private String firmaDirector;
 }
