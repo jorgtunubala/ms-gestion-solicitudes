@@ -180,8 +180,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitudPendiente.setAbreviatura(ABREVIATURA_SOLICITUD.valueOf(tipoSolicitud.getCodigo()).getDescripcion());
             solicitudPendiente.setNombreEstudiante(estudiante.obtenerNombreCompleto());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            solicitudPendiente.setFecha(solicitud.getFechaCreacion().format(formatter));
-            solicitudPendiente.setRequiereFirmaDirector(solicitud.getRequiereFirmaDirector());
+            solicitudPendiente.setFecha(solicitud.getFechaCreacion().format(formatter));            
             solicitudes.add(solicitudPendiente);
         }
         return solicitudes;
@@ -209,6 +208,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosComun.setTipoIdentSolicitante(estudiante.getTipoDocumento());
                 datosComun.setNumeroIdentSolicitante(estudiante.getNumeroDocumento());
                 datosComun.setNombreTutor(tutor.obtenerNombreCompleto());
+                datosComun.setRequiereFirmaDirector(solicitud.getRequiereFirmaDirector());
+                FirmaSolicitud firmaSolicitud = firmaSolicitudRepository.findBySolicitud(solicitud);
+                datosComun.setFirmaSolicitante(firmaSolicitud.getFirmaEstudiante());
                 response.setDatosComunSolicitud(datosComun);
                 switch (solicitud.getTipoSolicitud().getCodigo()) {
                     case "HO_ASIG_POS":

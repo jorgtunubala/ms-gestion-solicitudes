@@ -10,5 +10,4 @@ public class SolicitudPendientesAval {
     private String nombreTipoSolicitud;
     private String abreviatura;
     private String fecha;
-    private Boolean requiereFirmaDirector;
 }

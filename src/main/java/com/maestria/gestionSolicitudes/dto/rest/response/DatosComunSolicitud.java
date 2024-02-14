@@ -15,5 +15,7 @@ public class DatosComunSolicitud {
     private String numeroIdentSolicitante;
     private String nombreTutor;
     private String nombreDirector;
+    private Boolean requiereFirmaDirector;
+    private String firmaSolicitante;
 
 }
