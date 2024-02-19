@@ -46,4 +46,7 @@ public class Solicitudes extends EntidadPrincipal {
     @Column(name = "requiere_firma_director")
     @Convert(converter = BooleanConverter.class)
     private Boolean requiereFirmaDirector;
+
+    @Column(name = "documento_firmado")
+    private String documentoFirmado;
 }

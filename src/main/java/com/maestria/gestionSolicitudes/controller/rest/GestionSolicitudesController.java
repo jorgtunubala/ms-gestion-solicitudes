@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
+import com.maestria.gestionSolicitudes.dto.rest.request.DatosAvalarSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DatosGestionSolicitudResponse;
@@ -92,5 +93,10 @@ public class GestionSolicitudesController {
     @GetMapping("/obtener-datos-solicitud/{idSolicitud}")
     public DatosGestionSolicitudResponse obtenerDatosSolicitud(@PathVariable Integer idSolicitud) throws Exception {
         return gestionSolicitudesService.obtenerDatosSolicitud(idSolicitud);
+    }
+
+    @PostMapping("/save/firmas")
+    public Boolean registrarFirmasSolicitud(@RequestBody DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception {
+        return gestionSolicitudesService.registrarFirmasPendientes(dAvalarSolicitudDto);
     }
 }

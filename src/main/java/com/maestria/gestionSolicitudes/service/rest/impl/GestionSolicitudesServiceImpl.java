@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -211,6 +212,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosComun.setRequiereFirmaDirector(solicitud.getRequiereFirmaDirector());
                 FirmaSolicitud firmaSolicitud = firmaSolicitudRepository.findBySolicitud(solicitud);
                 datosComun.setFirmaSolicitante(firmaSolicitud.getFirmaEstudiante());
+                datosComun.setFirmaTutor(firmaSolicitud.getFirmaTutor());
+                datosComun.setFirmaDirector(firmaSolicitud.getFirmaDirector());
                 response.setDatosComunSolicitud(datosComun);
                 switch (solicitud.getTipoSolicitud().getCodigo()) {
                     case "HO_ASIG_POS":
@@ -269,6 +272,45 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         } catch (Exception e) {
             logger.error("Ocurrió un error inesperado al guardar los datos de la homologación.", e);            
         }
+    }
+
+    @Override
+    public Boolean registrarFirmasPendientes(DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception {
+        Boolean registroDocumento = Boolean.FALSE;
+        Boolean registroFirma = Boolean.FALSE;
+        Solicitudes solicitud = solicitudesRepository.findById(dAvalarSolicitudDto.getIdSolicitud()).get();
+        FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
+        String firmaTutor = dAvalarSolicitudDto.getFirmaTutor();
+        String firmaDirector = dAvalarSolicitudDto.getFirmaDirector();
+        if (solicitud.getRequiereFirmaDirector()){
+            if (StringUtils.isNotBlank(firmaTutor) && StringUtils.isNotBlank(firmaDirector)) {
+                firmas.setFirmaTutor(firmaTutor);
+                firmas.setFirmaDirector(firmaDirector);
+                firmaSolicitudRepository.save(firmas);
+                registroDocumento = Boolean.TRUE;
+                registroFirma = Boolean.TRUE;
+            } else if (StringUtils.isNotBlank(firmaTutor)){
+                firmas.setFirmaTutor(firmaTutor);
+                firmaSolicitudRepository.save(firmas);
+                registroFirma = Boolean.TRUE;
+            } else if (StringUtils.isNotBlank(firmaDirector)){
+                firmas.setFirmaDirector(firmaDirector);
+                firmaSolicitudRepository.save(firmas);
+                registroFirma = Boolean.TRUE;
+            }
+        } else {
+            if (StringUtils.isNotBlank(firmaTutor)) {
+                firmas.setFirmaTutor(firmaTutor);
+                firmaSolicitudRepository.save(firmas);
+                registroDocumento = Boolean.TRUE;
+                registroFirma = Boolean.TRUE;
+            }
+        }
+        if (registroDocumento) {
+            solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
+            solicitudesRepository.save(solicitud);
+        }
+        return registroFirma;
     }
 
 }
