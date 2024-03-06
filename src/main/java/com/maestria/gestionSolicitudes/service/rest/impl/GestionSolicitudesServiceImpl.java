@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.maestria.gestionSolicitudes.comun.enums.*;
 import com.maestria.gestionSolicitudes.domain.*;
@@ -116,6 +117,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     }
 
     @Override
+    @Transactional
     public Boolean registrarSolicitud(SolicitudRequestDto datosSolicitud) throws Exception {
         Boolean registro = Boolean.FALSE;
         try {
@@ -129,20 +131,31 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitud.setEstado(ESTADO_SOLICITUD.EN_PROGRESO.getDescripcion());
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
             Solicitudes registroSolicitud = solicitudesRepository.save(solicitud);
-            registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
-            registrarFirmaEstudiante(registroSolicitud, datosSolicitud.getFirmaEstudiante());
-            logger.info("Se registró correctamente la solicitud.");
-            registro = true;
-
+            boolean datosTipoSolicitudRegistrados = registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
+            boolean firmaEstudianteRegistrada = registrarFirmaEstudiante(registroSolicitud, datosSolicitud.getFirmaEstudiante());
+            // Verificar si todas las operaciones fueron exitosas
+            if (datosTipoSolicitudRegistrados && firmaEstudianteRegistrada) {
+                registro = Boolean.TRUE;
+                logger.info("Se registró correctamente la solicitud.");
+            } else {                
+                logger.error("Ocurrió un error al registrar la solicitud.");
+                throw new Exception("Error al registrar la solicitud.");
+            }
         } catch (Exception e) {
             logger.error("Ocurrió un error inesperado al registrar la solicitud.", e);
+            throw e;
         }
         return registro;
     }
 
-    private boolean registrarDatosTipoSolicitud(SolicitudRequestDto datosSolicitud, Integer idSolicitud, String tipoSolicitud){
+    @Transactional
+    private boolean registrarDatosTipoSolicitud(SolicitudRequestDto datosSolicitud, Integer idSolicitud, String tipoSolicitud) throws Exception{
         boolean registro = false;
         switch (tipoSolicitud) {
+            case "AD_ASIG":
+                
+                break;
+            case "HO_ASIG_ESP":                
             case "HO_ASIG_POS":
                 try {
                     boolean registroHomologacion = solicitudesHomologacionService.
@@ -154,13 +167,14 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 } catch (Exception e) {
                     logger.error("Ocurrió un error inesperado al guardar los datos de la homologación.", e);
                     registro = false;
+                    throw e;
                 }
                 break;
         
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
                 registro = false;
-                break;
+                throw new Exception("Tipo de solicitud no encontrado: " + tipoSolicitud); // Lanzar excepción para revertir la transacción
         }
         return registro;
     }
@@ -216,6 +230,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosComun.setFirmaDirector(firmaSolicitud.getFirmaDirector());
                 response.setDatosComunSolicitud(datosComun);
                 switch (solicitud.getTipoSolicitud().getCodigo()) {
+                    case "HO_ASIG_ESP":
                     case "HO_ASIG_POS":
                         DatosSolicitudHomologacion datosHomologacion = new DatosSolicitudHomologacion();
                         Homologaciones homologacion = homologacionRepository.findBySolicitud(solicitud);
@@ -263,14 +278,17 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         return response;
     }
 
-    private void registrarFirmaEstudiante(Solicitudes solicitud, String firmaEstudiante){
+    @Transactional
+    private Boolean registrarFirmaEstudiante(Solicitudes solicitud, String firmaEstudiante) throws Exception{
         try {
             FirmaSolicitud firmaSolicitud = new FirmaSolicitud();
             firmaSolicitud.setSolicitud(solicitud);
             firmaSolicitud.setFirmaEstudiante(firmaEstudiante);
             firmaSolicitudRepository.save(firmaSolicitud);
+            return  Boolean.TRUE;
         } catch (Exception e) {
-            logger.error("Ocurrió un error inesperado al guardar los datos de la homologación.", e);            
+            logger.error("Ocurrió un error inesperado al guardar la firma del estudiante.", e);            
+            return Boolean.FALSE;
         }
     }
 
@@ -308,6 +326,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         }
         if (registroDocumento) {
             solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
+            solicitud.setEstado(ESTADO_SOLICITUD.AVALADO.getDescripcion());
             solicitudesRepository.save(solicitud);
         }
         return registroFirma;
