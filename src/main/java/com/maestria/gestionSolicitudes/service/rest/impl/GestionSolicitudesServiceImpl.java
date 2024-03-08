@@ -183,7 +183,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(String correo) throws Exception {
         List<SolicitudPendientesAval> solicitudes = new ArrayList<>();
         InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(correo);
-        List<Solicitudes> solicitudesPendientes = solicitudesRepository.findAllByIdTutorOrderByFechaCreacionAsc(infoTutor.getId());
+        List<Solicitudes> solicitudesPendientes = solicitudesRepository.findAllByIdTutorOrderByFechaCreacionAsc(infoTutor.getId(), ESTADO_SOLICITUD.EN_PROGRESO.getDescripcion());
         for (Solicitudes solicitud : solicitudesPendientes) {
             TiposSolicitud tipoSolicitud = tipoSolicitudRepository.findById(solicitud.getTipoSolicitud().getId()).get();
             InformacionPersonalDto estudiante = gestionDocentesEstudiantesService

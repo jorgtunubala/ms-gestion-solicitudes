@@ -10,9 +10,10 @@ import com.maestria.gestionSolicitudes.domain.Solicitudes;
 public interface SolicitudesRepository extends JpaRepository<Solicitudes, Integer> {
     
     @Query("""
-        SELECT h FROM Solicitudes h 
-        WHERE h.idTutor = ?1
-        ORDER BY h.fechaCreacion ASC
+        SELECT s FROM Solicitudes s 
+        WHERE s.idTutor = ?1
+        AND s.estado = ?2
+        ORDER BY s.fechaCreacion ASC
         """)           
-    List<Solicitudes> findAllByIdTutorOrderByFechaCreacionAsc(Integer idTutor);
+    List<Solicitudes> findAllByIdTutorOrderByFechaCreacionAsc(Integer idTutor, String estado);
 }
