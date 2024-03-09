@@ -53,6 +53,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private GestionAsignaturasService gestionAsignaturasService;
     @Autowired
     private FirmaSolicitudRepository firmaSolicitudRepository;
+    @Autowired
+    private AdicionAsignaturaService adicionAsignaturaService;
 
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
@@ -153,7 +155,17 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         boolean registro = false;
         switch (tipoSolicitud) {
             case "AD_ASIG":
-                
+                try {
+                    boolean registroAdicion = registrarAdicionAsignatura(idSolicitud, datosSolicitud.getDatosAdicionAsignatura());
+                    if (registroAdicion) {
+                        logger.info("Se registraron los datos de la adición asignaturas satisfactoriamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la adición asignaturas.", e);
+                    registro = false;
+                    throw e;
+                }
                 break;
             case "HO_ASIG_ESP":                
             case "HO_ASIG_POS":
@@ -332,4 +344,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         return registroFirma;
     }
 
+    private boolean registrarAdicionAsignatura(Integer idSolicitud, List<Integer> listaAsignaturas) throws Exception {
+        Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+        return adicionAsignaturaService.registrarAdicionAsignaturas(solicitud, listaAsignaturas);
+    }
 }

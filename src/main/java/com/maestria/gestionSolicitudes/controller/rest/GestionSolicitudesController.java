@@ -15,7 +15,6 @@ import com.maestria.gestionSolicitudes.dto.rest.request.DatosAvalarSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DatosGestionSolicitudResponse;
-import com.maestria.gestionSolicitudes.dto.rest.response.DatosSolicitudHomologacion;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoRequeridoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentosRequeridosResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.InformacionPersonalResponse;
