@@ -40,3 +40,4 @@ gestion-asignaturas:
     crear-asignaturas-externas: asignaturasExternas
     obtener-asignatura: asignaturasExternas/obtener-asignatura/{idAsignatura}
     docentes-asignaturas: asignaturas/docentes-asignaturas
+    asignaturas-adicionar: asignaturas/asignaturas-adicionar/{lista}
