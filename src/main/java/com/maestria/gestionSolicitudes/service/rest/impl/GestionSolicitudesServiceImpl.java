@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.maestria.gestionSolicitudes.comun.enums.*;
 import com.maestria.gestionSolicitudes.domain.*;
 import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
+import com.maestria.gestionSolicitudes.dto.client.DocentesAsignaturasResponse;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
@@ -55,6 +56,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private FirmaSolicitudRepository firmaSolicitudRepository;
     @Autowired
     private AdicionAsignaturaService adicionAsignaturaService;
+    @Autowired
+    private AdicionarAsignaturaRepository adicionarAsignaturaRepository;
+    @Autowired
+    private AsignaturaAdicionadaRepository asignaturaAdicionadaRepository;
 
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
@@ -240,8 +245,30 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosComun.setFirmaSolicitante(firmaSolicitud.getFirmaEstudiante());
                 datosComun.setFirmaTutor(firmaSolicitud.getFirmaTutor());
                 datosComun.setFirmaDirector(firmaSolicitud.getFirmaDirector());
+                datosComun.setEstadoSolicitud(solicitud.getEstado());
                 response.setDatosComunSolicitud(datosComun);
                 switch (solicitud.getTipoSolicitud().getCodigo()) {
+                    case "AD_ASIG":                        
+                        AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
+                        List<AsignaturaAdicionada> asignaturaAdicionadas = asignaturaAdicionadaRepository
+                                        .findByAdicionarAsignatura(adicionarAsignatura);
+                        List<Integer> lista = new ArrayList<>();
+                        for (AsignaturaAdicionada asignaturaAdicionada : asignaturaAdicionadas) {
+                            lista.add(asignaturaAdicionada.getIdAsignatura());
+                        }
+                        List<DocentesAsignaturasResponse> lAsignaturasResponses = gestionAsignaturasService
+                                .obtenerDocentesAsignaturas(lista);
+                        DatosSolicitudAdicionCancelacionAsignatura dAdicionCancelacionAsignatura = new DatosSolicitudAdicionCancelacionAsignatura();
+                        List<InfoAdicionCancelacion> lInfoAdicionCancelacions = new ArrayList<>();
+                        for (DocentesAsignaturasResponse dAsignaturasResponse : lAsignaturasResponses) {                            
+                            InfoAdicionCancelacion info = new InfoAdicionCancelacion();
+                            info.setNombreAsignatura(dAsignaturasResponse.getNombreAsignatura());
+                            info.setGrupo(dAsignaturasResponse.getCodigoAsignatura());
+                            lInfoAdicionCancelacions.add(info);
+                        }
+                        dAdicionCancelacionAsignatura.setListaAsignaturas(lInfoAdicionCancelacions);
+                        response.setDAdicionCancelacionAsignatura(dAdicionCancelacionAsignatura);
+                        break;
                     case "HO_ASIG_ESP":
                     case "HO_ASIG_POS":
                         DatosSolicitudHomologacion datosHomologacion = new DatosSolicitudHomologacion();
@@ -270,8 +297,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                                 datosHomologacion.setInstitutoProcedencia(institucion);
                                 datosHomologacion.setProgramaProcedencia(programa);
                                 datosHomologacion.setDatosAsignatura(datosAsignaturaHomologar);
-                                datosHomologacion.setDocumentosAdjuntos(datosAdjuntos);
-                                datosHomologacion.setEstadoSolicitud(solicitud.getEstado());
+                                datosHomologacion.setDocumentosAdjuntos(datosAdjuntos);                                
                                 response.setDatosSolicitudHomologacion(datosHomologacion);
                         }
                         break;

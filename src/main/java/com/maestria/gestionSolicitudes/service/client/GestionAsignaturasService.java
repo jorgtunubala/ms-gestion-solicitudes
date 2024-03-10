@@ -22,4 +22,7 @@ public interface GestionAsignaturasService {
 
     @GetMapping("${gestion-asignaturas.resources.docentes-asignaturas}")
     List<DocentesAsignaturasResponse> listarDocentesAsignaturas();
+
+    @GetMapping("${gestion-asignaturas.resources.asignaturas-adicionar}")
+    List<DocentesAsignaturasResponse> obtenerDocentesAsignaturas(@PathVariable List<Integer> lista);
 }
