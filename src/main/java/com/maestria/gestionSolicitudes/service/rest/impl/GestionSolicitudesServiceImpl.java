@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.maestria.gestionSolicitudes.comun.enums.*;
 import com.maestria.gestionSolicitudes.domain.*;
 import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
-import com.maestria.gestionSolicitudes.dto.client.DocentesAsignaturasResponse;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
@@ -60,10 +59,19 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private AdicionarAsignaturaRepository adicionarAsignaturaRepository;
     @Autowired
     private AsignaturaAdicionadaRepository asignaturaAdicionadaRepository;
+    @Autowired
+    private CancelarAsignaturaRepository cancelarAsignaturaRepository;
+    @Autowired
+    private AsignaturaCanceladaRepository asignaturaCanceladaRepository;
 
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
-        List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findAll();
+        /*
+         * Función que se encarga de retornar los tipos de solcitudes activas.
+        */
+        
+        // Buscamos en la tabla tipos_solicitudes y retornamos los tipos de solicitudes en esatado ACTIVO
+        List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstado("ACTIVO");
         List<TipoSolicitudDto> tiposSolicitudDtos = new ArrayList<>();
         for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
             TipoSolicitudDto tiposSolicitudDto = new TipoSolicitudDto();
@@ -77,6 +85,12 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     @Override
     public DocumentoRequeridoSolicitudDto getRequisitoSolicitudAndDocumentosAndNotasPorSolicitudId(String codigo) throws Exception {
+        /* 
+         * Función que se encarga de retornar toda la información de los requisitos 
+         * requeridos por cada solicitud.
+        */
+        
+        // Buscamos los requisitos requeridos asociados a la solicitud.
         Optional<RequisitoSolicitud> optionalRequisitoSolicitud = requisitoSolicitudRepository.findByCodigo(codigo);
         DocumentoRequeridoSolicitudDto dSolicitudDto = new DocumentoRequeridoSolicitudDto();
         if (optionalRequisitoSolicitud.isPresent()){
@@ -85,12 +99,14 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             dSolicitudDto.setDescripcion(requisitoSolicitud.getDescripcion());
             dSolicitudDto.setTenerEnCuenta(requisitoSolicitud.getTenerEnCuenta());
             dSolicitudDto.setArticulo(requisitoSolicitud.getArticulo());
+            // Anexamos los documentos requeridos de la solicitud
             List<DocumentoRequisitoSolicitud> lRequisitoSolicituds = dSolicitudRepository.findByRequisitoSolicitudId(requisitoSolicitud.getId());
             List<String> lDocumentos = new ArrayList<>();
             for (DocumentoRequisitoSolicitud documentoRequisitoSolicitud : lRequisitoSolicituds) {
                 lDocumentos.add(documentoRequisitoSolicitud.getNombreDocumento());
             }
             dSolicitudDto.setDocumentosRequeridos(lDocumentos);
+            // Buscamos Notas que pueden estar asociadas a la solicitud.
             List<NotaDocumentoRequerido> lNotaDocumentoRequeridos = notaDocumentoRequeridoRepository.findByRequisitoSolicitudId(requisitoSolicitud.getTipoSolicitud().getId());
             List<String> notas = new ArrayList<>();
             for (NotaDocumentoRequerido notaDocumentoRequerido : lNotaDocumentoRequeridos) {
@@ -105,11 +121,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     @Override
     public InformacionPersonalDto obtenerInformacionPersonal(String correo) throws Exception {
+        /*
+         * Función que se encarga de retornar la información personal de un Estudiante
+         * a partir de su correo.
+         * La función consume el servicio suministrado por el microservicio ms-gestion-docentes-estudiantes
+        */
         return gestionDocentesEstudiantesService.obtenerInformacionEstudiante(correo);
     }
 
     @Override
     public List<TutorDto> obtenerTutotes() throws Exception {
+        /*
+         * Función que se encarga de retornar la información personal de los docentes activos.         
+         * La función consume el servicio suministrado por el microservicio ms-gestion-docentes-estudiantes
+        */
         List<TutorDto> tutorDtos = gestionDocentesEstudiantesService.obtenerDocentesActivos("ACTIVO")
         .stream()
         .map(docente -> {
@@ -126,20 +151,30 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     @Override
     @Transactional
     public Boolean registrarSolicitud(SolicitudRequestDto datosSolicitud) throws Exception {
+        /*
+         * Función que se encarga de registrar toda la información de cada solicitud de cualquier tipo.
+        */
         Boolean registro = Boolean.FALSE;
         try {
             logger.info("Inicia proceso registrar solicitud...");
+            // Buscamos el tipo de solciitud a asociar en el regsitro de la solicitud.
             TiposSolicitud tipoSolicitud = tipoSolicitudRepository
                 .findById(datosSolicitud.getIdTipoSolicitud()).get();
             Solicitudes solicitud = new Solicitudes();
+            // Asignamos los datos necesarios de la solicitud.
             solicitud.setIdEstudiante(datosSolicitud.getIdEstudiante());
             solicitud.setTipoSolicitud(tipoSolicitud);
             solicitud.setIdTutor(datosSolicitud.getIdTutor());
             solicitud.setEstado(ESTADO_SOLICITUD.EN_PROGRESO.getDescripcion());
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
             Solicitudes registroSolicitud = solicitudesRepository.save(solicitud);
+
+            // Utilizamos la siguiente función para guardar otros datos de la solicitud según su tipo.
             boolean datosTipoSolicitudRegistrados = registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
+            
+            // Utilizamos la siguiente función para garantizar la firma del estudiante en la solicitud.
             boolean firmaEstudianteRegistrada = registrarFirmaEstudiante(registroSolicitud, datosSolicitud.getFirmaEstudiante());
+            
             // Verificar si todas las operaciones fueron exitosas
             if (datosTipoSolicitudRegistrados && firmaEstudianteRegistrada) {
                 registro = Boolean.TRUE;
@@ -168,6 +203,19 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     }
                 } catch (Exception e) {
                     logger.error("Ocurrió un error inesperado al guardar los datos de la adición asignaturas.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+            case "CA_ASIG":
+                try {
+                    boolean registroCancelar = registrarCancelarAsignatura(idSolicitud, datosSolicitud.getDatosCancelarAsignatura());
+                    if (registroCancelar) {
+                        logger.info("Se registraron los datos de la cancelación de asignaturas satisfactoriamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la cancelación de asignaturas.", e);
                     registro = false;
                     throw e;
                 }
@@ -251,23 +299,37 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     case "AD_ASIG":                        
                         AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
                         List<AsignaturaAdicionada> asignaturaAdicionadas = asignaturaAdicionadaRepository
-                                        .findByAdicionarAsignatura(adicionarAsignatura);
-                        List<Integer> lista = new ArrayList<>();
-                        for (AsignaturaAdicionada asignaturaAdicionada : asignaturaAdicionadas) {
-                            lista.add(asignaturaAdicionada.getIdAsignatura());
-                        }
-                        List<DocentesAsignaturasResponse> lAsignaturasResponses = gestionAsignaturasService
-                                .obtenerDocentesAsignaturas(lista);
-                        DatosSolicitudAdicionCancelacionAsignatura dAdicionCancelacionAsignatura = new DatosSolicitudAdicionCancelacionAsignatura();
-                        List<InfoAdicionCancelacion> lInfoAdicionCancelacions = new ArrayList<>();
-                        for (DocentesAsignaturasResponse dAsignaturasResponse : lAsignaturasResponses) {                            
+                                        .findByAdicionarAsignatura(adicionarAsignatura);                                                
+                        DatosSolicitudAdicionCancelacionAsignatura datosAdicionAsignatura = new DatosSolicitudAdicionCancelacionAsignatura();
+                        List<InfoAdicionCancelacion> lInfoAdiciones = new ArrayList<>();
+                        for (AsignaturaAdicionada asignaturasAdicionadas : asignaturaAdicionadas) {                            
                             InfoAdicionCancelacion info = new InfoAdicionCancelacion();
-                            info.setNombreAsignatura(dAsignaturasResponse.getNombreAsignatura());
-                            info.setGrupo(dAsignaturasResponse.getCodigoAsignatura());
-                            lInfoAdicionCancelacions.add(info);
+                            info.setNombreAsignatura(asignaturasAdicionadas.getNombreAsignatura());
+                            InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
+                                .obtenerTutor(asignaturasAdicionadas.getIdDocente().toString());
+                            info.setDocenteAsignatura(infoDocente.obtenerNombreCompleto());
+                            lInfoAdiciones.add(info);
                         }
-                        dAdicionCancelacionAsignatura.setListaAsignaturas(lInfoAdicionCancelacions);
-                        response.setDAdicionCancelacionAsignatura(dAdicionCancelacionAsignatura);
+                        datosAdicionAsignatura.setListaAsignaturas(lInfoAdiciones);
+                        response.setDAdicionCancelacionAsignatura(datosAdicionAsignatura);
+                        break;
+                    case "CA_ASIG":                        
+                        CancelarAsignatura cancelarAsignatura = cancelarAsignaturaRepository.findBySolicitud(solicitud);
+                        List<AsignaturaCancelada> asignaturaCanceladas = asignaturaCanceladaRepository
+                                        .findByCancelarAsignatura(cancelarAsignatura);                                                
+                        DatosSolicitudAdicionCancelacionAsignatura datosCancelacionAsignatura = new DatosSolicitudAdicionCancelacionAsignatura();
+                        datosCancelacionAsignatura.setMotivo(cancelarAsignatura.getMotivo());
+                        List<InfoAdicionCancelacion> lInfoCancelacion = new ArrayList<>();
+                        for (AsignaturaCancelada asignaturasCanceladas : asignaturaCanceladas) {                            
+                            InfoAdicionCancelacion info = new InfoAdicionCancelacion();
+                            info.setNombreAsignatura(asignaturasCanceladas.getNombreAsignatura());
+                            InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
+                                .obtenerTutor(asignaturasCanceladas.getIdDocente().toString());
+                            info.setDocenteAsignatura(infoDocente.obtenerNombreCompleto());
+                            lInfoCancelacion.add(info);
+                        }
+                        datosCancelacionAsignatura.setListaAsignaturas(lInfoCancelacion);
+                        response.setDAdicionCancelacionAsignatura(datosCancelacionAsignatura);
                         break;
                     case "HO_ASIG_ESP":
                     case "HO_ASIG_POS":
@@ -370,8 +432,13 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         return registroFirma;
     }
 
-    private boolean registrarAdicionAsignatura(Integer idSolicitud, List<Integer> listaAsignaturas) throws Exception {
+    private boolean registrarAdicionAsignatura(Integer idSolicitud, List<InfoAdicionAsignaturaRequest> listaAsignaturas) throws Exception {
         Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
         return adicionAsignaturaService.registrarAdicionAsignaturas(solicitud, listaAsignaturas);
+    }
+
+    private boolean registrarCancelarAsignatura(Integer idSolicitud, CancelarAsignaturaRequest datosCancelarAsignatura) throws Exception {
+        Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+        return adicionAsignaturaService.registrarCancelarAsignaturas(solicitud, datosCancelarAsignatura);
     }
 }

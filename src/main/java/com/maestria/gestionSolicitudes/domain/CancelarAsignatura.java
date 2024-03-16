@@ -13,27 +13,18 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "asignaturas_adicionadas")
+@Table(name = "cancelar_asignaturas")
 @Data
-public class AsignaturaAdicionada {
+public class CancelarAsignatura {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_adicionar_asignatura")
-    private AdicionarAsignatura adicionarAsignatura;
+    @JoinColumn(name = "id_solicitud")
+    private Solicitudes solicitud;
 
-    @Column(name = "id_asignatura")
-    private Integer idAsignatura;
-
-    @Column(name = "noombre_asignatura")
-    private String nombreAsignatura;
-
-    @Column(name = "id_docente")
-    private Integer idDocente;
-
-    @Column(name = "estado")
-    private String estado;
+    @Column(name = "motivo")
+    private String motivo;
 }
