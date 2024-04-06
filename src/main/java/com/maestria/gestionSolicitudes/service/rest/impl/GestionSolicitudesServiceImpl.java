@@ -63,6 +63,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private CancelarAsignaturaRepository cancelarAsignaturaRepository;
     @Autowired
     private AsignaturaCanceladaRepository asignaturaCanceladaRepository;
+    @Autowired
+    private AplazarSemestreRepository aplazarSemestreRepository;
 
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
@@ -236,6 +238,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 }
                 break;
         
+            case "AP_SEME":
+                try {
+                    boolean registroAplazar = registrarAplazarSemestre(idSolicitud, datosSolicitud.getDatosAplazarSemestre());
+                    if (registroAplazar) {
+                        logger.info("Se registraron los datos de la adición asignaturas satisfactoriamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la adición asignaturas.", e);
+                    registro = false;
+                    throw e;
+                }                
+                break;
+                
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
                 registro = false;
@@ -363,7 +379,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                                 response.setDatosSolicitudHomologacion(datosHomologacion);
                         }
                         break;
-                
+                    case "AP_SEME":
+                        AplazarSemestre aplazarSemestre = aplazarSemestreRepository.findBySolicitud(solicitud);
+                        if (aplazarSemestre != null){
+                            DatosSolicitudAplazarSemestre datosAplazarS = new DatosSolicitudAplazarSemestre();
+                            datosAplazarS.setPeriodo(aplazarSemestre.getSemestre());
+                            datosAplazarS.setMotivo(aplazarSemestre.getMotivo());
+                            response.setDatosSolicitudAplazarSemestre(datosAplazarS);
+                        }
+                        break;
+
                     default:
                         logger.info("No se encontró tipo de solicitud para retornar la información de la solicitud.");
                         break;
@@ -440,5 +465,22 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private boolean registrarCancelarAsignatura(Integer idSolicitud, CancelarAsignaturaRequest datosCancelarAsignatura) throws Exception {
         Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
         return adicionAsignaturaService.registrarCancelarAsignaturas(solicitud, datosCancelarAsignatura);
+    }
+
+    private boolean registrarAplazarSemestre(Integer idSolicitud, AplazarSemestreRequest datosAplazarSemestre) {
+        boolean registro = false;
+        try{
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            AplazarSemestre aplazarSemestre = new AplazarSemestre();
+            aplazarSemestre.setSolicitud(solicitud);
+            aplazarSemestre.setSemestre(datosAplazarSemestre.getSemestre());
+            aplazarSemestre.setMotivo(datosAplazarSemestre.getMotivo());        
+            aplazarSemestreRepository.save(aplazarSemestre);
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de aplazar semestre.", e);
+            registro = false;
+        }
+        return registro;
     }
 }

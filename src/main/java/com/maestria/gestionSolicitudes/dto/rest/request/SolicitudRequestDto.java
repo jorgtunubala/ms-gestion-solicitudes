@@ -12,6 +12,7 @@ public class SolicitudRequestDto {
     private DatosSolicitudHomologacionDto datosHomologacion;
     private List<InfoAdicionAsignaturaRequest> datosAdicionAsignatura;
     private CancelarAsignaturaRequest datosCancelarAsignatura;
+    private AplazarSemestreRequest datosAplazarSemestre;
     private Boolean requiereFirmaDirector;
     private String firmaEstudiante;
 }
