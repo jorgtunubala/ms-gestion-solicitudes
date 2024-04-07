@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.maestria.gestionSolicitudes.comun.enums.*;
 import com.maestria.gestionSolicitudes.domain.*;
+import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaDto;
 import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
@@ -65,6 +66,12 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private AsignaturaCanceladaRepository asignaturaCanceladaRepository;
     @Autowired
     private AplazarSemestreRepository aplazarSemestreRepository;
+    @Autowired
+    private CursarAsignaturaRepository cursarAsignaturaRepository;
+    @Autowired
+    private DatosCursarAsignaturaRepository datosCursarAsignaturaRepository;
+    @Autowired
+    private DocumentosCursarAsignaturaRepository documentosCursarAsignaturaRepository;
 
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
@@ -251,6 +258,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     throw e;
                 }                
                 break;
+
+            case "CU_ASIG":
+                try {
+                    boolean registroCursarAsignatura = registrarCursarAsignatura(idSolicitud, datosSolicitud.getDatosCursarAsignatura());
+                    if (registroCursarAsignatura) {
+                        logger.info("Se registraron los datos de la adición asignaturas satisfactoriamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la adición asignaturas.", e);
+                    registro = false;
+                    throw e;
+                }                
+                break;
                 
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
@@ -389,6 +410,35 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         }
                         break;
 
+                    case "CU_ASIG":
+                        CursarAsignatura cursarAsignatura = cursarAsignaturaRepository.findBySolicitud(solicitud);
+                        DatosSolicitudCursarAsignaturas datosSolicitudCursarAsignaturas = new DatosSolicitudCursarAsignaturas();
+                        datosSolicitudCursarAsignaturas.setMotivo(cursarAsignatura.getMotivo());
+                        List<DatosCursarAsignatura> listDatosCursarAsignaturas = datosCursarAsignaturaRepository
+                                                                        .findAllByCursarAsignatura(cursarAsignatura);
+                        List<DatosAsignaturaOtroPrograma> listAsignaturaOtroPrograma = new ArrayList<>();
+                        for (DatosCursarAsignatura infoDatosCursarAsig : listDatosCursarAsignaturas) {
+                            DatosAsignaturaOtroPrograma infoAsigOtroPrograma = new DatosAsignaturaOtroPrograma();
+                            AsignaturaExternaResponseDto asignaturaExterna = gestionAsignaturasService.
+                                                                obtenerAsignaturaExterna(infoDatosCursarAsig.getIdAsignaturaExterna());
+                            infoAsigOtroPrograma.setNombre(asignaturaExterna.getNombre());
+                            infoAsigOtroPrograma.setCodigo(infoDatosCursarAsig.getCodigoAsignatura());
+                            infoAsigOtroPrograma.setCreditos(asignaturaExterna.getCreditos());
+                            infoAsigOtroPrograma.setIntensidadHoraria(asignaturaExterna.getIntensidadHoraria());
+                            infoAsigOtroPrograma.setNombrePrograma(asignaturaExterna.getPrograma());
+                            infoAsigOtroPrograma.setNombreDocente(infoDatosCursarAsig.getNombreDocente());
+                            listAsignaturaOtroPrograma.add(infoAsigOtroPrograma);
+                        }
+                        datosSolicitudCursarAsignaturas.setDatosAsignaturaOtroProgramas(listAsignaturaOtroPrograma);
+                        List<DocumentosCursarAsignatura> listDocumentosCursarAsignatura = documentosCursarAsignaturaRepository
+                                                                .findAllByCursarAsignatura(cursarAsignatura);
+                        List<String> documentosAdjuntos = new ArrayList<>();
+                        for (DocumentosCursarAsignatura documentos : listDocumentosCursarAsignatura) {
+                            documentosAdjuntos.add(documentos.getDocumento());
+                        }
+                        datosSolicitudCursarAsignaturas.setDocumentosAdjuntos(documentosAdjuntos);
+                        response.setDatosSolicitudCursarAsignaturas(datosSolicitudCursarAsignaturas);
+                        break;
                     default:
                         logger.info("No se encontró tipo de solicitud para retornar la información de la solicitud.");
                         break;
@@ -482,5 +532,64 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             registro = false;
         }
         return registro;
+    }
+
+    private boolean registrarCursarAsignatura(Integer idSolicitud, DatosSolicitudCursarAsignaturaDto datosCursarAsignaturaDto) {
+        CursarAsignatura cursarAsignatura = new CursarAsignatura();
+        try {
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            cursarAsignatura.setSolicitud(solicitud);
+            cursarAsignatura.setMotivo(datosCursarAsignaturaDto.getDatosCursarAsignaturaDto().getMotivo());
+            cursarAsignatura = cursarAsignaturaRepository.save(cursarAsignatura);
+
+            // Se procede a guardar la información de la asignatura externa a cursar
+            List<AsignaturaExternaRequest> asignaturasExternasCursar = datosCursarAsignaturaDto
+                                                    .getDatosCursarAsignaturaDto().getListaAsignaturasCursar();
+            DatosCursarAsignaturaDto datosCursarAsig = datosCursarAsignaturaDto.getDatosCursarAsignaturaDto();
+            for (AsignaturaExternaRequest infoAsignaturaExterna : asignaturasExternasCursar) {
+                AsignaturaExternaResponseDto info = registrarAsignaturasExternas(infoAsignaturaExterna);
+                // Procedemos a guardar la informacion de los datos de la solicitud asignatura a cursar
+                DatosCursarAsignatura datosCursarAsignatura = new DatosCursarAsignatura();
+                datosCursarAsignatura.setCursarAsignatura(cursarAsignatura);
+                datosCursarAsignatura.setIdAsignaturaExterna(info.getIdAsignatura());
+                datosCursarAsignatura.setCodigoAsignatura(datosCursarAsig.getCodigoAsignatura());
+                datosCursarAsignatura.setGrupo(datosCursarAsig.getGrupo());
+                datosCursarAsignatura.setNombreDocente(datosCursarAsig.getNombreDocente());
+                datosCursarAsignatura.setTituloDocente(datosCursarAsig.getTituloDocente());
+                datosCursarAsignatura.setCartaAceptacion(datosCursarAsig.getCartaAceptacion());
+                datosCursarAsignatura.setEstado(ESTADO_SOLICITUD.PENDIENTE_AVAL.getDescripcion());
+                datosCursarAsignaturaRepository.save(datosCursarAsignatura);
+            }
+            
+            // Procedemos a guardar los ducumentos adjuntos de la solicitud
+            for (String documento : datosCursarAsignaturaDto.getDocumentosAdjuntos()) {
+                DocumentosCursarAsignatura documentosCursarAsignatura = new DocumentosCursarAsignatura();
+                documentosCursarAsignatura.setCursarAsignatura(cursarAsignatura);
+                documentosCursarAsignatura.setDocumento(documento);
+                documentosCursarAsignaturaRepository.save(documentosCursarAsignatura);
+            }
+
+        } catch (Exception e) {
+            logger.error("Ocurrió un error al intentar guardar los datos de cursar asignaturas.", e);
+        }        
+        return true;
+    }
+
+    private AsignaturaExternaResponseDto registrarAsignaturasExternas(AsignaturaExternaRequest datosAsignatura){
+        try {
+            AsignaturaExternaDto asignaturaExternaDto = new AsignaturaExternaDto();
+            asignaturaExternaDto.setInstitutoProcedencia(datosAsignatura.getInstitutoProcedencia());
+            asignaturaExternaDto.setProgramaProcedencia(datosAsignatura.getProgramaProcedencia());
+            asignaturaExternaDto.setNombreAsignatura(datosAsignatura.getNombreAsignatura());
+            asignaturaExternaDto.setNumeroCreditos(datosAsignatura.getNumeroCreditos());
+            asignaturaExternaDto.setIntensidadHoraria(datosAsignatura.getIntensidadHoraria());
+            asignaturaExternaDto.setContenidoProgramatico(datosAsignatura.getContenidoProgramatico());            
+            return gestionAsignaturasService.registrarAsignaturasExternas(asignaturaExternaDto);
+            
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error al registrar la asignatura externa a cursar en otro programa, ");
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -9,5 +9,5 @@ public class DatosGestionSolicitudResponse {
     private DatosSolicitudHomologacion datosSolicitudHomologacion;
     private DatosSolicitudAdicionCancelacionAsignatura dAdicionCancelacionAsignatura;
     private DatosSolicitudAplazarSemestre datosSolicitudAplazarSemestre;
-    
+    private DatosSolicitudCursarAsignaturas datosSolicitudCursarAsignaturas;
 }
