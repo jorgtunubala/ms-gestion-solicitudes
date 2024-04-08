@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class DatosSolicitudAplazarSemestre {
-    private String periodo;
+    private String semestre;
     private String motivo;
 }

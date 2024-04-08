@@ -404,7 +404,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         AplazarSemestre aplazarSemestre = aplazarSemestreRepository.findBySolicitud(solicitud);
                         if (aplazarSemestre != null){
                             DatosSolicitudAplazarSemestre datosAplazarS = new DatosSolicitudAplazarSemestre();
-                            datosAplazarS.setPeriodo(aplazarSemestre.getSemestre());
+                            datosAplazarS.setSemestre(aplazarSemestre.getSemestre());
                             datosAplazarS.setMotivo(aplazarSemestre.getMotivo());
                             response.setDatosSolicitudAplazarSemestre(datosAplazarS);
                         }
@@ -545,29 +545,29 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             // Se procede a guardar la información de la asignatura externa a cursar
             List<AsignaturaExternaRequest> asignaturasExternasCursar = datosCursarAsignaturaDto
                                                     .getDatosCursarAsignaturaDto().getListaAsignaturasCursar();
-            DatosCursarAsignaturaDto datosCursarAsig = datosCursarAsignaturaDto.getDatosCursarAsignaturaDto();
             for (AsignaturaExternaRequest infoAsignaturaExterna : asignaturasExternasCursar) {
                 AsignaturaExternaResponseDto info = registrarAsignaturasExternas(infoAsignaturaExterna);
                 // Procedemos a guardar la informacion de los datos de la solicitud asignatura a cursar
                 DatosCursarAsignatura datosCursarAsignatura = new DatosCursarAsignatura();
                 datosCursarAsignatura.setCursarAsignatura(cursarAsignatura);
                 datosCursarAsignatura.setIdAsignaturaExterna(info.getIdAsignatura());
-                datosCursarAsignatura.setCodigoAsignatura(datosCursarAsig.getCodigoAsignatura());
-                datosCursarAsignatura.setGrupo(datosCursarAsig.getGrupo());
-                datosCursarAsignatura.setNombreDocente(datosCursarAsig.getNombreDocente());
-                datosCursarAsignatura.setTituloDocente(datosCursarAsig.getTituloDocente());
-                datosCursarAsignatura.setCartaAceptacion(datosCursarAsig.getCartaAceptacion());
+                datosCursarAsignatura.setCodigoAsignatura(infoAsignaturaExterna.getCodigoAsignatura());
+                datosCursarAsignatura.setGrupo(infoAsignaturaExterna.getGrupo());
+                datosCursarAsignatura.setNombreDocente(infoAsignaturaExterna.getNombreDocente());
+                datosCursarAsignatura.setTituloDocente(infoAsignaturaExterna.getTituloDocente());
+                datosCursarAsignatura.setCartaAceptacion(infoAsignaturaExterna.getCartaAceptacion());
                 datosCursarAsignatura.setEstado(ESTADO_SOLICITUD.PENDIENTE_AVAL.getDescripcion());
                 datosCursarAsignaturaRepository.save(datosCursarAsignatura);
             }
             
             // Procedemos a guardar los ducumentos adjuntos de la solicitud
-            for (String documento : datosCursarAsignaturaDto.getDocumentosAdjuntos()) {
+            // Se suspende ya que no se tienen documentos adjuntos
+            /* for (String documento : datosCursarAsignaturaDto.getDocumentosAdjuntos()) {
                 DocumentosCursarAsignatura documentosCursarAsignatura = new DocumentosCursarAsignatura();
                 documentosCursarAsignatura.setCursarAsignatura(cursarAsignatura);
                 documentosCursarAsignatura.setDocumento(documento);
                 documentosCursarAsignaturaRepository.save(documentosCursarAsignatura);
-            }
+            } */
 
         } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos de cursar asignaturas.", e);

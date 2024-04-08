@@ -10,4 +10,9 @@ public class AsignaturaExternaRequest {
     private Integer numeroCreditos;
     private Integer intensidadHoraria;    
     private String contenidoProgramatico;
+    private String codigoAsignatura;
+    private String grupo;
+    private String nombreDocente;
+    private String tituloDocente;
+    private String cartaAceptacion;
 }

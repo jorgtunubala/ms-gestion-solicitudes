@@ -7,5 +7,4 @@ import lombok.Data;
 @Data
 public class DatosSolicitudCursarAsignaturaDto {
     private DatosCursarAsignaturaDto datosCursarAsignaturaDto;
-    private List<String> documentosAdjuntos;
 }

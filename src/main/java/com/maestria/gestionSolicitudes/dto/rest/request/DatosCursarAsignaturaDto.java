@@ -8,9 +8,4 @@ import lombok.Data;
 public class DatosCursarAsignaturaDto {
     private String motivo;    
     private List<AsignaturaExternaRequest> listaAsignaturasCursar;
-    private String codigoAsignatura;
-    private String grupo;
-    private String nombreDocente;
-    private String tituloDocente;
-    private String cartaAceptacion;
 }
