@@ -72,6 +72,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private DatosCursarAsignaturaRepository datosCursarAsignaturaRepository;
     @Autowired
     private DocumentosCursarAsignaturaRepository documentosCursarAsignaturaRepository;
+    @Autowired
+    private AvalPasantiaInvestigacionRepository avalPasantiaInvestigacionRepository;
 
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
@@ -272,7 +274,21 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     throw e;
                 }                
                 break;
-                
+            
+            case "AV_PASA_INV":
+                try {
+                    boolean registroAvalPasantia = registrarAvalPasantiaInvestigacion(idSolicitud, datosSolicitud.getDatosAvalPasantiaInv());
+                    if (registroAvalPasantia) {
+                        logger.info("Se registraron los datos aval pasantia investigación correctamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud aval pasantia investigación.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
                 registro = false;
@@ -591,5 +607,23 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             e.printStackTrace();
             return null;
         }
+    }
+
+    private boolean registrarAvalPasantiaInvestigacion(Integer idSolicitud, AvalPasantiaInvRequest avalPasantiaInvRequest) {
+        boolean registro = false;
+        try{
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            AvalPasantiaInvestigacion avalPasantiaInvestigacion = new AvalPasantiaInvestigacion();
+            avalPasantiaInvestigacion.setSolicitud(solicitud);
+            avalPasantiaInvestigacion.setLugarPasantia(avalPasantiaInvRequest.getLugarPasantia());
+            avalPasantiaInvestigacion.setFechaInicio(avalPasantiaInvRequest.getFechaInicio());
+            avalPasantiaInvestigacion.setFechaFin(avalPasantiaInvRequest.getFechaFin());
+            avalPasantiaInvestigacionRepository.save(avalPasantiaInvestigacion);
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de aval pasantia investigación.", e);
+            registro = false;
+        }
+        return registro;
     }
 }
