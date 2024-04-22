@@ -74,6 +74,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private DocumentosCursarAsignaturaRepository documentosCursarAsignaturaRepository;
     @Autowired
     private AvalPasantiaInvestigacionRepository avalPasantiaInvestigacionRepository;
+    @Autowired
+    private DocumentosAvalPasantiaRepository documentosAvalPasantiaRepository;
 
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
@@ -618,7 +620,15 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             avalPasantiaInvestigacion.setLugarPasantia(avalPasantiaInvRequest.getLugarPasantia());
             avalPasantiaInvestigacion.setFechaInicio(avalPasantiaInvRequest.getFechaInicio());
             avalPasantiaInvestigacion.setFechaFin(avalPasantiaInvRequest.getFechaFin());
-            avalPasantiaInvestigacionRepository.save(avalPasantiaInvestigacion);
+            avalPasantiaInvestigacion = avalPasantiaInvestigacionRepository.save(avalPasantiaInvestigacion);           
+
+            // Procedemos a guardar los ducumentos adjuntos de la solicitud
+            for (String documento : avalPasantiaInvRequest.getDocumentosAdjuntos()) {
+                DocumentosAvalPasantia documentosAvalPasantia = new DocumentosAvalPasantia();
+                documentosAvalPasantia.setAvalPasantia(avalPasantiaInvestigacion);
+                documentosAvalPasantia.setDocumento(documento);                
+                documentosAvalPasantiaRepository.save(documentosAvalPasantia);
+            }
             registro = true;
         } catch (Exception e){
             logger.error("Ocurrió un error al intentar guardar los datos de aval pasantia investigación.", e);
