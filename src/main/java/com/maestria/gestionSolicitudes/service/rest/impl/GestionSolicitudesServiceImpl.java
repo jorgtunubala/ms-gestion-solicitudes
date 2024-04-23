@@ -1,6 +1,5 @@
 package com.maestria.gestionSolicitudes.service.rest.impl;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +20,7 @@ import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
+import com.maestria.gestionSolicitudes.mapper.ApoyoEconomicoMapper;
 import com.maestria.gestionSolicitudes.repository.*;
 import com.maestria.gestionSolicitudes.service.client.GestionAsignaturasService;
 import com.maestria.gestionSolicitudes.service.client.GestionDocentesEstudiantesService;
@@ -77,7 +77,17 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private AvalPasantiaInvestigacionRepository avalPasantiaInvestigacionRepository;
     @Autowired
     private DocumentosAvalPasantiaRepository documentosAvalPasantiaRepository;
+    @Autowired
+    private ApoyoEconomicoInvestigacionRepository apoyoEconomicoInvestigacionRepository;
+    @Autowired
+    private DocumentosApoyoEconomicoRepository documentosApoyoEconomicoRepository;
 
+    private final ApoyoEconomicoMapper apoyoEconomicoMapper;
+
+    public GestionSolicitudesServiceImpl(ApoyoEconomicoMapper apoyoEconomicoMapper) {
+        this.apoyoEconomicoMapper = apoyoEconomicoMapper;
+    }
+    
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
         /*
@@ -292,6 +302,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 }
                 break;
 
+            case "AP_ECON_INV":
+                try {
+                    boolean registroApoyoEconomico = registrarApoyoEconimico(idSolicitud, datosSolicitud.getDatosApoyoEconomico());
+                    if (registroApoyoEconomico) {
+                        logger.info("Se registraron los datos para el apoyo económico correctamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para apoyo económico.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
                 registro = false;
@@ -477,6 +501,21 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         }
                         break;
 
+                    case "AP_ECON_INV":
+                        ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoInvestigacionRepository.findBySolicitud(solicitud);
+                        if (apoyoEconomicoInvestigacion != null){
+                            ApoyoEconomicoRequest responseApoyoEconomico = apoyoEconomicoMapper.entidadAdto(apoyoEconomicoInvestigacion);
+                            List<DocumentosApoyoEconomico> documentosApoyosEconomicos = documentosApoyoEconomicoRepository.
+                                    findAllByApoyoEconomicoInvestigacion(apoyoEconomicoInvestigacion);
+                            List<String> documentos = new ArrayList<>();
+                            for (DocumentosApoyoEconomico documento : documentosApoyosEconomicos) {
+                                documentos.add(documento.getDocumento());
+                            }
+                            responseApoyoEconomico.setDocumentosAdjuntos(documentos);
+                            response.setDatosApoyoEconomico(responseApoyoEconomico);
+                        }
+                        break;
+
                     default:
                         logger.info("No se encontró tipo de solicitud para retornar la información de la solicitud.");
                         break;
@@ -648,6 +687,29 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 documentosAvalPasantia.setAvalPasantia(avalPasantiaInvestigacion);
                 documentosAvalPasantia.setDocumento(documento);                
                 documentosAvalPasantiaRepository.save(documentosAvalPasantia);
+            }
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de aval pasantia investigación.", e);
+            registro = false;
+        }
+        return registro;
+    }
+
+    private boolean registrarApoyoEconimico(Integer idSolicitud, ApoyoEconomicoRequest apoyoEconomicoRequest) {
+        boolean registro = false;
+        try{
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoMapper.dtoToEntity(apoyoEconomicoRequest);
+            apoyoEconomicoInvestigacion.setSolicitud(solicitud);
+            apoyoEconomicoInvestigacion = apoyoEconomicoInvestigacionRepository.save(apoyoEconomicoInvestigacion);
+
+            // Procedemos a guardar los ducumentos adjuntos de la solicitud
+            for (String documento : apoyoEconomicoRequest.getDocumentosAdjuntos()) {
+                DocumentosApoyoEconomico documentosApoyoEconomico = new DocumentosApoyoEconomico();
+                documentosApoyoEconomico.setApoyoEconomicoInvestigacion(apoyoEconomicoInvestigacion);
+                documentosApoyoEconomico.setDocumento(documento);                
+                documentosApoyoEconomicoRepository.save(documentosApoyoEconomico);
             }
             registro = true;
         } catch (Exception e){

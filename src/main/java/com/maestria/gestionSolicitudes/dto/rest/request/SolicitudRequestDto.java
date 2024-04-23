@@ -15,6 +15,7 @@ public class SolicitudRequestDto {
     private AplazarSemestreRequest datosAplazarSemestre;
     private DatosSolicitudCursarAsignaturaDto datosCursarAsignatura;
     private AvalPasantiaInvRequest datosAvalPasantiaInv;
+    private ApoyoEconomicoRequest datosApoyoEconomico;
     private Boolean requiereFirmaDirector;
     private String firmaEstudiante;
 }

@@ -59,21 +59,31 @@
 
 		<!--Mapper -->
 		<dependency>
-        	<groupId>org.mapstruct</groupId>
-        	<artifactId>mapstruct</artifactId>
-        	<version>1.4.2.Final</version>
-    	</dependency>
-    	<dependency>
-        	<groupId>org.mapstruct</groupId>
-        	<artifactId>mapstruct-processor</artifactId>
-        	<version>1.4.2.Final</version>
-        	<scope>provided</scope>
-    	</dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>1.4.2.Final</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct-processor -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>1.4.2.Final</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok-mapstruct-binding -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok-mapstruct-binding</artifactId>
+			<version>0.2.0</version>
+		</dependency>
+
 		<dependency>
       		<groupId>org.springdoc</groupId>
       		<artifactId>springdoc-openapi-ui</artifactId>
       		<version>1.6.12</version>
    		</dependency>
+		
 		<!-- SLF4J para logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

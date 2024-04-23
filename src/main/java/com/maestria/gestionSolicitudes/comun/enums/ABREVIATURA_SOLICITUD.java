@@ -7,7 +7,8 @@ public enum ABREVIATURA_SOLICITUD {
     HO_ASIG_POS("Homologación Asignaturas"),
     AP_SEME("Aplazamiento Semestre"),
     CU_ASIG("Cursos Externos"),
-    AV_PASA_INV("Aval Pasantía");
+    AV_PASA_INV("Aval Pasantía"),
+    AP_ECON_INV("Apoyo Económico");
 
     private final String descripcion;
 
