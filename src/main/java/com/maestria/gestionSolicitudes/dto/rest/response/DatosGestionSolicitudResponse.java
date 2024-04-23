@@ -10,4 +10,5 @@ public class DatosGestionSolicitudResponse {
     private DatosSolicitudAdicionCancelacionAsignatura dAdicionCancelacionAsignatura;
     private DatosSolicitudAplazarSemestre datosSolicitudAplazarSemestre;
     private DatosSolicitudCursarAsignaturas datosSolicitudCursarAsignaturas;
+    private AvalPasantiaInvResponse datoAvalPasantiaInv;
 }

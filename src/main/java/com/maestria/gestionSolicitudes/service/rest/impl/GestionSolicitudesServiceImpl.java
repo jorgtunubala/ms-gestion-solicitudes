@@ -1,5 +1,6 @@
 package com.maestria.gestionSolicitudes.service.rest.impl;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -457,6 +458,25 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         datosSolicitudCursarAsignaturas.setDocumentosAdjuntos(documentosAdjuntos);
                         response.setDatosSolicitudCursarAsignaturas(datosSolicitudCursarAsignaturas);
                         break;
+
+                    case "AV_PASA_INV":
+                        AvalPasantiaInvestigacion avalPasantiaInvestigacion = avalPasantiaInvestigacionRepository.findBySolicitud(solicitud);                        
+                        if (avalPasantiaInvestigacion != null){
+                            AvalPasantiaInvResponse datosAvalPasantia = new AvalPasantiaInvResponse();
+                            datosAvalPasantia.setLugarPasantia(avalPasantiaInvestigacion.getLugarPasantia());
+                            datosAvalPasantia.setFechaInicio(avalPasantiaInvestigacion.getFechaInicio().format(formatter));
+                            datosAvalPasantia.setFechaFin(avalPasantiaInvestigacion.getFechaFin().format(formatter));
+                            List<DocumentosAvalPasantia> documentosAvalPasantias = documentosAvalPasantiaRepository.
+                                    findAllByAvalPasantia(avalPasantiaInvestigacion);
+                            List<String> documentos = new ArrayList<>();
+                            for (DocumentosAvalPasantia documento : documentosAvalPasantias) {
+                                documentos.add(documento.getDocumento());
+                            }
+                            datosAvalPasantia.setDocumentosAdjuntos(documentos);
+                            response.setDatoAvalPasantiaInv(datosAvalPasantia);
+                        }
+                        break;
+
                     default:
                         logger.info("No se encontró tipo de solicitud para retornar la información de la solicitud.");
                         break;

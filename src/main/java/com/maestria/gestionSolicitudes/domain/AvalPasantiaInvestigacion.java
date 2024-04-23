@@ -1,6 +1,6 @@
 package com.maestria.gestionSolicitudes.domain;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,8 +31,8 @@ public class AvalPasantiaInvestigacion {
     private String lugarPasantia;
 
     @Column(name = "fecha_inicio")
-    private Date fechaInicio;  
+    private LocalDateTime fechaInicio;  
 
     @Column(name = "fecha_fin")
-    private Date fechaFin;  
+    private LocalDateTime fechaFin;  
 }
