@@ -8,26 +8,24 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 
-import com.maestria.gestionSolicitudes.domain.ApoyoEconomicoInvestigacion;
-import com.maestria.gestionSolicitudes.dto.rest.request.ApoyoEconomicoRequest;
+import com.maestria.gestionSolicitudes.domain.AvalPasantiaInvestigacion;
+import com.maestria.gestionSolicitudes.dto.rest.request.AvalPasantiaInvRequest;
 
 @Mapper(componentModel = "spring")
-public interface ApoyoEconomicoMapper {
+public interface AvalPasantiaInvMapper {
 
     @Mappings({
         @Mapping(target = "solicitud", ignore = true),
         @Mapping(target = "id", ignore = true),
-        @Mapping(target = "idDirector", source = "idDirectorGrupo"),
         @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "stringToLocalDate"),
         @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "stringToLocalDate")
     })
-    ApoyoEconomicoInvestigacion dtoToEntity(ApoyoEconomicoRequest apoyoEconomicoRequest);
+    AvalPasantiaInvestigacion dtoToEntity(AvalPasantiaInvRequest avalPasantiaInvRequest); 
 
-    @Mapping(target = "idDirectorGrupo", source = "idDirector")
-    @Mapping(target = "documentosAdjuntos", ignore = true)
+    @Mapping(target = "documentosAdjuntos", ignore = true) 
     @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "localDateToString")
-    @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "localDateToString") 
-    ApoyoEconomicoRequest entidadAdto(ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion);
+    @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "localDateToString")
+    AvalPasantiaInvRequest entidadAdto(AvalPasantiaInvestigacion avalPasantiaInvestigacion);
 
     @Named("stringToLocalDate")
     default LocalDate stringToLocalDate(String fecha) {

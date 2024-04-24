@@ -11,13 +11,8 @@ import lombok.Data;
 @Data
 public class ApoyoEconomicoRequest {
     private String lugarPasantia;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate fechaInicio;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate fechaFin;
-
+    private String fechaInicio;
+    private String fechaFin;
     private Integer idDirectorGrupo;
     private String grupoInvestigacion;
     private BigDecimal valorApoyo;

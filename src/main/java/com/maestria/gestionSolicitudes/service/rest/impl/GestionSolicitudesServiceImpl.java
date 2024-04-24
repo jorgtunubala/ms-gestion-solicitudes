@@ -21,6 +21,7 @@ import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
 import com.maestria.gestionSolicitudes.mapper.ApoyoEconomicoMapper;
+import com.maestria.gestionSolicitudes.mapper.AvalPasantiaInvMapper;
 import com.maestria.gestionSolicitudes.repository.*;
 import com.maestria.gestionSolicitudes.service.client.GestionAsignaturasService;
 import com.maestria.gestionSolicitudes.service.client.GestionDocentesEstudiantesService;
@@ -83,9 +84,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private DocumentosApoyoEconomicoRepository documentosApoyoEconomicoRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
+    private final AvalPasantiaInvMapper avalPasantiaInvMapper;
 
-    public GestionSolicitudesServiceImpl(ApoyoEconomicoMapper apoyoEconomicoMapper) {
+    public GestionSolicitudesServiceImpl(ApoyoEconomicoMapper apoyoEconomicoMapper, AvalPasantiaInvMapper avalPasantiaInvMapper) {
         this.apoyoEconomicoMapper = apoyoEconomicoMapper;
+        this.avalPasantiaInvMapper = avalPasantiaInvMapper;
     }
     
     @Override
@@ -674,11 +677,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         boolean registro = false;
         try{
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            AvalPasantiaInvestigacion avalPasantiaInvestigacion = new AvalPasantiaInvestigacion();
+            AvalPasantiaInvestigacion avalPasantiaInvestigacion = avalPasantiaInvMapper.dtoToEntity(avalPasantiaInvRequest);
             avalPasantiaInvestigacion.setSolicitud(solicitud);
-            avalPasantiaInvestigacion.setLugarPasantia(avalPasantiaInvRequest.getLugarPasantia());
-            avalPasantiaInvestigacion.setFechaInicio(avalPasantiaInvRequest.getFechaInicio());
-            avalPasantiaInvestigacion.setFechaFin(avalPasantiaInvRequest.getFechaFin());
             avalPasantiaInvestigacion = avalPasantiaInvestigacionRepository.save(avalPasantiaInvestigacion);           
 
             // Procedemos a guardar los ducumentos adjuntos de la solicitud
