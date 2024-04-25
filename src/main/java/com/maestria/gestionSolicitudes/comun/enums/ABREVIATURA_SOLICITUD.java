@@ -8,7 +8,8 @@ public enum ABREVIATURA_SOLICITUD {
     AP_SEME("Aplazamiento Semestre"),
     CU_ASIG("Cursos Externos"),
     AV_PASA_INV("Aval Pasantía"),
-    AP_ECON_INV("Apoyo Económico");
+    AP_ECON_INV("Apoyo Económico"),
+    RE_CRED_PAS("Reconocimiento Créditos Pasantia");
 
     private final String descripcion;
 

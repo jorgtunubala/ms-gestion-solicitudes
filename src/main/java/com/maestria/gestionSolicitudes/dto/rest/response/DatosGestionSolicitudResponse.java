@@ -1,6 +1,7 @@
 package com.maestria.gestionSolicitudes.dto.rest.response;
 
 import com.maestria.gestionSolicitudes.dto.rest.request.ApoyoEconomicoRequest;
+import com.maestria.gestionSolicitudes.dto.rest.request.RecCreditosPasantiaRequest;
 
 import lombok.Data;
 
@@ -14,4 +15,5 @@ public class DatosGestionSolicitudResponse {
     private DatosSolicitudCursarAsignaturas datosSolicitudCursarAsignaturas;
     private AvalPasantiaInvResponse datoAvalPasantiaInv;
     private ApoyoEconomicoRequest datosApoyoEconomico;
+    private RecCreditosPasantiaRequest datosRecCreditosPasantia;
 }

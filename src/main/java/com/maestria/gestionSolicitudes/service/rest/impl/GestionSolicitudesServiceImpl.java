@@ -82,6 +82,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private ApoyoEconomicoInvestigacionRepository apoyoEconomicoInvestigacionRepository;
     @Autowired
     private DocumentosApoyoEconomicoRepository documentosApoyoEconomicoRepository;
+    @Autowired
+    private RecCreditosPasantiaRepository recCreditosPasantiaRepository;
+    @Autowired
+    private DocumentosRecCreditosPasantiaRepository dRecCreditosPasantiaRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -319,6 +323,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 }
                 break;
 
+            case "RE_CRED_PAS":
+                try {
+                    boolean registroRecCredPasantia = registrarRecCreditosPasantia(idSolicitud, datosSolicitud.getDatosRecCreditosPasantia());
+                    if (registroRecCredPasantia) {
+                        logger.info("Se registraron los datos para el reconocimiento de créditos de pasantia correctamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para reconocimiento créditos de pasantia.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
                 registro = false;
@@ -519,6 +537,21 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         }
                         break;
 
+                    case "RE_CRED_PAS":
+                        RecCreditosPasantia recCreditosPasantia = recCreditosPasantiaRepository.findBySolicitud(solicitud);
+                        if (recCreditosPasantia != null){
+                            RecCreditosPasantiaRequest recCreditosPasantiaRequest = new RecCreditosPasantiaRequest();
+                            List<DocumentosRecCreditosPasantia> docsRecCreditosPasantias = dRecCreditosPasantiaRepository.
+                            findAllByRecCreditosPasantia(recCreditosPasantia);
+                            List<String> documentos = new ArrayList<>();
+                            for (DocumentosRecCreditosPasantia documento : docsRecCreditosPasantias) {
+                                documentos.add(documento.getDocumento());
+                            }
+                            recCreditosPasantiaRequest.setDocumentosAdjuntos(documentos);
+                            response.setDatosRecCreditosPasantia(recCreditosPasantiaRequest);
+                        }
+                        break;
+
                     default:
                         logger.info("No se encontró tipo de solicitud para retornar la información de la solicitud.");
                         break;
@@ -714,6 +747,29 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             registro = true;
         } catch (Exception e){
             logger.error("Ocurrió un error al intentar guardar los datos de aval pasantia investigación.", e);
+            registro = false;
+        }
+        return registro;
+    }
+
+    private boolean registrarRecCreditosPasantia(Integer idSolicitud, RecCreditosPasantiaRequest recCreditosPasantiaRequest) {
+        boolean registro = false;
+        try{
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            RecCreditosPasantia recCreditosPasantia = new RecCreditosPasantia();
+            recCreditosPasantia.setSolicitud(solicitud);
+            recCreditosPasantia = recCreditosPasantiaRepository.save(recCreditosPasantia);
+
+            // Procedemos a guardar los ducumentos adjuntos de la solicitud
+            for (String documento : recCreditosPasantiaRequest.getDocumentosAdjuntos()) {
+                DocumentosRecCreditosPasantia dRecCreditosPasantia = new DocumentosRecCreditosPasantia();
+                dRecCreditosPasantia.setRecCreditosPasantia(recCreditosPasantia);
+                dRecCreditosPasantia.setDocumento(documento);
+                dRecCreditosPasantiaRepository.save(dRecCreditosPasantia);
+            }
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de reconocimiento de créditos pasantia.", e);
             registro = false;
         }
         return registro;
