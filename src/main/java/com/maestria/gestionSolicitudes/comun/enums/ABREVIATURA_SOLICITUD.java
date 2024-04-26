@@ -10,7 +10,20 @@ public enum ABREVIATURA_SOLICITUD {
     AV_PASA_INV("Aval Pasantía"),
     AP_ECON_INV("Apoyo Económico"),
     RE_CRED_PAS("Reconocimiento Créditos Pasantia"),
-    RE_CRED_DIS("Reconocimiento Créditos Diseño Curricular");
+    RE_CRED_DIS("Reconocimiento Créditos Diseño Curricular"),
+    PR_CURS_TEO("Reconocimiento Créditos Cursos Teóricos"),
+    AS_CRED_DO("Asignación Créditos por Docencia"),
+    RE_CRED_SEM("Reconocimiento Créditos Seminario Actualización"),
+    AS_CRED_MON("Asignación Créditos Monitorias Cursos"),
+    AS_CRED_MAT("Asignación Créditos Elaboración Material Apoyo"),
+    TG_PREG_POS("Asignación Créditos Dirección Trabajo Grado"),
+    JU_PREG_POS("Reconocimiento Créditos Jurado Trabajo Grado"),
+    EV_ANTE_PRE("Reconocimiento Créditos Evaluación Anteproyecto"),
+    EV_PROD_INT("Reconocimiento Créditos Evaluación Productividad Intelectual"),
+    EV_INFO_SAB("Reconocimiento Créditos Evaluación Informe Sabático"),
+    PA_COMI_PRO("Reconocimiento Créditos Participación Comité Programa"),
+    OT_ACTI_APO("Reconocimiento Créditos Realización Otras Actividades Apoyo"),
+    RE_CRED_PUB("Reconocimiento Créditos Publicaciones");
 
     private final String descripcion;
 
