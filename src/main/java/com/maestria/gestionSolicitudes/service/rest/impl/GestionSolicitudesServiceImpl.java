@@ -86,6 +86,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private RecCreditosPasantiaRepository recCreditosPasantiaRepository;
     @Autowired
     private DocumentosRecCreditosPasantiaRepository dRecCreditosPasantiaRepository;
+    @Autowired
+    private RecCreditosDisCurricularRepository recCreditosDisCurricularRepository;
+    @Autowired
+    private DocumentosRecCreditosDisCurricularRepository dRecCreditosDisCurricularRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -325,13 +329,27 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
             case "RE_CRED_PAS":
                 try {
-                    boolean registroRecCredPasantia = registrarRecCreditosPasantia(idSolicitud, datosSolicitud.getDatosRecCreditosPasantia());
+                    boolean registroRecCredPasantia = registrarRecCreditosPasantia(idSolicitud, datosSolicitud.getDatosReconocimientoCreditos());
                     if (registroRecCredPasantia) {
                         logger.info("Se registraron los datos para el reconocimiento de créditos de pasantia correctamente.");
                         registro = true;
                     }
                 } catch (Exception e) {
                     logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para reconocimiento créditos de pasantia.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+
+            case "RE_CRED_DIS":
+                try {
+                    boolean registroRecCredDisCurricular = registrarRecCreditosDisCurricular(idSolicitud, datosSolicitud.getDatosReconocimientoCreditos());
+                    if (registroRecCredDisCurricular) {
+                        logger.info("Se registraron los datos para el reconocimiento de créditos diseño curricular correctamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para reconocimiento créditos diseño curricular.", e);
                     registro = false;
                     throw e;
                 }
@@ -526,6 +544,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoInvestigacionRepository.findBySolicitud(solicitud);
                         if (apoyoEconomicoInvestigacion != null){
                             ApoyoEconomicoRequest responseApoyoEconomico = apoyoEconomicoMapper.entidadAdto(apoyoEconomicoInvestigacion);
+                            InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService.obtenerTutor(responseApoyoEconomico.getIdDirectorGrupo().toString());
+                            responseApoyoEconomico.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
                             List<DocumentosApoyoEconomico> documentosApoyosEconomicos = documentosApoyoEconomicoRepository.
                                     findAllByApoyoEconomicoInvestigacion(apoyoEconomicoInvestigacion);
                             List<String> documentos = new ArrayList<>();
@@ -540,7 +560,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     case "RE_CRED_PAS":
                         RecCreditosPasantia recCreditosPasantia = recCreditosPasantiaRepository.findBySolicitud(solicitud);
                         if (recCreditosPasantia != null){
-                            RecCreditosPasantiaRequest recCreditosPasantiaRequest = new RecCreditosPasantiaRequest();
+                            ReconocimientoCreditosRequest recCreditosPasantiaRequest = new ReconocimientoCreditosRequest();
                             List<DocumentosRecCreditosPasantia> docsRecCreditosPasantias = dRecCreditosPasantiaRepository.
                             findAllByRecCreditosPasantia(recCreditosPasantia);
                             List<String> documentos = new ArrayList<>();
@@ -548,7 +568,22 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                                 documentos.add(documento.getDocumento());
                             }
                             recCreditosPasantiaRequest.setDocumentosAdjuntos(documentos);
-                            response.setDatosRecCreditosPasantia(recCreditosPasantiaRequest);
+                            response.setDatosReconocimientoCreditos(recCreditosPasantiaRequest);
+                        }
+                        break;
+
+                    case "RE_CRED_DIS":
+                        RecCreditosDisCurricular recCreditosDisCurricular = recCreditosDisCurricularRepository.findBySolicitud(solicitud);
+                        if (recCreditosDisCurricular != null){
+                            ReconocimientoCreditosRequest recCreditosPasantiaRequest = new ReconocimientoCreditosRequest();
+                            List<DocumentosRecCreditosDisCurricular> docsRecCreditosDisCurriculares = dRecCreditosDisCurricularRepository.
+                            findAllByRecCreditosDisCurricular(recCreditosDisCurricular);
+                            List<String> documentos = new ArrayList<>();
+                            for (DocumentosRecCreditosDisCurricular documento : docsRecCreditosDisCurriculares) {
+                                documentos.add(documento.getDocumento());
+                            }
+                            recCreditosPasantiaRequest.setDocumentosAdjuntos(documentos);
+                            response.setDatosReconocimientoCreditos(recCreditosPasantiaRequest);
                         }
                         break;
 
@@ -752,7 +787,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         return registro;
     }
 
-    private boolean registrarRecCreditosPasantia(Integer idSolicitud, RecCreditosPasantiaRequest recCreditosPasantiaRequest) {
+    private boolean registrarRecCreditosPasantia(Integer idSolicitud, ReconocimientoCreditosRequest recCreditosPasantiaRequest) {
         boolean registro = false;
         try{
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
@@ -770,6 +805,29 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             registro = true;
         } catch (Exception e){
             logger.error("Ocurrió un error al intentar guardar los datos de reconocimiento de créditos pasantia.", e);
+            registro = false;
+        }
+        return registro;
+    }
+
+    private boolean registrarRecCreditosDisCurricular(Integer idSolicitud, ReconocimientoCreditosRequest reconocimientoCreditosRequest) {
+        boolean registro = false;
+        try{
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            RecCreditosDisCurricular recCreditosDisCurricular = new RecCreditosDisCurricular();
+            recCreditosDisCurricular.setSolicitud(solicitud);
+            recCreditosDisCurricular = recCreditosDisCurricularRepository.save(recCreditosDisCurricular);
+
+            // Procedemos a guardar los ducumentos adjuntos de la solicitud
+            for (String documento : reconocimientoCreditosRequest.getDocumentosAdjuntos()) {
+                DocumentosRecCreditosDisCurricular dCreditosDisCurricular = new DocumentosRecCreditosDisCurricular();
+                dCreditosDisCurricular.setRecCreditosDisCurricular(recCreditosDisCurricular);
+                dCreditosDisCurricular.setDocumento(documento);
+                dRecCreditosDisCurricularRepository.save(dCreditosDisCurricular);
+            }
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de reconocimiento de créditos diseño curricular.", e);
             registro = false;
         }
         return registro;

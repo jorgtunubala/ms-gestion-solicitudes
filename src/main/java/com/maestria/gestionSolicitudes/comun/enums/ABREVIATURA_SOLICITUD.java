@@ -9,7 +9,8 @@ public enum ABREVIATURA_SOLICITUD {
     CU_ASIG("Cursos Externos"),
     AV_PASA_INV("Aval Pasantía"),
     AP_ECON_INV("Apoyo Económico"),
-    RE_CRED_PAS("Reconocimiento Créditos Pasantia");
+    RE_CRED_PAS("Reconocimiento Créditos Pasantia"),
+    RE_CRED_DIS("Reconocimiento Créditos Diseño Curricular");
 
     private final String descripcion;
 

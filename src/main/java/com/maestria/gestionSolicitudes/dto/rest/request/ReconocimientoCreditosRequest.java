@@ -5,6 +5,6 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class RecCreditosPasantiaRequest {
+public class ReconocimientoCreditosRequest {
     private List<String> documentosAdjuntos;
 }
