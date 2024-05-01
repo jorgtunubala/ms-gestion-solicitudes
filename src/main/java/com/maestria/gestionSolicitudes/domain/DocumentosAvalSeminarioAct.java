@@ -13,17 +13,17 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "documentos_rec_creditos_pasantia")
+@Table(name = "documentos_aval_seminario_act")
 @Data
-public class DocumentosRecCreditosPasantia {
+public class DocumentosAvalSeminarioAct {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_rec_cred_pasantia")
-    private RecCreditosPasantia recCreditosPasantia;
+    @JoinColumn(name = "id_aval_seminario_act")
+    private AvalSeminarioActualizacion avalSeminarioActualizacion;
 
     @Column(name = "documento")
     private String documento;

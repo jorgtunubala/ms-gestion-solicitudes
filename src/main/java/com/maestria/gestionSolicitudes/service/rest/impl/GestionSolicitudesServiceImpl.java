@@ -20,7 +20,9 @@ import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
+import com.maestria.gestionSolicitudes.mapper.ApoyoEconomicoCongresoMapper;
 import com.maestria.gestionSolicitudes.mapper.ApoyoEconomicoMapper;
+import com.maestria.gestionSolicitudes.mapper.ApoyoEconomicoPublicacionEventoMapper;
 import com.maestria.gestionSolicitudes.mapper.AvalPasantiaInvMapper;
 import com.maestria.gestionSolicitudes.repository.*;
 import com.maestria.gestionSolicitudes.service.client.GestionAsignaturasService;
@@ -83,24 +85,33 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     @Autowired
     private DocumentosApoyoEconomicoRepository documentosApoyoEconomicoRepository;
     @Autowired
-    private RecCreditosPasantiaRepository recCreditosPasantiaRepository;
+    private AvalSeminarioActRepository avalSeminarioActRepository;
     @Autowired
-    private DocumentosRecCreditosPasantiaRepository dRecCreditosPasantiaRepository;
-    @Autowired
-    private RecCreditosDisCurricularRepository recCreditosDisCurricularRepository;
-    @Autowired
-    private DocumentosRecCreditosDisCurricularRepository dRecCreditosDisCurricularRepository;
+    private DocumentosAvalSeminarioActRepository dAvalSeminarioActRepository;
     @Autowired
     private ReconocimientoCreditosRepository reconocimientoCreditosRepository;
     @Autowired
     private DocumentosRecCreditosRepository documentosRecCreditosRepository;
+    @Autowired
+    private ApoyoEconomicoCongresoRepository apoyoEconomicoCongresoRepository;
+    @Autowired
+    private DocumentosApoyoEconomicoCongresoRepository documentosApoyoEconomicoCongresoRepository;
+    @Autowired
+    private ApoyoEconomicoPublicacionEventoRepository apoyoEconomicoPublicacionEventoRepository;
+    @Autowired
+    private DocumentosApoyoEconomicoPublicacionEventoRepository documentosApoyoEconomicoPublicacionEventoRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
+    private final ApoyoEconomicoCongresoMapper apoyoEconomicoCongresoMapper;
+    private final ApoyoEconomicoPublicacionEventoMapper apoyoEconomicoPublicacionEventoMapper;
 
-    public GestionSolicitudesServiceImpl(ApoyoEconomicoMapper apoyoEconomicoMapper, AvalPasantiaInvMapper avalPasantiaInvMapper) {
+    public GestionSolicitudesServiceImpl(ApoyoEconomicoMapper apoyoEconomicoMapper, AvalPasantiaInvMapper avalPasantiaInvMapper, 
+                ApoyoEconomicoCongresoMapper apoyoEconomicoCongresoMapper, ApoyoEconomicoPublicacionEventoMapper apoyoEconomicoPublicacionEventoMapper) {
         this.apoyoEconomicoMapper = apoyoEconomicoMapper;
         this.avalPasantiaInvMapper = avalPasantiaInvMapper;
+        this.apoyoEconomicoCongresoMapper = apoyoEconomicoCongresoMapper;
+        this.apoyoEconomicoPublicacionEventoMapper = apoyoEconomicoPublicacionEventoMapper;
     }
     
     @Override
@@ -359,6 +370,48 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 }
                 break;
 
+            case "AV_SEMI_ACT":
+                try {
+                    boolean registroAvalSeminario = registrarAvalSeminario(idSolicitud, datosSolicitud.getDatosAvalSeminario());
+                    if (registroAvalSeminario) {
+                        logger.info("Se registraron los datos para el aval seminario actualización correctamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para aval seminario actualización.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+
+            case "AP_ECON_ASI":
+                try {
+                    boolean registroApoyoEconomicoCongreso = registrarApoyoEconimicoCongreso(idSolicitud, datosSolicitud.getDatosApoyoEconomicoCongreso());
+                    if (registroApoyoEconomicoCongreso) {
+                        logger.info("Se registraron los datos para el apoyo económico congreso correctamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para apoyo económico congreso.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+
+            case "PA_PUBL_EVE":
+                try {
+                    boolean registroApoyoEconomicoPubEvento = registrarApoyoEconimicoPublicacionEvento(idSolicitud, datosSolicitud.getDatosApoyoEconomicoPublicacion());
+                    if (registroApoyoEconomicoPubEvento) {
+                        logger.info("Se registraron los datos para el apoyo económico pago publicación evento correctamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para apoyo económico pago publicación evento.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
                 registro = false;
@@ -590,6 +643,59 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             response.setDatosReconocimientoCreditos(reconocimientoCreditosRequest);
                         }
                         break;
+                    
+                    case "AV_SEMI_ACT":
+                        AvalSeminarioActualizacion avalSeminarioActualizacion = avalSeminarioActRepository
+                                    .findBySolicitud(solicitud);
+                        if (avalSeminarioActualizacion != null){
+                            AvalSeminarioActRequest avalSeminarioActRequest = new AvalSeminarioActRequest();
+                            List<DocumentosAvalSeminarioAct> docsAvalSeminario = dAvalSeminarioActRepository
+                                    .findAllByAvalSeminarioActualizacion(avalSeminarioActualizacion);
+                            List<String> documentos = new ArrayList<>();
+                            for (DocumentosAvalSeminarioAct documento : docsAvalSeminario) {
+                                documentos.add(documento.getDocumento());
+                            }
+                            avalSeminarioActRequest.setDocumentosAdjuntos(documentos);
+                            response.setDatosAvalSeminario(avalSeminarioActRequest);
+                        }
+                        break;
+
+                    case "AP_ECON_ASI":
+                        ApoyoEconomicoCongreso apoyoEconomicoCongreso = apoyoEconomicoCongresoRepository.findBySolicitud(solicitud);
+                        if (apoyoEconomicoCongreso != null){
+                            ApoyoEconomicoCongresoRequest responseApoyoEconomicoCongreso = apoyoEconomicoCongresoMapper.entidadAdto(apoyoEconomicoCongreso);
+                            InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
+                                            .obtenerTutor(responseApoyoEconomicoCongreso.getIdDirectorGrupo().toString());
+                            responseApoyoEconomicoCongreso.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
+                            List<DocumentosApoyoEconomicoCongreso> documentosApoyosEconomicoCongreso = documentosApoyoEconomicoCongresoRepository.
+                                    findAllByApoyoEconomicoCongreso(apoyoEconomicoCongreso);
+                            List<String> documentos = new ArrayList<>();
+                            for (DocumentosApoyoEconomicoCongreso documento : documentosApoyosEconomicoCongreso) {
+                                documentos.add(documento.getDocumento());
+                            }
+                            responseApoyoEconomicoCongreso.setDocumentosAdjuntos(documentos);
+                            response.setDatosApoyoEconomicoCongreso(responseApoyoEconomicoCongreso);
+                        }
+                        break;
+
+                    case "PA_PUBL_EVE":
+                        ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoRepository
+                                    .findBySolicitud(solicitud);
+                        if (apoyoEconomicoPublicacionEvento != null){
+                            ApoyoEconomicoPublicacionEventoRequest responseApoyoEconomicoPubEvento = apoyoEconomicoPublicacionEventoMapper.entidadAdto(apoyoEconomicoPublicacionEvento);
+                            InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
+                                            .obtenerTutor(responseApoyoEconomicoPubEvento.getIdDirectorGrupo().toString());
+                            responseApoyoEconomicoPubEvento.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
+                            List<DocumentosApoyoEconomicoPublicacionEvento> documentosApoyosEconomicoPubEvento = documentosApoyoEconomicoPublicacionEventoRepository.
+                                    findAllByApoyoEconomicoPublicacionEvento(apoyoEconomicoPublicacionEvento);
+                            List<String> documentos = new ArrayList<>();
+                            for (DocumentosApoyoEconomicoPublicacionEvento documento : documentosApoyosEconomicoPubEvento) {
+                                documentos.add(documento.getDocumento());
+                            }
+                            responseApoyoEconomicoPubEvento.setDocumentosAdjuntos(documentos);
+                            response.setDatosApoyoEconomicoPublicacion(responseApoyoEconomicoPubEvento);
+                        }
+                        break;
 
                     default:
                         logger.info("No se encontró tipo de solicitud para retornar la información de la solicitud.");
@@ -785,7 +891,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             }
             registro = true;
         } catch (Exception e){
-            logger.error("Ocurrió un error al intentar guardar los datos de aval pasantia investigación.", e);
+            logger.error("Ocurrió un error al intentar guardar los datos de apoyo economico investigación.", e);
             registro = false;
         }
         return registro;
@@ -810,6 +916,75 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             registro = true;
         } catch (Exception e){
             logger.error("Ocurrió un error al intentar guardar los datos de reconocimiento de créditos.", e);
+            registro = false;
+        }
+        return registro;
+    }
+
+    private boolean registrarAvalSeminario(Integer idSolicitud, AvalSeminarioActRequest avalSeminarioActRequest) {
+        boolean registro = false;
+        try{
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            AvalSeminarioActualizacion avalSeminarioActualizacion = new AvalSeminarioActualizacion();
+            avalSeminarioActualizacion.setSolicitud(solicitud);            
+            avalSeminarioActualizacion = avalSeminarioActRepository.save(avalSeminarioActualizacion);
+
+            // Procedemos a guardar los ducumentos adjuntos de la solicitud
+            for (String documento : avalSeminarioActRequest.getDocumentosAdjuntos()) {
+                DocumentosAvalSeminarioAct documentosAvalSeminarioAct = new DocumentosAvalSeminarioAct();
+                documentosAvalSeminarioAct.setAvalSeminarioActualizacion(avalSeminarioActualizacion);
+                documentosAvalSeminarioAct.setDocumento(documento);
+                dAvalSeminarioActRepository.save(documentosAvalSeminarioAct);
+            }
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de aval seminario actualización.", e);
+            registro = false;
+        }
+        return registro;
+    }
+
+    private boolean registrarApoyoEconimicoCongreso(Integer idSolicitud, ApoyoEconomicoCongresoRequest apoyoEconomicoCongresoRequest) {
+        boolean registro = false;
+        try{
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            ApoyoEconomicoCongreso apoyoEconomicoCongreso = apoyoEconomicoCongresoMapper.dtoToEntity(apoyoEconomicoCongresoRequest);
+            apoyoEconomicoCongreso.setSolicitud(solicitud);
+            apoyoEconomicoCongreso = apoyoEconomicoCongresoRepository.save(apoyoEconomicoCongreso);
+
+            // Procedemos a guardar los ducumentos adjuntos de la solicitud
+            for (String documento : apoyoEconomicoCongresoRequest.getDocumentosAdjuntos()) {
+                DocumentosApoyoEconomicoCongreso documentosApoyoEconomicoCongreso = new DocumentosApoyoEconomicoCongreso();
+                documentosApoyoEconomicoCongreso.setApoyoEconomicoCongreso(apoyoEconomicoCongreso);
+                documentosApoyoEconomicoCongreso.setDocumento(documento);                
+                documentosApoyoEconomicoCongresoRepository.save(documentosApoyoEconomicoCongreso);
+            }
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de apoyo económico asistencia al congreso.", e);
+            registro = false;
+        }
+        return registro;
+    }
+
+    private boolean registrarApoyoEconimicoPublicacionEvento(Integer idSolicitud, ApoyoEconomicoPublicacionEventoRequest apoyoEconomicoPublicacionEventoRequest) {
+        boolean registro = false;
+        try{
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoMapper.dtoToEntity(apoyoEconomicoPublicacionEventoRequest);
+            apoyoEconomicoPublicacionEvento.setSolicitud(solicitud);
+            apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoRepository.save(apoyoEconomicoPublicacionEvento);
+
+            // Procedemos a guardar los ducumentos adjuntos de la solicitud
+            for (String documento : apoyoEconomicoPublicacionEventoRequest.getDocumentosAdjuntos()) {
+                DocumentosApoyoEconomicoPublicacionEvento documentosApoyoEconomicoPubEvento = new DocumentosApoyoEconomicoPublicacionEvento();
+                documentosApoyoEconomicoPubEvento.setApoyoEconomicoPublicacionEvento(apoyoEconomicoPublicacionEvento);
+                documentosApoyoEconomicoPubEvento.setDocumento(documento);
+                documentosApoyoEconomicoPublicacionEventoRepository.save(documentosApoyoEconomicoPubEvento);
+            }
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de apoyo económico pago publicación evento.", e);
             registro = false;
         }
         return registro;

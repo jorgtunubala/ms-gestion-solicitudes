@@ -1,0 +1,12 @@
+package com.maestria.gestionSolicitudes.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.maestria.gestionSolicitudes.domain.ApoyoEconomicoPublicacionEvento;
+import com.maestria.gestionSolicitudes.domain.DocumentosApoyoEconomicoPublicacionEvento;
+
+public interface DocumentosApoyoEconomicoPublicacionEventoRepository extends JpaRepository<DocumentosApoyoEconomicoPublicacionEvento, Integer> {
+    List<DocumentosApoyoEconomicoPublicacionEvento> findAllByApoyoEconomicoPublicacionEvento(ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento);
+}

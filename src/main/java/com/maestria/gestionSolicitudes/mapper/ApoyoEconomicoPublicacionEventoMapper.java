@@ -8,11 +8,11 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 
-import com.maestria.gestionSolicitudes.domain.ApoyoEconomicoInvestigacion;
-import com.maestria.gestionSolicitudes.dto.rest.request.ApoyoEconomicoRequest;
+import com.maestria.gestionSolicitudes.domain.ApoyoEconomicoPublicacionEvento;
+import com.maestria.gestionSolicitudes.dto.rest.request.ApoyoEconomicoPublicacionEventoRequest;
 
 @Mapper(componentModel = "spring")
-public interface ApoyoEconomicoMapper {
+public interface ApoyoEconomicoPublicacionEventoMapper {
 
     @Mappings({
         @Mapping(target = "solicitud", ignore = true),
@@ -21,14 +21,14 @@ public interface ApoyoEconomicoMapper {
         @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "stringToLocalDate"),
         @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "stringToLocalDate")
     })
-    ApoyoEconomicoInvestigacion dtoToEntity(ApoyoEconomicoRequest apoyoEconomicoRequest);
+    ApoyoEconomicoPublicacionEvento dtoToEntity(ApoyoEconomicoPublicacionEventoRequest apoyoEconomicoPublicacionEventoRequest);
 
     @Mapping(target = "idDirectorGrupo", source = "idDirector")
     @Mapping(target = "documentosAdjuntos", ignore = true)
     @Mapping(target = "nombreDirectorGrupo", ignore = true)
     @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "localDateToString")
     @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "localDateToString") 
-    ApoyoEconomicoRequest entidadAdto(ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion);
+    ApoyoEconomicoPublicacionEventoRequest entidadAdto(ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento);
 
     @Named("stringToLocalDate")
     default LocalDate stringToLocalDate(String fecha) {

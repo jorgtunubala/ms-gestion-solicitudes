@@ -23,7 +23,10 @@ public enum ABREVIATURA_SOLICITUD {
     EV_INFO_SAB("Reconocimiento Créditos Evaluación Informe Sabático"),
     PA_COMI_PRO("Reconocimiento Créditos Participación Comité Programa"),
     OT_ACTI_APO("Reconocimiento Créditos Realización Otras Actividades Apoyo"),
-    RE_CRED_PUB("Reconocimiento Créditos Publicaciones");
+    RE_CRED_PUB("Reconocimiento Créditos Publicaciones"),
+    AV_SEMI_ACT("Aval Seminario Actualización"),
+    AP_ECON_ASI("Apoyo Económico Asistencia Congresos"),
+    PA_PUBL_EVE("Apoyo Económico Pago Publicación o Eventos");
 
     private final String descripcion;
 

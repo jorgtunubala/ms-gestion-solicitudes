@@ -17,6 +17,9 @@ public class SolicitudRequestDto {
     private AvalPasantiaInvRequest datosAvalPasantiaInv;
     private ApoyoEconomicoRequest datosApoyoEconomico;
     private ReconocimientoCreditosRequest datosReconocimientoCreditos;
+    private AvalSeminarioActRequest datosAvalSeminario;
+    private ApoyoEconomicoCongresoRequest datosApoyoEconomicoCongreso;
+    private ApoyoEconomicoPublicacionEventoRequest datosApoyoEconomicoPublicacion;
     private Boolean requiereFirmaDirector;
     private String firmaEstudiante;
 }

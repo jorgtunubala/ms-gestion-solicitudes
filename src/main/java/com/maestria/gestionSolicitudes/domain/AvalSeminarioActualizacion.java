@@ -15,9 +15,9 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "reconocimiento_creditos_pasantia")
+@Table(name = "aval_seminario_actualizacion")
 @Data
-public class RecCreditosPasantia {
+public class AvalSeminarioActualizacion {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
