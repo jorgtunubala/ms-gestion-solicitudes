@@ -19,7 +19,8 @@ public enum ABREVIATURA_SUBTIPOS {
     EVA_JUR_EMP("Evaluación jurado pasantía"),
     EVA_TRA_EMP("Evaluación plan de trabajo pasantía"),
     EVA_ANT_PREG_DEP("Evaluación Anteproyectos"),
-    EVA_PRO_INT("Productividad Intelectual"),
+    EVA_PRO_INT_PON("Productividad Intelectual (Ponencias)"),
+    EVA_PRO_INT_LIB("Productividad Intelectual (Libros)"),
     EVA_INF_SAB("Informe sabático"),
     PAR_COM_PRO("Participación comité"),
     ACT_APO_DEP("Otras actividades apoyo");

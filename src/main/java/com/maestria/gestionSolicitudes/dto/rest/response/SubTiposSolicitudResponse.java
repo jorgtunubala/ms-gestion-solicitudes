@@ -1,6 +1,7 @@
 package com.maestria.gestionSolicitudes.dto.rest.response;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import lombok.Data;
 
@@ -13,4 +14,7 @@ public class SubTiposSolicitudResponse {
     private String nombre;
     private String abreviatura;
     private BigDecimal peso;
+    private Integer horasAsignadas;
+    private List<String> documentos;
+    private List<String> enlaces;
 }

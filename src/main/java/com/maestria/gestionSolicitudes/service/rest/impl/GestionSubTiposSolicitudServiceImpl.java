@@ -1,6 +1,7 @@
 package com.maestria.gestionSolicitudes.service.rest.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,10 @@ public class GestionSubTiposSolicitudServiceImpl implements GestionSubTiposSolic
             SubTiposSolicitudResponse subTiposSolicitudResponse = subTiposSolicitudMapper.entidadAdto(subTiposSolicitud);
             String codigo = subTiposSolicitud.getCodigo();
             subTiposSolicitudResponse.setAbreviatura(ABREVIATURA_SUBTIPOS.getDescripcionPorCodigo(codigo));
+            List<String> documentos = Arrays.asList("Documento 1", "Documento 2");
+            List<String> enlaces = Arrays.asList("Enlace 1");
+            subTiposSolicitudResponse.setDocumentos(documentos);
+            subTiposSolicitudResponse.setEnlaces(enlaces);
             response.add(subTiposSolicitudResponse);
         }
         return response;

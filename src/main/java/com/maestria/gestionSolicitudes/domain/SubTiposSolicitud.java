@@ -42,6 +42,9 @@ public class SubTiposSolicitud extends EntidadPrincipal {
     @Column(name = "peso")
     private BigDecimal peso;
 
+    @Column(name = "horas_asignadas")
+    private Integer horasAsignadas;
+
     @Column(name = "estado")
     private String estado;
 }
