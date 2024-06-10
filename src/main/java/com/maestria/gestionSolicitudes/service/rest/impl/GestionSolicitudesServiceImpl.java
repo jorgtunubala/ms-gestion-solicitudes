@@ -100,6 +100,14 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private ApoyoEconomicoPublicacionEventoRepository apoyoEconomicoPublicacionEventoRepository;
     @Autowired
     private DocumentosApoyoEconomicoPublicacionEventoRepository documentosApoyoEconomicoPublicacionEventoRepository;
+    @Autowired
+    private SubTiposSolicitudRepository subTiposSolicitudRepository;
+    @Autowired
+    private ActividadesRealizadasPracticaDocenteRepository actividadesRealizadasPracticaDocenteRepository;
+    @Autowired
+    private DocumentosActividadesRealizadasRepository documentosActividadesRealizadasRepository;
+    @Autowired
+    private EnlacesActividadesRealizadasRepository enlacesActividadesRealizadasRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -343,6 +351,18 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 break;
 
             case "RE_CRED_PAS":
+                    try {
+                        boolean registroActDocente = registrarActividadesPracticaDocente(idSolicitud, datosSolicitud.getDatosActividadDocenteRequest());
+                        if (registroActDocente) {
+                            logger.info("Se registraron los datos para el reconocimiento de créditos de práctica docente correctamente.");
+                            registro = true;
+                        }
+                    } catch (Exception e) {
+                        logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para reconocimiento de créditos por práctica docente.", e);
+                        registro = false;
+                        throw e;
+                    }
+                    break;
             case "RE_CRED_DIS":
             case "PR_CURS_TEO":
             case "AS_CRED_DO":
@@ -985,6 +1005,51 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             registro = true;
         } catch (Exception e){
             logger.error("Ocurrió un error al intentar guardar los datos de apoyo económico pago publicación evento.", e);
+            registro = false;
+        }
+        return registro;
+    }
+
+    private boolean registrarActividadesPracticaDocente(Integer idSolicitud, List<DatosActividadDocenteRequest> infoActividadesDocente) {
+        boolean registro = false;
+        try{            
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();            
+            
+            for (DatosActividadDocenteRequest actividadDocente : infoActividadesDocente) {
+
+                ActividadesRealizadasPracticaDocente actPracticaDocente = new ActividadesRealizadasPracticaDocente();
+                actPracticaDocente.setSolicitud(solicitud);
+                SubTiposSolicitud subtipo = subTiposSolicitudRepository.findByCodigo(actividadDocente.getCodigoSubtipo());
+                actPracticaDocente.setSubTiposSolicitud(subtipo);
+                if (actividadDocente.getIntensidadHoraria() != null) {
+                    actPracticaDocente.setIntensidadHoraria(actividadDocente.getIntensidadHoraria());
+                }
+                actPracticaDocente.setHorasReconocer(actividadDocente.getHorasReconocer());
+
+                // Guardar datos de la entidad
+                actPracticaDocente = actividadesRealizadasPracticaDocenteRepository.save(actPracticaDocente);
+
+                // Procedemos a guardar los ducumentos adjuntos de la solicitud
+                for (String documento : actividadDocente.getDocumentosAdjuntos()) {
+                    DocumentosActividadesRealizadas documentos = new DocumentosActividadesRealizadas();
+                    documentos.setActividadRealizada(actPracticaDocente);
+                    documentos.setSubTiposSolicitud(subtipo);
+                    documentos.setDocumento(documento);
+                    documentosActividadesRealizadasRepository.save(documentos);
+                }
+
+                // Procedemos a guardar los enlaces adjuntos de la solicitud
+                for (String enlace : actividadDocente.getEnlacesAdjuntos()) {
+                    EnlacesActividadesRealizadas enlaces = new EnlacesActividadesRealizadas();
+                    enlaces.setActividadRealizada(actPracticaDocente);
+                    enlaces.setSubTiposSolicitud(subtipo);
+                    enlaces.setEnlace(enlace);
+                    enlacesActividadesRealizadasRepository.save(enlaces);
+                }
+            }            
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de la práctiva actividad docente.", e);
             registro = false;
         }
         return registro;

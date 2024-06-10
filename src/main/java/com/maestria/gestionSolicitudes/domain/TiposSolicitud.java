@@ -1,17 +1,12 @@
 package com.maestria.gestionSolicitudes.domain;
 
-import java.time.LocalDate;
-
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.maestria.gestionSolicitudes.comun.util.BooleanConverter;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

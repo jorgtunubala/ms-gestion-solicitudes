@@ -20,6 +20,7 @@ public class SolicitudRequestDto {
     private AvalSeminarioActRequest datosAvalSeminario;
     private ApoyoEconomicoCongresoRequest datosApoyoEconomicoCongreso;
     private ApoyoEconomicoPublicacionEventoRequest datosApoyoEconomicoPublicacion;
+    private List<DatosActividadDocenteRequest> datosActividadDocenteRequest;
     private Boolean requiereFirmaDirector;
     private String firmaEstudiante;
 }

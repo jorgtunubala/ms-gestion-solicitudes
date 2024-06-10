@@ -10,4 +10,6 @@ import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
 public interface SubTiposSolicitudRepository extends JpaRepository<SubTiposSolicitud, Integer> {
 
     List<SubTiposSolicitud> findByTipoSolicitud(TiposSolicitud tiposSolicitud);
+
+    SubTiposSolicitud findByCodigo(String codigo);
 }
