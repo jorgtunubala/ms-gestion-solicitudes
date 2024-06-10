@@ -1,5 +1,7 @@
 package com.maestria.gestionSolicitudes.dto.rest.response;
 
+import java.util.List;
+
 import com.maestria.gestionSolicitudes.dto.rest.request.ApoyoEconomicoCongresoRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.ApoyoEconomicoPublicacionEventoRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.ApoyoEconomicoRequest;
@@ -22,4 +24,5 @@ public class DatosGestionSolicitudResponse {
     private AvalSeminarioActRequest datosAvalSeminario;
     private ApoyoEconomicoCongresoRequest datosApoyoEconomicoCongreso;
     private ApoyoEconomicoPublicacionEventoRequest datosApoyoEconomicoPublicacion;
+    private List<DatosActividadDocenteResponse> datosActividadDocente;
 }

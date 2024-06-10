@@ -635,6 +635,39 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         break;
 
                     case "RE_CRED_PAS":
+                        List<ActividadesRealizadasPracticaDocente> actividadPracticaDocente = 
+                            actividadesRealizadasPracticaDocenteRepository.findBySolicitud(solicitud);                        
+                        List<DatosActividadDocenteResponse> infoActividadesDocentes = new ArrayList<>();
+                        
+                        for (ActividadesRealizadasPracticaDocente actividad : actividadPracticaDocente) {
+                            DatosActividadDocenteResponse datosActividadDocente = new DatosActividadDocenteResponse();
+                            datosActividadDocente.setNombreActividad(actividad.getSubTiposSolicitud().getNombre());
+                            datosActividadDocente.setHorasReconocer(actividad.getHorasReconocer());
+
+                            //Agregamos los documentos de la actividad 
+                            List<DocumentosActividadesRealizadas> documentos = 
+                                documentosActividadesRealizadasRepository
+                                    .findByActividadRealizadaAndSubTiposSolicitud(actividad, actividad.getSubTiposSolicitud());
+                            List<String> documentosAdjuntosActRealizadas = new ArrayList<>();
+                            for (DocumentosActividadesRealizadas documento : documentos) {
+                                documentosAdjuntosActRealizadas.add(documento.getDocumento());
+                            }
+                            datosActividadDocente.setDocumentos(documentosAdjuntosActRealizadas);
+
+                            //Agregamos los enlaces de la actividad
+                            List<EnlacesActividadesRealizadas> enlaces = 
+                                enlacesActividadesRealizadasRepository
+                                    .findByActividadRealizadaAndSubTiposSolicitud(actividad, actividad.getSubTiposSolicitud());
+                            List<String> enlacesAdjuntosActRealizadas = new ArrayList<>();
+                            for (EnlacesActividadesRealizadas enlace : enlaces) {
+                                enlacesAdjuntosActRealizadas.add(enlace.getEnlace());
+                            }
+                            datosActividadDocente.setEnlaces(enlacesAdjuntosActRealizadas);
+                            infoActividadesDocentes.add(datosActividadDocente);
+                        }                        
+                        response.setDatosActividadDocente(infoActividadesDocentes);
+                        break;
+
                     case "RE_CRED_DIS":
                     case "PR_CURS_TEO":
                     case "AS_CRED_DO":
