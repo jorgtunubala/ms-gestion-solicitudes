@@ -108,6 +108,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private DocumentosActividadesRealizadasRepository documentosActividadesRealizadasRepository;
     @Autowired
     private EnlacesActividadesRealizadasRepository enlacesActividadesRealizadasRepository;
+    @Autowired
+    private AvalComiteProgramaRepository avalComiteProgramaRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -432,6 +434,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 }
                 break;
 
+            case "AV_COMI_PR":
+                try {
+                    boolean registroAvales = registrarAvalComitePrograma(idSolicitud, datosSolicitud.getDatosAvalComite());
+                    if (registroAvales) {
+                        logger.info("Se registraron los datos para el aval comite de programa correctamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos del aval de comite de programa.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
                 registro = false;
@@ -749,6 +765,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             response.setDatosApoyoEconomicoPublicacion(responseApoyoEconomicoPubEvento);
                         }
                         break;
+
+                    case "AV_COMI_PR":
+                        List<AvalComitePrograma> avalesComite = 
+                            avalComiteProgramaRepository.findBySolicitud(solicitud);                        
+                        List<DatosAvalComiteResponse> infoAvales = new ArrayList<>();
+                        
+                        for (AvalComitePrograma aval : avalesComite) {
+                            DatosAvalComiteResponse datosAvales = new DatosAvalComiteResponse();
+                            datosAvales.setNombreActividad(aval.getSubTiposSolicitud().getNombre());
+                            datosAvales.setHorasReconocer(aval.getHorasReconocer());
+                            infoAvales.add(datosAvales);
+                        }
+                        response.setDatosAvalComite(infoAvales);
+                        break;                        
 
                     default:
                         logger.info("No se encontró tipo de solicitud para retornar la información de la solicitud.");
@@ -1083,6 +1113,32 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             registro = true;
         } catch (Exception e){
             logger.error("Ocurrió un error al intentar guardar los datos de la práctiva actividad docente.", e);
+            registro = false;
+        }
+        return registro;
+    }
+
+    private boolean registrarAvalComitePrograma(Integer idSolicitud, List<AvalComiteRequest> datosAvalComite) {
+        boolean registro = false;
+        try{            
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();            
+            
+            for (AvalComiteRequest avales : datosAvalComite) {
+
+                AvalComitePrograma aval = new AvalComitePrograma();
+                aval.setSolicitud(solicitud);
+                SubTiposSolicitud subtipo = subTiposSolicitudRepository.findByCodigo(avales.getCodigoSubtipo());
+                aval.setSubTiposSolicitud(subtipo);                
+                aval.setIntensidadHoraria(avales.getIntensidadHoraria());                
+                aval.setHorasReconocer(avales.getHorasReconocer());
+
+                // Guardar datos de la entidad
+                aval = avalComiteProgramaRepository.save(aval);
+                
+            }            
+            registro = true;
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos del aval comite de programa.", e);
             registro = false;
         }
         return registro;

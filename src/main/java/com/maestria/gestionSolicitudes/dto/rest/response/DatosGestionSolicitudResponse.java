@@ -25,4 +25,5 @@ public class DatosGestionSolicitudResponse {
     private ApoyoEconomicoCongresoRequest datosApoyoEconomicoCongreso;
     private ApoyoEconomicoPublicacionEventoRequest datosApoyoEconomicoPublicacion;
     private List<DatosActividadDocenteResponse> datosActividadDocente;
+    private List<DatosAvalComiteResponse> datosAvalComite;
 }
