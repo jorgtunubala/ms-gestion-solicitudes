@@ -18,7 +18,7 @@ public interface GestionSolicitudesService {
 
     List<TutorDto> obtenerTutotes() throws Exception;
 
-    Boolean registrarSolicitud(SolicitudRequestDto datosSolicitud) throws Exception;
+    String registrarSolicitud(SolicitudRequestDto datosSolicitud) throws Exception;
 
     List<SolicitudPendientesAval> obtenerSolicitudesPendientes(String correo) throws Exception;
 

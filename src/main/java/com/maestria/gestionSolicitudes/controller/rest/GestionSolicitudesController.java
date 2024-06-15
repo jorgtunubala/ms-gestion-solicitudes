@@ -80,7 +80,7 @@ public class GestionSolicitudesController {
     }
 
     @PostMapping("/save")
-    public Boolean registrarSolicitud(@RequestBody SolicitudRequestDto datosSolicitud) throws Exception {
+    public String registrarSolicitud(@RequestBody SolicitudRequestDto datosSolicitud) throws Exception {
         return gestionSolicitudesService.registrarSolicitud(datosSolicitud);
     }
 

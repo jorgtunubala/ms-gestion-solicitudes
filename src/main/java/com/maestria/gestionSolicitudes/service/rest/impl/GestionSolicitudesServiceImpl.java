@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.maestria.gestionSolicitudes.comun.enums.*;
+import com.maestria.gestionSolicitudes.comun.util.TokenAleatorio;
 import com.maestria.gestionSolicitudes.domain.*;
 import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaDto;
 import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
@@ -210,11 +211,12 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     @Override
     @Transactional
-    public Boolean registrarSolicitud(SolicitudRequestDto datosSolicitud) throws Exception {
+    public String registrarSolicitud(SolicitudRequestDto datosSolicitud) throws Exception {
         /*
          * Función que se encarga de registrar toda la información de cada solicitud de cualquier tipo.
         */
         Boolean registro = Boolean.FALSE;
+        String radicado;
         try {
             logger.info("Inicia proceso registrar solicitud...");
             // Buscamos el tipo de solciitud a asociar en el regsitro de la solicitud.
@@ -238,6 +240,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             // Verificar si todas las operaciones fueron exitosas
             if (datosTipoSolicitudRegistrados && firmaEstudianteRegistrada) {
                 registro = Boolean.TRUE;
+                radicado = TokenAleatorio.generarCodigoAleatorio();
+                registroSolicitud.setRadicado(radicado);
+                //solicitudesRepository.save(registroSolicitud);
                 logger.info("Se registró correctamente la solicitud.");
             } else {                
                 logger.error("Ocurrió un error al registrar la solicitud.");
@@ -247,7 +252,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             logger.error("Ocurrió un error inesperado al registrar la solicitud.", e);
             throw e;
         }
-        return registro;
+        return registro ? radicado : null;
     }
 
     @Transactional

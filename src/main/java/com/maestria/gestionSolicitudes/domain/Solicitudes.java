@@ -49,4 +49,7 @@ public class Solicitudes extends EntidadPrincipal {
 
     @Column(name = "documento_firmado")
     private String documentoFirmado;
+
+    @Column(name = "radicado")
+    private String radicado;
 }
