@@ -1,12 +1,13 @@
 package com.maestria.gestionSolicitudes.comun.enums;
 
 public enum ESTADO_SOLICITUD {
-    PENDIENTE_AVAL("Pendiente Aval"),
-    AVALADO("Avalado"),
-    RECIBIDO("Recibido"),
-    EN_PROGRESO("En progreso"),
-    COMPLETADO("Completado"),
-    CANCELADO("Cancelado");
+    RADICADA("Radicada"),
+    AVALADA("Avalada"),
+    NO_AVALADA("No Avalada"),
+    EN_COMITE("En cómite"),
+    RECHAZADA("Rechazada"),
+    APROBADA("Aprobada"),
+    NO_APROBADA("No Aprobada");
 
     private final String descripcion;
 

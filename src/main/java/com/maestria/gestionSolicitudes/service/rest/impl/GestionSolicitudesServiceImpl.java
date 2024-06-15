@@ -111,6 +111,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private EnlacesActividadesRealizadasRepository enlacesActividadesRealizadasRepository;
     @Autowired
     private AvalComiteProgramaRepository avalComiteProgramaRepository;
+    @Autowired
+    private HistorialEstadoSolicitudesRepository historialEstadoSolicitudesRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -226,9 +228,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             // Asignamos los datos necesarios de la solicitud.
             solicitud.setIdEstudiante(datosSolicitud.getIdEstudiante());
             solicitud.setTipoSolicitud(tipoSolicitud);
-            solicitud.setIdTutor(datosSolicitud.getIdTutor());
-            solicitud.setEstado(ESTADO_SOLICITUD.EN_PROGRESO.getDescripcion());
+            solicitud.setIdTutor(datosSolicitud.getIdTutor());            
+            solicitud.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
+            solicitud.setDocumentoFirmado(datosSolicitud.getOficioPdf());
             Solicitudes registroSolicitud = solicitudesRepository.save(solicitud);
 
             // Utilizamos la siguiente función para guardar otros datos de la solicitud según su tipo.
@@ -244,6 +247,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 registroSolicitud.setRadicado(radicado);
                 //solicitudesRepository.save(registroSolicitud);
                 logger.info("Se registró correctamente la solicitud.");
+
+                // registrar en el historico
+                registrarHistoricoSolicitud(registroSolicitud);
             } else {                
                 logger.error("Ocurrió un error al registrar la solicitud.");
                 throw new Exception("Error al registrar la solicitud.");
@@ -465,7 +471,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(String correo) throws Exception {
         List<SolicitudPendientesAval> solicitudes = new ArrayList<>();
         InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(correo);
-        List<Solicitudes> solicitudesPendientes = solicitudesRepository.findAllByIdTutorOrderByFechaCreacionAsc(infoTutor.getId(), ESTADO_SOLICITUD.EN_PROGRESO.getDescripcion());
+        List<Solicitudes> solicitudesPendientes = solicitudesRepository.findAllByIdTutorOrderByFechaCreacionAsc(infoTutor.getId(), ESTADO_SOLICITUD.RADICADA.getDescripcion());
         for (Solicitudes solicitud : solicitudesPendientes) {
             TiposSolicitud tipoSolicitud = tipoSolicitudRepository.findById(solicitud.getTipoSolicitud().getId()).get();
             InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
@@ -847,7 +853,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         }
         if (registroDocumento) {
             solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
-            solicitud.setEstado(ESTADO_SOLICITUD.AVALADO.getDescripcion());
+            solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
             solicitudesRepository.save(solicitud);
         }
         return registroFirma;
@@ -902,7 +908,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosCursarAsignatura.setNombreDocente(infoAsignaturaExterna.getNombreDocente());
                 datosCursarAsignatura.setTituloDocente(infoAsignaturaExterna.getTituloDocente());
                 datosCursarAsignatura.setCartaAceptacion(infoAsignaturaExterna.getCartaAceptacion());
-                datosCursarAsignatura.setEstado(ESTADO_SOLICITUD.PENDIENTE_AVAL.getDescripcion());
+                datosCursarAsignatura.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
                 datosCursarAsignaturaRepository.save(datosCursarAsignatura);
             }
             
@@ -1147,5 +1153,15 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             registro = false;
         }
         return registro;
+    }
+
+    private void registrarHistoricoSolicitud(Solicitudes solicitud) {
+        HistorialEstadoSolicitudes historico = new HistorialEstadoSolicitudes();
+        historico.setSolicitud(solicitud);
+        historico.setEstado(solicitud.getEstado());
+        historico.setPdfBase64(solicitud.getDocumentoFirmado());
+        historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(solicitud.getEstado().toUpperCase()));
+        historico.setComentarios("sin comentarios");
+        historialEstadoSolicitudesRepository.save(historico);
     }
 }

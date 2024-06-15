@@ -25,4 +25,6 @@ public interface GestionSolicitudesService {
     DatosGestionSolicitudResponse obtenerDatosSolicitud(Integer idSolicitud) throws Exception;
 
     Boolean registrarFirmasPendientes(DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception;
+
+    
 }

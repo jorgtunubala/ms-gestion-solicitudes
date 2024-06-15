@@ -24,4 +24,5 @@ public class SolicitudRequestDto {
     private List<AvalComiteRequest> datosAvalComite;
     private Boolean requiereFirmaDirector;
     private String firmaEstudiante;
+    private String oficioPdf;
 }

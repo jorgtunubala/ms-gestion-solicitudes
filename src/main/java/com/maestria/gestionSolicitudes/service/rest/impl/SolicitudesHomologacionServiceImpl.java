@@ -77,7 +77,7 @@ public class SolicitudesHomologacionServiceImpl implements SolicitudesHomologaci
                 asignaturasHomologadas.setAsignaturaHomologar(null);
                 asignaturasHomologadas.setAsignaturaExterna(asignaturaExternaResponseDto.getIdAsignatura());
                 asignaturasHomologadas.setCalificacionObtenida(datosAsignaturaHomologacionDto.getCalificacion());
-                asignaturasHomologadas.setEstado(ESTADO_SOLICITUD.PENDIENTE_AVAL.getDescripcion());
+                asignaturasHomologadas.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
                 asignaturasHomologadasRepository.save(asignaturasHomologadas);
             }
             return Boolean.TRUE;
