@@ -1164,4 +1164,30 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         historico.setComentarios("sin comentarios");
         historialEstadoSolicitudesRepository.save(historico);
     }
+
+    @Override
+    public List<SolicitudHistoricoResponse> obtenerHistorialSeguimiento(EstadoSolicitudRequest estadoSolicitudRequest) {
+        List<SolicitudHistoricoResponse> response = new ArrayList<>();
+        String radicado = estadoSolicitudRequest.getRadicado();
+        Solicitudes solicitud = solicitudesRepository
+                .findByRadicado(radicado).get();
+        if(solicitud != null){
+            List<HistorialEstadoSolicitudes> historial = historialEstadoSolicitudesRepository
+                                .findBySolicitudOrderByFechaCreacionAsc(solicitud);
+            SolicitudHistoricoResponse info;
+            for (HistorialEstadoSolicitudes historico : historial) {
+                info = new SolicitudHistoricoResponse();
+                info.setRadicado(radicado);
+                info.setEstadoSolicitud(historico.getEstado());
+                info.setFechaHora(historico.getFechaCreacion().toString());
+                info.setPdfBase64(historico.getPdfBase64());
+                info.setDescripcion(historico.getDescripcion());
+                info.setComentarios(historico.getComentarios());
+                response.add(info);
+            }            
+            
+            return response;
+        }
+        return null;
+    }
 }

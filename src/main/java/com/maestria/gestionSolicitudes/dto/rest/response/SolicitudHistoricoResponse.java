@@ -8,5 +8,6 @@ public class SolicitudHistoricoResponse {
     private String estadoSolicitud;
     private String fechaHora;
     private String pdfBase64;
-    private String observaciones;
+    private String descripcion;
+    private String comentarios;
 }

@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.DatosAvalarSolicitudDto;
+import com.maestria.gestionSolicitudes.dto.rest.request.EstadoSolicitudRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DatosGestionSolicitudResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoRequeridoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentosRequeridosResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.InformacionPersonalResponse;
+import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudHistoricoResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudPendientesAval;
 import com.maestria.gestionSolicitudes.dto.rest.response.TipoSolicitudResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.TutorDto;
@@ -98,4 +100,10 @@ public class GestionSolicitudesController {
     public Boolean registrarFirmasSolicitud(@RequestBody DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception {
         return gestionSolicitudesService.registrarFirmasPendientes(dAvalarSolicitudDto);
     }
+
+    @GetMapping("/historial/solicitud")
+    public List<SolicitudHistoricoResponse> obtenerHistorialSolicitud(@RequestBody EstadoSolicitudRequest estadoSolicitudRequest) throws Exception {
+        return gestionSolicitudesService.obtenerHistorialSeguimiento(estadoSolicitudRequest);
+    }
 }
+

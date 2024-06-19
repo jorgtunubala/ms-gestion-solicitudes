@@ -43,7 +43,7 @@ public class HistorialEstadoSolicitudes {
 
     @CreationTimestamp
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
-    private LocalDateTime fecha_creacion;
+    private LocalDateTime fechaCreacion;
 
     @Column(name = "usuario_creacion")
     private Integer usuarioCreacion;
