@@ -1170,7 +1170,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         List<SolicitudHistoricoResponse> response = new ArrayList<>();
         String radicado = estadoSolicitudRequest.getRadicado();
         Solicitudes solicitud = solicitudesRepository
-                .findByRadicado(radicado).get();
+                .findByRadicado(radicado).orElse(null);
         if(solicitud != null){
             List<HistorialEstadoSolicitudes> historial = historialEstadoSolicitudesRepository
                                 .findBySolicitudOrderByFechaCreacionAsc(solicitud);
@@ -1185,9 +1185,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 info.setComentarios(historico.getComentarios());
                 response.add(info);
             }            
-            
-            return response;
+               
         }
-        return null;
+        return response;
     }
 }
