@@ -27,5 +27,5 @@ public interface GestionSolicitudesService {
 
     Boolean registrarFirmasPendientes(DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception;
 
-    List<SolicitudHistoricoResponse> obtenerHistorialSeguimiento(EstadoSolicitudRequest estadoSolicitudRequest);
+    List<SolicitudHistoricoResponse> obtenerHistorialSeguimiento(String radicado);
 }

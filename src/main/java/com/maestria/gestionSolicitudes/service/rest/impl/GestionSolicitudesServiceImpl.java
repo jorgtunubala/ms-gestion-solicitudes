@@ -1166,9 +1166,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     }
 
     @Override
-    public List<SolicitudHistoricoResponse> obtenerHistorialSeguimiento(EstadoSolicitudRequest estadoSolicitudRequest) {
+    public List<SolicitudHistoricoResponse> obtenerHistorialSeguimiento(String radicado) {
         List<SolicitudHistoricoResponse> response = new ArrayList<>();
-        String radicado = estadoSolicitudRequest.getRadicado();
         Solicitudes solicitud = solicitudesRepository
                 .findByRadicado(radicado).orElse(null);
         if(solicitud != null){

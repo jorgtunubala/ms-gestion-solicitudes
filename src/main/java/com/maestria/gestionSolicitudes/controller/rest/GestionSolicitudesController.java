@@ -101,9 +101,9 @@ public class GestionSolicitudesController {
         return gestionSolicitudesService.registrarFirmasPendientes(dAvalarSolicitudDto);
     }
 
-    @GetMapping("/historial/solicitud")
-    public List<SolicitudHistoricoResponse> obtenerHistorialSolicitud(@RequestBody EstadoSolicitudRequest estadoSolicitudRequest) throws Exception {
-        return gestionSolicitudesService.obtenerHistorialSeguimiento(estadoSolicitudRequest);
+    @GetMapping("/historial/solicitud/{radicado}")
+    public List<SolicitudHistoricoResponse> obtenerHistorialSolicitud(@PathVariable String radicado) throws Exception {
+        return gestionSolicitudesService.obtenerHistorialSeguimiento(radicado);
     }
 }
 
