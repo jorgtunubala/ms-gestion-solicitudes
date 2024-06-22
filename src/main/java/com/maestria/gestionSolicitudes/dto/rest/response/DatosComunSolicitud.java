@@ -19,5 +19,6 @@ public class DatosComunSolicitud {
     private String firmaSolicitante;
     private String firmaTutor;
     private String firmaDirector;
-    private String estadoSolicitud;    
+    private String estadoSolicitud;
+    private String oficioPdf;
 }
