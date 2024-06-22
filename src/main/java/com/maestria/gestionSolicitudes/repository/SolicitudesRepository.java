@@ -19,4 +19,6 @@ public interface SolicitudesRepository extends JpaRepository<Solicitudes, Intege
     List<Solicitudes> findAllByIdTutorOrderByFechaCreacionAsc(Integer idTutor, String estado);
 
     Optional<Solicitudes> findByRadicado(String radicado);
+
+    List<Solicitudes> findByEstado(String estado);
 }

@@ -105,5 +105,10 @@ public class GestionSolicitudesController {
     public List<SolicitudHistoricoResponse> obtenerHistorialSolicitud(@PathVariable String radicado) throws Exception {
         return gestionSolicitudesService.obtenerHistorialSeguimiento(radicado);
     }
+
+    @GetMapping("/obtener-solicitudes-pendientes-coordinador/{estado}")
+    public List<SolicitudPendientesAval> obtenerDatosSolicitudPendientesCoordinador(@PathVariable String estado) throws Exception {
+        return gestionSolicitudesService.obtenerDatosSolicitudPendientesCoordinador(estado);
+    }
 }
 

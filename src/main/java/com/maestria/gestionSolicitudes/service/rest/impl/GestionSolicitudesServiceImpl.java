@@ -1189,4 +1189,26 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         }
         return response;
     }
+
+    @Override
+    public List<SolicitudPendientesAval> obtenerDatosSolicitudPendientesCoordinador(String estado) throws Exception {
+        List<SolicitudPendientesAval> solicitudes = new ArrayList<>();
+        List<Solicitudes> solicitudesPendientes = solicitudesRepository.
+                    findByEstado(ESTADO_SOLICITUD.getDescripcionPorCodigo(estado));
+        for (Solicitudes solicitud : solicitudesPendientes) {
+            TiposSolicitud tipoSolicitud = tipoSolicitudRepository.findById(solicitud.getTipoSolicitud().getId()).get();
+            InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
+                    .obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
+            SolicitudPendientesAval solicitudPendiente = new SolicitudPendientesAval();
+            solicitudPendiente.setIdSolicitud(solicitud.getId());
+            solicitudPendiente.setCodigoSolicitud(tipoSolicitud.getCodigo());
+            solicitudPendiente.setNombreTipoSolicitud(tipoSolicitud.getNombre());
+            solicitudPendiente.setAbreviatura(ABREVIATURA_SOLICITUD.valueOf(tipoSolicitud.getCodigo()).getDescripcion());
+            solicitudPendiente.setNombreEstudiante(estudiante.obtenerNombreCompleto());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            solicitudPendiente.setFecha(solicitud.getFechaCreacion().format(formatter));            
+            solicitudes.add(solicitudPendiente);
+        }
+        return solicitudes;
+    }
 }

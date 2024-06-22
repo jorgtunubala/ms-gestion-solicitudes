@@ -28,4 +28,6 @@ public interface GestionSolicitudesService {
     Boolean registrarFirmasPendientes(DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception;
 
     List<SolicitudHistoricoResponse> obtenerHistorialSeguimiento(String radicado);
+
+    List<SolicitudPendientesAval> obtenerDatosSolicitudPendientesCoordinador(String estado) throws Exception;
 }

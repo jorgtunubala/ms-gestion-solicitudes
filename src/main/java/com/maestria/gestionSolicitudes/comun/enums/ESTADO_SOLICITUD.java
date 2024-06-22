@@ -18,4 +18,13 @@ public enum ESTADO_SOLICITUD {
     public String getDescripcion() {
         return descripcion;
     }
+
+    public static String getDescripcionPorCodigo(String codigo) {
+        for (ESTADO_SOLICITUD tipo : ESTADO_SOLICITUD.values()) {
+            if (tipo.name().equals(codigo)) {
+                return tipo.getDescripcion();
+            }
+        }
+        return null; // O lanza una excepción si prefieres
+    }
 }
