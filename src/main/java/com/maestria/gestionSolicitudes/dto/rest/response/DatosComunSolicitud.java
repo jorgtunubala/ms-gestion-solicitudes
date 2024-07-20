@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class DatosComunSolicitud {
     private String tipoSolicitud;
+    private String radicado;
     private String fechaEnvioSolicitud;
     private String nombreSolicitante;
     private String apellidoSolicitante;

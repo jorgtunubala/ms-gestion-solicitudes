@@ -134,7 +134,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         */
         
         // Buscamos en la tabla tipos_solicitudes y retornamos los tipos de solicitudes en esatado ACTIVO
-        List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstado("ACTIVO");
+        List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
         List<TipoSolicitudDto> tiposSolicitudDtos = new ArrayList<>();
         for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
             TipoSolicitudDto tiposSolicitudDto = new TipoSolicitudDto();
@@ -164,9 +164,12 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             dSolicitudDto.setArticulo(requisitoSolicitud.getArticulo());
             // Anexamos los documentos requeridos de la solicitud
             List<DocumentoRequisitoSolicitud> lRequisitoSolicituds = dSolicitudRepository.findByRequisitoSolicitudId(requisitoSolicitud.getId());
-            List<String> lDocumentos = new ArrayList<>();
+            List<DocumentoRequerido> lDocumentos = new ArrayList<>();
             for (DocumentoRequisitoSolicitud documentoRequisitoSolicitud : lRequisitoSolicituds) {
-                lDocumentos.add(documentoRequisitoSolicitud.getNombreDocumento());
+                DocumentoRequerido doc = new DocumentoRequerido();
+                doc.setNombre(documentoRequisitoSolicitud.getNombreDocumento());
+                doc.setAdjuntarDocumento(documentoRequisitoSolicitud.getAdjuntarDocumento());
+                lDocumentos.add(doc);
             }
             dSolicitudDto.setDocumentosRequeridos(lDocumentos);
             // Buscamos Notas que pueden estar asociadas a la solicitud.
@@ -478,6 +481,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     .obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
             SolicitudPendientesAval solicitudPendiente = new SolicitudPendientesAval();
             solicitudPendiente.setIdSolicitud(solicitud.getId());
+            solicitudPendiente.setRadicado(solicitud.getRadicado());
             solicitudPendiente.setCodigoSolicitud(tipoSolicitud.getCodigo());
             solicitudPendiente.setNombreTipoSolicitud(tipoSolicitud.getNombre());
             solicitudPendiente.setAbreviatura(ABREVIATURA_SOLICITUD.valueOf(tipoSolicitud.getCodigo()).getDescripcion());
@@ -500,6 +504,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdTutor().toString());
                 InformacionPersonalDto estudiante = gestionDocentesEstudiantesService.obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
                 datosComun.setTipoSolicitud(solicitud.getTipoSolicitud().getNombre());
+                datosComun.setRadicado(solicitud.getRadicado());
                 // Formatear la fecha y hora en el formato deseado
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 datosComun.setFechaEnvioSolicitud(solicitud.getFechaCreacion().format(formatter));
@@ -1162,7 +1167,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         historico.setEstado(solicitud.getEstado());
         historico.setPdfBase64(solicitud.getDocumentoFirmado());
         historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(solicitud.getEstado().toUpperCase()));
-        historico.setComentarios("sin comentarios");
+        historico.setComentarios("");
         historialEstadoSolicitudesRepository.save(historico);
     }
 

@@ -8,5 +8,5 @@ import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
 
 public interface TiposSolicitudRepository extends JpaRepository<TiposSolicitud, Integer> {
 
-    List<TiposSolicitud> findByEstado(String estado);
+    List<TiposSolicitud> findByEstadoOrderByNombreAsc(String estado);
 }

@@ -10,6 +10,6 @@ public class DocumentoRequeridoSolicitudDto {
     private String descripcion;
     private String articulo;
     private String tenerEnCuenta;
-    private List<String> documentosRequeridos;
-    private List<String> notas;
+    private List<DocumentoRequerido> documentosRequeridos;
+    private List<String> notas; 
 }
