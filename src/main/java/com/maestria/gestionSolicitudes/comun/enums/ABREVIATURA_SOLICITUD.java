@@ -10,6 +10,7 @@ public enum ABREVIATURA_SOLICITUD {
     AV_PASA_INV("Aval Pasantía"),
     AP_ECON_INV("Apoyo Económico"),
     RE_CRED_PAS("Reconocimiento Créditos Pasantia"),
+    RE_CRED_PR_DOC("Reconocimiento Práctica Docente"),
     RE_CRED_DIS("Reconocimiento Créditos Diseño Curricular"),
     PR_CURS_TEO("Reconocimiento Créditos Cursos Teóricos"),
     AS_CRED_DO("Asignación Créditos por Docencia"),

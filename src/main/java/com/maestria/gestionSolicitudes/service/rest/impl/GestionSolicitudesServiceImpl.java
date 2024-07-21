@@ -366,7 +366,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 }
                 break;
 
-            case "RE_CRED_PAS":
+            case "RE_CRED_PR_DOC":
                     try {
                         boolean registroActDocente = registrarActividadesPracticaDocente(idSolicitud, datosSolicitud.getDatosActividadDocenteRequest());
                         if (registroActDocente) {
@@ -379,6 +379,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         throw e;
                     }
                     break;
+            case "RE_CRED_PAS":
             case "RE_CRED_DIS":
             case "PR_CURS_TEO":
             case "AS_CRED_DO":
@@ -667,7 +668,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         }
                         break;
 
-                    case "RE_CRED_PAS":
+                    case "RE_CRED_PR_DOC":
                         List<ActividadesRealizadasPracticaDocente> actividadPracticaDocente = 
                             actividadesRealizadasPracticaDocenteRepository.findBySolicitud(solicitud);                        
                         List<DatosActividadDocenteResponse> infoActividadesDocentes = new ArrayList<>();
@@ -701,6 +702,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         response.setDatosActividadDocente(infoActividadesDocentes);
                         break;
 
+                    case "RE_CRED_PAS":
                     case "RE_CRED_DIS":
                     case "PR_CURS_TEO":
                     case "AS_CRED_DO":
