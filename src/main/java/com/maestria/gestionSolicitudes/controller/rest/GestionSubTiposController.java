@@ -19,11 +19,11 @@ public class GestionSubTiposController {
     @Autowired
     private GestionSubTiposSolicitudService gestionSubTiposSolicitudService;
 
-    @GetMapping("/subTiposSolicitud/{idSubTipo}")
-    public List<SubTiposSolicitudResponse> obtenerSubTiposSolicitud(@PathVariable Integer idSubTipo) {
+    @GetMapping("/subTiposSolicitud")
+    public List<SubTiposSolicitudResponse> obtenerSubTiposSolicitud() {
         List<SubTiposSolicitudResponse> response = new ArrayList<>();
         try {
-            response = gestionSubTiposSolicitudService.obtenerSubtiposPorTipoSolicitud(idSubTipo);
+            response = gestionSubTiposSolicitudService.obtenerSubtiposPorTipoSolicitud();
         } catch (Exception e) {
             e.getMessage();
         }

@@ -43,8 +43,8 @@ public class GestionSubTiposSolicitudServiceImpl implements GestionSubTiposSolic
     private SubTiposSolicitudRepository subTiposSolicitudRepository;
 
     @Override
-    public List<SubTiposSolicitudResponse> obtenerSubtiposPorTipoSolicitud(Integer id) {
-        TiposSolicitud tiposSolicitud = tiposSolicitudRepository.findById(id).get();
+    public List<SubTiposSolicitudResponse> obtenerSubtiposPorTipoSolicitud() {
+        TiposSolicitud tiposSolicitud = tiposSolicitudRepository.findByCodigo("RE_CRED_PR_DOC");
         List<SubTiposSolicitud> listaSubTipos = subTiposSolicitudRepository.findByTipoSolicitud(tiposSolicitud);
         List<SubTiposSolicitudResponse> response = new ArrayList<>();
         for (SubTiposSolicitud subTiposSolicitud : listaSubTipos) {
