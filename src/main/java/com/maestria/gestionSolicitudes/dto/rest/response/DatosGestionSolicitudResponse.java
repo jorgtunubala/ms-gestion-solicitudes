@@ -7,6 +7,7 @@ import com.maestria.gestionSolicitudes.dto.rest.request.ApoyoEconomicoPublicacio
 import com.maestria.gestionSolicitudes.dto.rest.request.ApoyoEconomicoRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.AvalSeminarioActRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.ReconocimientoCreditosRequest;
+import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudBecaRequest;
 
 import lombok.Data;
 
@@ -26,4 +27,5 @@ public class DatosGestionSolicitudResponse {
     private ApoyoEconomicoPublicacionEventoRequest datosApoyoEconomicoPublicacion;
     private List<DatosActividadDocenteResponse> datosActividadDocente;
     private List<DatosAvalComiteResponse> datosAvalComite;
+    private SolicitudBecaRequest datoSolicitudBeca;
 }

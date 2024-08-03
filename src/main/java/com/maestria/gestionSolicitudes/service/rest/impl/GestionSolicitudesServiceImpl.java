@@ -113,6 +113,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private AvalComiteProgramaRepository avalComiteProgramaRepository;
     @Autowired
     private HistorialEstadoSolicitudesRepository historialEstadoSolicitudesRepository;
+    @Autowired
+    private SolicitudBecaRepository solicitudBecaRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -463,6 +465,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 }
                 break;
 
+            case "SO_BECA":
+                try {
+                    boolean registroBeca = registrarSolicitudBeca(idSolicitud, datosSolicitud.getDatosSolicitudBeca());
+                    if (registroBeca) {
+                        logger.info("Se registraron los datos para la solicitud de beca correctamente.");
+                        registro = true;
+                    }
+                } catch (Exception e) {
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud de beca.", e);
+                    registro = false;
+                    throw e;
+                }
+                break;
+
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
                 registro = false;
@@ -797,7 +813,15 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             infoAvales.add(datosAvales);
                         }
                         response.setDatosAvalComite(infoAvales);
-                        break;                        
+                        break;     
+                        
+                    case "SO_BECA":
+                        SolicitudBeca solicitudBeca = 
+                            solicitudBecaRepository.findBySolicitud(solicitud);                        
+                        SolicitudBecaRequest solicitudBecaDto = new SolicitudBecaRequest();
+                        solicitudBecaDto.setFormatoSolicitudBeca(solicitudBeca.getFormatoSolicitudBeca());
+                        response.setDatoSolicitudBeca(solicitudBecaDto);
+                        break;
 
                     default:
                         logger.info("No se encontró tipo de solicitud para retornar la información de la solicitud.");
@@ -1217,5 +1241,23 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitudes.add(solicitudPendiente);
         }
         return solicitudes;
+    }
+
+    private boolean registrarSolicitudBeca(Integer idSolicitud, SolicitudBecaRequest datosSolicitudBeca) {
+        boolean registro = false;
+        try{            
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            SolicitudBeca beca = new SolicitudBeca();
+            beca.setSolicitud(solicitud);
+            beca.setFormatoSolicitudBeca(datosSolicitudBeca.getFormatoSolicitudBeca());
+
+            // Guardar datos de la entidad
+            beca = solicitudBecaRepository.save(beca);
+            registro = true;        
+        } catch (Exception e){
+            logger.error("Ocurrió un error al intentar guardar los datos de la solicitud de beca.", e);
+            registro = false;
+        }
+        return registro;
     }
 }
