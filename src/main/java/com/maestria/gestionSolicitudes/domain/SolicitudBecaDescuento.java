@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="solicitud_becas")
+@Table(name="solicitud_beca_descuento")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SolicitudBeca {
+public class SolicitudBecaDescuento {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +30,12 @@ public class SolicitudBeca {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_solicitud")
     private Solicitudes solicitud;    
+
+    @Column(name = "tipo")
+    private String tipo;
+
+    @Column(name = "motivo")
+    private String motivo;
 
     @Column(name = "formato_solicitud_beca")
     private String formatoSolicitudBeca;

@@ -114,7 +114,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     @Autowired
     private HistorialEstadoSolicitudesRepository historialEstadoSolicitudesRepository;
     @Autowired
-    private SolicitudBecaRepository solicitudBecaRepository;
+    private SolicitudBecaDescuentoRepository solicitudBecaRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -466,8 +466,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 break;
 
             case "SO_BECA":
+            case "SO_DESC":
                 try {
-                    boolean registroBeca = registrarSolicitudBeca(idSolicitud, datosSolicitud.getDatosSolicitudBeca());
+                    boolean registroBeca = registrarSolicitudBecaDescuento(idSolicitud, datosSolicitud.getDatosSolicitudBeca());
                     if (registroBeca) {
                         logger.info("Se registraron los datos para la solicitud de beca correctamente.");
                         registro = true;
@@ -816,7 +817,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         break;     
                         
                     case "SO_BECA":
-                        SolicitudBeca solicitudBeca = 
+                        SolicitudBecaDescuento solicitudBeca = 
                             solicitudBecaRepository.findBySolicitud(solicitud);                        
                         SolicitudBecaRequest solicitudBecaDto = new SolicitudBecaRequest();
                         solicitudBecaDto.setFormatoSolicitudBeca(solicitudBeca.getFormatoSolicitudBeca());
@@ -1243,12 +1244,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         return solicitudes;
     }
 
-    private boolean registrarSolicitudBeca(Integer idSolicitud, SolicitudBecaRequest datosSolicitudBeca) {
+    private boolean registrarSolicitudBecaDescuento(Integer idSolicitud, SolicitudBecaRequest datosSolicitudBeca) {
         boolean registro = false;
         try{            
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            SolicitudBeca beca = new SolicitudBeca();
+            SolicitudBecaDescuento beca = new SolicitudBecaDescuento();
             beca.setSolicitud(solicitud);
+            beca.setTipo(datosSolicitudBeca.getTipo());
+            if (datosSolicitudBeca.getMotivo() != null) {
+                beca.setMotivo(datosSolicitudBeca.getMotivo());
+            }
             beca.setFormatoSolicitudBeca(datosSolicitudBeca.getFormatoSolicitudBeca());
 
             // Guardar datos de la entidad
