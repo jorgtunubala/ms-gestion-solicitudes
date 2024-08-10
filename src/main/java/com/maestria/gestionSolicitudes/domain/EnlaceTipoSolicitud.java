@@ -15,31 +15,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="requisitos_solicitud")
+@Table(name = "enlaces_tipos_solicitudes")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequisitoSolicitud extends EntidadPrincipal{
-    
+public class EnlaceTipoSolicitud {
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "titulo_documento")
-    private String tituloDocumento;
-
-    @Column(name = "descripcion")
-    private String descripcion;
-
-    @Column(name = "articulo")
-    private String articulo;
-
-    @Column(name = "tener_en_cuenta")
-    private String tenerEnCuenta;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_solicitud")
-    private TiposSolicitud tipoSolicitud;
+    private TiposSolicitud tiposSolicitud;
 
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Column(name = "url_real")
+    private String urlReal;
+
+    @Column(name = "url_acortada")
+    private String urlAcortada;
 }

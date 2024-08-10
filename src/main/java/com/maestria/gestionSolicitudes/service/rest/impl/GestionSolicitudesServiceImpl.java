@@ -115,6 +115,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private HistorialEstadoSolicitudesRepository historialEstadoSolicitudesRepository;
     @Autowired
     private SolicitudBecaDescuentoRepository solicitudBecaRepository;
+    @Autowired
+    private EnlaceTipoSolicitudRepository enlaceTipoSolicitudRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -181,6 +183,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 notas.add(notaDocumentoRequerido.getNota());
             }
             dSolicitudDto.setNotas(notas);
+            TiposSolicitud tiposSolicitud = tipoSolicitudRepository.findByCodigo(codigo);
+            List<EnlaceTipoSolicitud> enlaces = enlaceTipoSolicitudRepository.findByTiposSolicitud(tiposSolicitud.getId());
+            List<EnlacesTiposSolicitud> listaEnlaces = new ArrayList<>();
+            for (EnlaceTipoSolicitud enlace : enlaces) {
+                EnlacesTiposSolicitud enlacesTiposSolicitud = new EnlacesTiposSolicitud();
+                enlacesTiposSolicitud.setNombre(enlace.getNombre());
+                enlacesTiposSolicitud.setUrlAcortada(enlace.getUrlAcortada());
+                listaEnlaces.add(enlacesTiposSolicitud);
+            }
+            dSolicitudDto.setEnlaces(listaEnlaces);
             return dSolicitudDto;
         } else {
             return null;
