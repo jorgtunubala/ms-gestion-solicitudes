@@ -37,6 +37,6 @@ public class SolicitudBecaDescuento {
     @Column(name = "motivo")
     private String motivo;
 
-    @Column(name = "formato_solicitud_beca")
+    @Column(name = "formato_solicitud")
     private String formatoSolicitudBeca;
 }
