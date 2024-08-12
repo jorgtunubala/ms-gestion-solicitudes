@@ -28,7 +28,9 @@ public enum ABREVIATURA_SOLICITUD {
     AV_SEMI_ACT("Aval Seminario Actualización"),
     AP_ECON_ASI("Apoyo Económico Asistencia Congresos"),
     PA_PUBL_EVE("Apoyo Económico Pago Publicación o Eventos"),
-    AV_COMI_PR("Aval Comite Programa");
+    AV_COMI_PR("Aval Comite Programa"),
+    SO_BECA("Solicitud de Beca"),
+    SO_DESC("Solicitud de Descuento");
 
     private final String descripcion;
 
