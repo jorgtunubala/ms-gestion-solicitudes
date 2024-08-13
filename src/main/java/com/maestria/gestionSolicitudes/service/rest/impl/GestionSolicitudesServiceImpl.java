@@ -829,9 +829,12 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         break;     
                         
                     case "SO_BECA":
+                    case "SO_DESC":
                         SolicitudBecaDescuento solicitudBeca = 
                             solicitudBecaRepository.findBySolicitud(solicitud);                        
                         SolicitudBecaRequest solicitudBecaDto = new SolicitudBecaRequest();
+                        solicitudBecaDto.setMotivo(solicitudBeca.getMotivo());
+                        solicitudBecaDto.setTipo(solicitudBeca.getTipo());
                         solicitudBecaDto.setFormatoSolicitudBeca(solicitudBeca.getFormatoSolicitudBeca());
                         response.setDatoSolicitudBeca(solicitudBecaDto);
                         break;
