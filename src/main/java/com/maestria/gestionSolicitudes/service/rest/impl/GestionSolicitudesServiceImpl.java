@@ -1280,4 +1280,22 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         }
         return registro;
     }
+
+    @Override
+    public boolean rechazarSolicitud(RechazarSolicitudRequest rechazarSolicitudRequest) throws Exception {
+        Optional<Solicitudes> optionalSolicitud = solicitudesRepository.findById(rechazarSolicitudRequest.getIdSolicitud());
+        InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(rechazarSolicitudRequest.getIdRevisor().toString());
+        if (optionalSolicitud.isPresent()){
+            Solicitudes solicitud = optionalSolicitud.get();
+            String mensajeComentario = tutor.obtenerNombreCompleto() + " rechazó la solicutd indicando lo siguiente: ";
+            mensajeComentario+=rechazarSolicitudRequest.getComentario();
+            solicitud.setComentario(mensajeComentario);
+            solicitud.setEstado(ESTADO_SOLICITUD.getDescripcionPorCodigo(rechazarSolicitudRequest.getEstado()));
+            solicitudesRepository.save(solicitud);
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
 }

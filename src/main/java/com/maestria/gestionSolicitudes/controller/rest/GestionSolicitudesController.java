@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.DatosAvalarSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.EstadoSolicitudRequest;
+import com.maestria.gestionSolicitudes.dto.rest.request.RechazarSolicitudRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DatosGestionSolicitudResponse;
@@ -109,6 +110,11 @@ public class GestionSolicitudesController {
     @GetMapping("/obtener-solicitudes-pendientes-coordinador/{estado}")
     public List<SolicitudPendientesAval> obtenerDatosSolicitudPendientesCoordinador(@PathVariable String estado) throws Exception {
         return gestionSolicitudesService.obtenerDatosSolicitudPendientesCoordinador(estado);
+    }
+
+    @PostMapping("/rechazar-solicitud")
+    public Boolean rechazarSolicitud(@RequestBody RechazarSolicitudRequest rechazarSolicitudRequest) throws Exception {
+        return gestionSolicitudesService.rechazarSolicitud(rechazarSolicitudRequest);
     }
 }
 

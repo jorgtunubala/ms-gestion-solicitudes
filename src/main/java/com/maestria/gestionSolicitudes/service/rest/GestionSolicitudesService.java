@@ -5,6 +5,7 @@ import java.util.List;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.DatosAvalarSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.EstadoSolicitudRequest;
+import com.maestria.gestionSolicitudes.dto.rest.request.RechazarSolicitudRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
@@ -30,4 +31,6 @@ public interface GestionSolicitudesService {
     List<SolicitudHistoricoResponse> obtenerHistorialSeguimiento(String radicado);
 
     List<SolicitudPendientesAval> obtenerDatosSolicitudPendientesCoordinador(String estado) throws Exception;
+
+    boolean rechazarSolicitud(RechazarSolicitudRequest rechazarSolicitudRequest) throws Exception;
 }

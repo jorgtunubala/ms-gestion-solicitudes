@@ -52,4 +52,7 @@ public class Solicitudes extends EntidadPrincipal {
 
     @Column(name = "radicado")
     private String radicado;
+
+    @Column(name = "comentario")
+    private String comentario;
 }
