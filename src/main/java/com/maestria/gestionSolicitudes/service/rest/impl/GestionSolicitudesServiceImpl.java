@@ -1208,7 +1208,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         historico.setSolicitud(solicitud);
         String estado = validarEstadoHistorico(solicitud);
         historico.setEstado(estado);
-        historico.setPdfBase64(solicitud.getDocumentoFirmado());
+        if (!solicitud.getEstado().equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())
+                && !solicitud.getEstado().equals(ESTADO_SOLICITUD.NO_APROBADA.getDescripcion())
+                && !solicitud.getEstado().equals(ESTADO_SOLICITUD.RECHAZADA.getDescripcion())) {
+            historico.setPdfBase64(solicitud.getDocumentoFirmado());
+        }                
         historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(solicitud.getEstado().toUpperCase().replace(" ", "_")));
         historico.setComentarios(solicitud.getComentario());
         historialEstadoSolicitudesRepository.save(historico);
@@ -1304,15 +1308,13 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     private String validarEstadoHistorico(Solicitudes solicitud) {
         String estado = solicitud.getEstado();
+
         if (estado.equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())) {
-            if(solicitud.getIdTutor().equals(solicitud.getIdRevisor())){
-                estado = "No Avalada Tutor";
-            } else {
-                estado = "No Avalada Director";
-            }
-        } else if(estado.equals(ESTADO_SOLICITUD.RECHAZADA.getDescripcion())){
+            estado = solicitud.getIdTutor().equals(solicitud.getIdRevisor()) ? "No Avalada Tutor"
+                    : "No Avalada Director";
+        } else if (estado.equals(ESTADO_SOLICITUD.RECHAZADA.getDescripcion())) {
             estado = "Rechazada Coordinador";
         }
-        return estado;        
-    }
+        return estado;
+    }  
 }
