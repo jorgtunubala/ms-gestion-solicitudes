@@ -1206,9 +1206,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private void registrarHistoricoSolicitud(Solicitudes solicitud) {
         HistorialEstadoSolicitudes historico = new HistorialEstadoSolicitudes();
         historico.setSolicitud(solicitud);
-        historico.setEstado(solicitud.getEstado());
+        String estado = validarEstadoHistorico(solicitud);
+        historico.setEstado(estado);
         historico.setPdfBase64(solicitud.getDocumentoFirmado());
-        historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(solicitud.getEstado().toUpperCase()));
+        historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(solicitud.getEstado().toUpperCase().replace(" ", "_")));
         historico.setComentarios(solicitud.getComentario());
         historialEstadoSolicitudesRepository.save(historico);
     }
@@ -1291,11 +1292,27 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             mensajeComentario+=rechazarSolicitudRequest.getComentario();
             solicitud.setComentario(mensajeComentario);
             solicitud.setEstado(ESTADO_SOLICITUD.getDescripcionPorCodigo(rechazarSolicitudRequest.getEstado()));
+            solicitud.setIdRevisor(tutor.getId());
             solicitudesRepository.save(solicitud);
+            registrarHistoricoSolicitud(solicitud);
             return true;
         } else {
             return false;
         }
         
+    }
+
+    private String validarEstadoHistorico(Solicitudes solicitud) {
+        String estado = solicitud.getEstado();
+        if (estado.equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())) {
+            if(solicitud.getIdTutor().equals(solicitud.getIdRevisor())){
+                estado = "No Avalada Tutor";
+            } else {
+                estado = "No Avalada Director";
+            }
+        } else if(estado.equals(ESTADO_SOLICITUD.RECHAZADA.getDescripcion())){
+            estado = "Rechazada Coordinador";
+        }
+        return estado;        
     }
 }

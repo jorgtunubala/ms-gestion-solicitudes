@@ -40,6 +40,9 @@ public class Solicitudes extends EntidadPrincipal {
     @Column(name = "id_tutor")
     private Integer idTutor;
 
+    @Column(name = "id_director")
+    private Integer idDirector;
+
     @Column(name = "estado")
     private String estado;
 
@@ -55,4 +58,8 @@ public class Solicitudes extends EntidadPrincipal {
 
     @Column(name = "comentario")
     private String comentario;
+
+    @Column(name = "id_revisor")
+    private Integer idRevisor;
+    
 }
