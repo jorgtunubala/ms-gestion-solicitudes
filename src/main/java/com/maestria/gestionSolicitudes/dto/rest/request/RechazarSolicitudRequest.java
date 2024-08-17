@@ -6,7 +6,7 @@ import lombok.Data;
 public class RechazarSolicitudRequest {
     
     private Integer idSolicitud;
-    private Integer idRevisor;
+    private String emailRevisor;
     private String estado;
     private String comentario;
 }

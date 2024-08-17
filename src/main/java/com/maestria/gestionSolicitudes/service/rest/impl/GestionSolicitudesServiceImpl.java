@@ -1209,7 +1209,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         historico.setEstado(solicitud.getEstado());
         historico.setPdfBase64(solicitud.getDocumentoFirmado());
         historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(solicitud.getEstado().toUpperCase()));
-        historico.setComentarios("");
+        historico.setComentarios(solicitud.getComentario());
         historialEstadoSolicitudesRepository.save(historico);
     }
 
@@ -1284,7 +1284,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     @Override
     public boolean rechazarSolicitud(RechazarSolicitudRequest rechazarSolicitudRequest) throws Exception {
         Optional<Solicitudes> optionalSolicitud = solicitudesRepository.findById(rechazarSolicitudRequest.getIdSolicitud());
-        InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(rechazarSolicitudRequest.getIdRevisor().toString());
+        InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(rechazarSolicitudRequest.getEmailRevisor());
         if (optionalSolicitud.isPresent()){
             Solicitudes solicitud = optionalSolicitud.get();
             String mensajeComentario = tutor.obtenerNombreCompleto() + " rechazó la solicutd indicando lo siguiente: ";
