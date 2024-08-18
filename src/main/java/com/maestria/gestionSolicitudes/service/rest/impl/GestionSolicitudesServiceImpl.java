@@ -248,6 +248,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitud.setIdTutor(datosSolicitud.getIdTutor());            
             solicitud.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
+            solicitud.setIdDirector(datosSolicitud.getIdDirector());
             solicitud.setDocumentoFirmado(datosSolicitud.getOficioPdf());
             Solicitudes registroSolicitud = solicitudesRepository.save(solicitud);
 
@@ -903,6 +904,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
             solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
             solicitudesRepository.save(solicitud);
+            registrarHistoricoSolicitud(solicitud);
         }
         return registroFirma;
     }
@@ -1308,7 +1310,14 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     private String validarEstadoHistorico(Solicitudes solicitud) {
         String estado = solicitud.getEstado();
-
+        FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
+        if (estado.equals(ESTADO_SOLICITUD.RADICADA.getDescripcion())) {
+            if (firmas.getFirmaTutor() != null) {
+                estado = "Avalada Tutor";
+            } else if (firmas.getFirmaDirector() != null) {
+                estado = "Avalada Director";
+            }
+        }
         if (estado.equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())) {
             estado = solicitud.getIdTutor().equals(solicitud.getIdRevisor()) ? "No Avalada Tutor"
                     : "No Avalada Director";
