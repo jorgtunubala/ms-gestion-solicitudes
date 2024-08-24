@@ -1317,8 +1317,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             } else if (firmas.getFirmaDirector() != null) {
                 estado = "Avalada Director";
             }
-        }
-        if (estado.equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())) {
+        } else if(estado.equals(ESTADO_SOLICITUD.AVALADA.getDescripcion())){
+            if (firmas.getFirmaDirector() == null) {
+                estado = "Avalada Tutor";
+            }
+        } else if (estado.equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())) {
             estado = solicitud.getIdTutor().equals(solicitud.getIdRevisor()) ? "No Avalada Tutor"
                     : "No Avalada Director";
         } else if (estado.equals(ESTADO_SOLICITUD.RECHAZADA.getDescripcion())) {
