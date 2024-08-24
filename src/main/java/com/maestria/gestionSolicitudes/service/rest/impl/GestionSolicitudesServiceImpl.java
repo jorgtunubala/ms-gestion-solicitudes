@@ -887,10 +887,12 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 firmas.setFirmaTutor(firmaTutor);
                 firmaSolicitudRepository.save(firmas);
                 registroFirma = Boolean.TRUE;
+                registrarHistoricoSolicitud(solicitud);
             } else if (StringUtils.isNotBlank(firmaDirector)){
                 firmas.setFirmaDirector(firmaDirector);
                 firmaSolicitudRepository.save(firmas);
                 registroFirma = Boolean.TRUE;
+                registrarHistoricoSolicitud(solicitud);
             }
         } else {
             if (StringUtils.isNotBlank(firmaTutor)) {
@@ -1311,6 +1313,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private String validarEstadoHistorico(Solicitudes solicitud) {
         String estado = solicitud.getEstado();
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
+        List<HistorialEstadoSolicitudes> historico = historialEstadoSolicitudesRepository.findBySolicitudOrderByFechaCreacionAsc(solicitud);
         if (estado.equals(ESTADO_SOLICITUD.RADICADA.getDescripcion())) {
             if (firmas.getFirmaTutor() != null) {
                 estado = "Avalada Tutor";
@@ -1318,7 +1321,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 estado = "Avalada Director";
             }
         } else if(estado.equals(ESTADO_SOLICITUD.AVALADA.getDescripcion())){
-            if (firmas.getFirmaDirector() == null) {
+            String estadoFinal = historico.get(historico.size() - 1).getEstado();
+            if (estadoFinal.equals("Avalada Tutor")){
+                estado = "Avalada Director";
+            } else {
                 estado = "Avalada Tutor";
             }
         } else if (estado.equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())) {
