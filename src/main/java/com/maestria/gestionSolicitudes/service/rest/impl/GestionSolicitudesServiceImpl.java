@@ -1321,7 +1321,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             } else if (firmas.getFirmaDirector() != null && firmas.getFirmaTutor() == null) {
                 estado = "Avalada Director";
             } else {
-                String estado Final = "";
+                String estadoFinal = "";
                 if (historico.size() > 1){
                     estadoFinal = historico.get(historico.size() - 1).getEstado();
                 }
