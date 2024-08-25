@@ -869,8 +869,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     }
 
     @Override
-    public Boolean registrarFirmasPendientes(DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception {
-        Boolean registroDocumento = Boolean.FALSE;
+    public Boolean registrarFirmasPendientes(DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception {        
         Boolean registroFirma = Boolean.FALSE;
         Solicitudes solicitud = solicitudesRepository.findById(dAvalarSolicitudDto.getIdSolicitud()).get();
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
@@ -880,32 +879,31 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             if (StringUtils.isNotBlank(firmaTutor) && StringUtils.isNotBlank(firmaDirector)) {
                 firmas.setFirmaTutor(firmaTutor);
                 firmas.setFirmaDirector(firmaDirector);
-                firmaSolicitudRepository.save(firmas);
-                registroDocumento = Boolean.TRUE;
-                registroFirma = Boolean.TRUE;
+                firmaSolicitudRepository.save(firmas);                
+                registroFirma = Boolean.TRUE;                
             } else if (StringUtils.isNotBlank(firmaTutor)){
                 firmas.setFirmaTutor(firmaTutor);
                 firmaSolicitudRepository.save(firmas);
-                registroFirma = Boolean.TRUE;
-                registrarHistoricoSolicitud(solicitud);
+                registroFirma = Boolean.TRUE;                
             } else if (StringUtils.isNotBlank(firmaDirector)){
                 firmas.setFirmaDirector(firmaDirector);
                 firmaSolicitudRepository.save(firmas);
-                registroFirma = Boolean.TRUE;
-                registrarHistoricoSolicitud(solicitud);
+                registroFirma = Boolean.TRUE;                
             }
         } else {
             if (StringUtils.isNotBlank(firmaTutor)) {
                 firmas.setFirmaTutor(firmaTutor);
-                firmaSolicitudRepository.save(firmas);
-                registroDocumento = Boolean.TRUE;
+                firmaSolicitudRepository.save(firmas);                
                 registroFirma = Boolean.TRUE;
             }
         }
-        if (registroDocumento) {
+        if (firmas.getFirmaTutor() != null && firmas.getFirmaDirector() != null) {
+            registrarHistoricoSolicitud(solicitud);
             solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
             solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
             solicitudesRepository.save(solicitud);
+            registrarHistoricoSolicitud(solicitud);
+        } else {
             registrarHistoricoSolicitud(solicitud);
         }
         return registroFirma;
@@ -1214,7 +1212,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         historico.setEstado(estado);
         if (!solicitud.getEstado().equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())
                 && !solicitud.getEstado().equals(ESTADO_SOLICITUD.NO_APROBADA.getDescripcion())
-                && !solicitud.getEstado().equals(ESTADO_SOLICITUD.RECHAZADA.getDescripcion())) {
+                && !solicitud.getEstado().equals(ESTADO_SOLICITUD.RECHAZADA.getDescripcion())
+                && !estado.equals("Avalada Tutor") 
+                && !estado.equals("Avalada Director")
+                && !estado.equals("En Coordinación")) {
             historico.setPdfBase64(solicitud.getDocumentoFirmado());
         }                
         historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(solicitud.getEstado().toUpperCase().replace(" ", "_")));
@@ -1315,18 +1316,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
         List<HistorialEstadoSolicitudes> historico = historialEstadoSolicitudesRepository.findBySolicitudOrderByFechaCreacionAsc(solicitud);
         if (estado.equals(ESTADO_SOLICITUD.RADICADA.getDescripcion())) {
-            if (firmas.getFirmaTutor() != null) {
+            if (firmas.getFirmaTutor() != null && firmas.getFirmaDirector() == null) {
                 estado = "Avalada Tutor";
-            } else if (firmas.getFirmaDirector() != null) {
-                estado = "Avalada Director";
-            }
-        } else if(estado.equals(ESTADO_SOLICITUD.AVALADA.getDescripcion())){
-            String estadoFinal = historico.get(historico.size() - 1).getEstado();
-            if (estadoFinal.equals("Avalada Tutor")){
+            } else if (firmas.getFirmaDirector() != null && firmas.getFirmaTutor() == null) {
                 estado = "Avalada Director";
             } else {
-                estado = "Avalada Tutor";
+                String estadoFinal = historico.get(historico.size() - 1).getEstado();
+                if (estadoFinal.equals("Avalada Tutor")){
+                    estado = "Avalada Director";
+                } else {
+                    estado = "Avalada Tutor";
+                }
             }
+        } else if(estado.equals(ESTADO_SOLICITUD.AVALADA.getDescripcion())){
+            estado = "En Coordinación";
         } else if (estado.equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())) {
             estado = solicitud.getIdTutor().equals(solicitud.getIdRevisor()) ? "No Avalada Tutor"
                     : "No Avalada Director";
