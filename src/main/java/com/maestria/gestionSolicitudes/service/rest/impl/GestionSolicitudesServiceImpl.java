@@ -897,7 +897,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 registroFirma = Boolean.TRUE;
             }
         }
-        if (firmas.getFirmaTutor() != null && firmas.getFirmaDirector() != null) {
+        if ((firmas.getFirmaTutor() != null && firmas.getFirmaDirector() != null) || 
+            (firmas.getFirmaTutor() != null && !solicitud.getRequiereFirmaDirector())) {
             registrarHistoricoSolicitud(solicitud);
             solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
             solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
