@@ -1219,7 +1219,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 && !estado.equals("En Coordinación")) {
             historico.setPdfBase64(solicitud.getDocumentoFirmado());
         }                
-        historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(solicitud.getEstado().toUpperCase().replace(" ", "_")));
+        historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(estado.toUpperCase().replace(" ", "_")));
         historico.setComentarios(solicitud.getComentario());
         historialEstadoSolicitudesRepository.save(historico);
     }
