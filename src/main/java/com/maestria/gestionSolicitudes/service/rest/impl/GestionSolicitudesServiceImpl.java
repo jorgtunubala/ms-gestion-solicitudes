@@ -1325,11 +1325,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 String estadoFinal = "";
                 if (historico.size() > 1){
                     estadoFinal = historico.get(historico.size() - 1).getEstado();
-                }
-                if (estadoFinal.equals("Avalada Tutor")){
-                    estado = "Avalada Director";
-                } else {
-                    estado = "Avalada Tutor";
+                    if (estadoFinal.equals("Avalada Tutor")){
+                        estado = "Avalada Director";
+                    } else if (estadoFinal.equals("Avalada Director")){
+                        estado = "Avalada Tutor";
+                    }
                 }
             }
         } else if(estado.equals(ESTADO_SOLICITUD.AVALADA.getDescripcion())){
