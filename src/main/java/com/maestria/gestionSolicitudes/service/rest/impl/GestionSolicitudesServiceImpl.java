@@ -2,6 +2,8 @@ package com.maestria.gestionSolicitudes.service.rest.impl;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,6 +20,8 @@ import com.maestria.gestionSolicitudes.comun.util.TokenAleatorio;
 import com.maestria.gestionSolicitudes.domain.*;
 import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaDto;
 import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
+import com.maestria.gestionSolicitudes.dto.client.EmailRequest;
+import com.maestria.gestionSolicitudes.comun.util.Base64;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
@@ -28,6 +32,7 @@ import com.maestria.gestionSolicitudes.mapper.AvalPasantiaInvMapper;
 import com.maestria.gestionSolicitudes.repository.*;
 import com.maestria.gestionSolicitudes.service.client.GestionAsignaturasService;
 import com.maestria.gestionSolicitudes.service.client.GestionDocentesEstudiantesService;
+import com.maestria.gestionSolicitudes.service.client.MensajeriaService;
 import com.maestria.gestionSolicitudes.service.rest.*;
 
 @Service
@@ -117,6 +122,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private SolicitudBecaDescuentoRepository solicitudBecaRepository;
     @Autowired
     private EnlaceTipoSolicitudRepository enlaceTipoSolicitudRepository;
+    @Autowired
+    private MensajeriaService mensajeriaService;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -236,6 +243,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         */
         Boolean registro = Boolean.FALSE;
         String radicado;
+        Solicitudes registroSolicitud = new Solicitudes();
         try {
             logger.info("Inicia proceso registrar solicitud...");
             // Buscamos el tipo de solciitud a asociar en el regsitro de la solicitud.
@@ -250,13 +258,13 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
             solicitud.setIdDirector(datosSolicitud.getIdDirector());
             solicitud.setDocumentoFirmado(datosSolicitud.getOficioPdf());
-            Solicitudes registroSolicitud = solicitudesRepository.save(solicitud);
+            registroSolicitud = solicitudesRepository.save(solicitud);
 
             // Utilizamos la siguiente función para guardar otros datos de la solicitud según su tipo.
             boolean datosTipoSolicitudRegistrados = registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
             
             // Utilizamos la siguiente función para garantizar la firma del estudiante en la solicitud.
-            boolean firmaEstudianteRegistrada = registrarFirmaEstudiante(registroSolicitud, datosSolicitud.getFirmaEstudiante());
+            boolean firmaEstudianteRegistrada = registrarFirmaEstudiante(registroSolicitud, datosSolicitud);
             
             // Verificar si todas las operaciones fueron exitosas
             if (datosTipoSolicitudRegistrados && firmaEstudianteRegistrada) {
@@ -276,7 +284,36 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             logger.error("Ocurrió un error inesperado al registrar la solicitud.", e);
             throw e;
         }
-        return registro ? radicado : null;
+        if (registro) {            
+            DatosEnvioCorreo datosCorreo = new DatosEnvioCorreo();
+            datosCorreo.setTipoSolicitud(registroSolicitud.getTipoSolicitud().getNombre());
+            datosCorreo.setRadicado(registroSolicitud.getRadicado());
+            datosCorreo.setDirigidoA(DESTINATARIO_CORREO.ESTUDIANTE.getDescripcion());
+            Map<String, String> documentos = Base64.obtenerBase64(registroSolicitud.getDocumentoFirmado());
+            datosCorreo.setDocumentos(documentos);
+            InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
+                    .obtenerInformacionEstudiantePorId(registroSolicitud.getIdEstudiante());
+            datosCorreo.setNombreEstudiante(estudiante.obtenerNombreCompleto());
+            InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
+            datosCorreo.setNombreTutor(infoTutor.obtenerNombreCompleto());
+            if (registroSolicitud.getRequiereFirmaDirector()) {
+                InformacionPersonalDto infoDirector = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
+                datosCorreo.setNombreDirector(infoDirector.obtenerNombreCompleto());
+            } else {
+                datosCorreo.setNombreDirector(null);
+            }
+            enviarCorreo(datosCorreo); // Enviar correo a Estudiante
+            datosCorreo.setDirigidoA(DESTINATARIO_CORREO.TUTOR.getDescripcion());
+            enviarCorreo(datosCorreo); // Enviar correo a Tutor
+            if (registroSolicitud.getRequiereFirmaDirector()) {
+                datosCorreo.setDirigidoA(DESTINATARIO_CORREO.DIRECTOR.getDescripcion());
+                enviarCorreo(datosCorreo); // Enviar correo a Director
+            }
+            return radicado;
+        } else {
+            logger.info("Error al registrar la solicitud o enviando correo.");
+            return null;
+        }
     }
 
     @Transactional
@@ -855,11 +892,17 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     }
 
     @Transactional
-    private Boolean registrarFirmaEstudiante(Solicitudes solicitud, String firmaEstudiante) throws Exception{
+    private Boolean registrarFirmaEstudiante(Solicitudes solicitud, SolicitudRequestDto datosSolicitud) throws Exception{
         try {
             FirmaSolicitud firmaSolicitud = new FirmaSolicitud();
             firmaSolicitud.setSolicitud(solicitud);
-            firmaSolicitud.setFirmaEstudiante(firmaEstudiante);
+            firmaSolicitud.setFirmaEstudiante(datosSolicitud.getFirmaEstudiante());
+            firmaSolicitud.setNumPaginaTutor(datosSolicitud.getNumPaginaTutor());
+            firmaSolicitud.setPosXTutor(datosSolicitud.getPosXTutor());
+            firmaSolicitud.setPosYTutor(datosSolicitud.getPosYTutor());
+            firmaSolicitud.setNumPaginaDirector(datosSolicitud.getNumPaginaDirector());
+            firmaSolicitud.setPosXDirector(datosSolicitud.getPosXDirector());
+            firmaSolicitud.setPosYDirector(datosSolicitud.getPosYDirector());
             firmaSolicitudRepository.save(firmaSolicitud);
             return  Boolean.TRUE;
         } catch (Exception e) {
@@ -873,37 +916,54 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         Boolean registroFirma = Boolean.FALSE;
         Solicitudes solicitud = solicitudesRepository.findById(dAvalarSolicitudDto.getIdSolicitud()).get();
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
-        String firmaTutor = dAvalarSolicitudDto.getFirmaTutor();
-        String firmaDirector = dAvalarSolicitudDto.getFirmaDirector();
+        Boolean firmaTutor = dAvalarSolicitudDto.getFirmaTutor();
+        Boolean firmaDirector = dAvalarSolicitudDto.getFirmaDirector();
         if (solicitud.getRequiereFirmaDirector()){
-            if (StringUtils.isNotBlank(firmaTutor) && StringUtils.isNotBlank(firmaDirector)) {
+            if (firmaTutor && firmaDirector) {
                 firmas.setFirmaTutor(firmaTutor);
                 firmas.setFirmaDirector(firmaDirector);
                 firmaSolicitudRepository.save(firmas);                
                 registroFirma = Boolean.TRUE;                
-            } else if (StringUtils.isNotBlank(firmaTutor)){
+            } else if (firmaTutor){
                 firmas.setFirmaTutor(firmaTutor);
                 firmaSolicitudRepository.save(firmas);
                 registroFirma = Boolean.TRUE;                
-            } else if (StringUtils.isNotBlank(firmaDirector)){
+            } else if (firmaDirector){
                 firmas.setFirmaDirector(firmaDirector);
                 firmaSolicitudRepository.save(firmas);
                 registroFirma = Boolean.TRUE;                
             }
         } else {
-            if (StringUtils.isNotBlank(firmaTutor)) {
+            if (firmaTutor) {
                 firmas.setFirmaTutor(firmaTutor);
                 firmaSolicitudRepository.save(firmas);                
                 registroFirma = Boolean.TRUE;
             }
         }
-        if ((firmas.getFirmaTutor() != null && firmas.getFirmaDirector() != null) || 
-            (firmas.getFirmaTutor() != null && !solicitud.getRequiereFirmaDirector())) {
+        if ((firmas.getFirmaTutor() && firmas.getFirmaDirector()) || 
+            (firmas.getFirmaTutor() && !solicitud.getRequiereFirmaDirector())) {
             registrarHistoricoSolicitud(solicitud);
             solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
             solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
             solicitudesRepository.save(solicitud);
             registrarHistoricoSolicitud(solicitud);
+            DatosEnvioCorreo datosCorreo = new DatosEnvioCorreo();
+            datosCorreo.setTipoSolicitud(solicitud.getTipoSolicitud().getNombre());
+            datosCorreo.setDirigidoA(DESTINATARIO_CORREO.COORDINADOR.getDescripcion());
+            Map<String, String> documentos = Base64.obtenerBase64(solicitud.getDocumentoFirmado());
+            datosCorreo.setDocumentos(documentos);
+            InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
+                    .obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
+            datosCorreo.setNombreEstudiante(estudiante.obtenerNombreCompleto());
+            InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdTutor().toString());
+            datosCorreo.setNombreTutor(infoTutor.obtenerNombreCompleto());
+            if (solicitud.getRequiereFirmaDirector()) {
+                InformacionPersonalDto infoDirector = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdDirector().toString());
+                datosCorreo.setNombreDirector(infoDirector.obtenerNombreCompleto());
+            } else {
+                datosCorreo.setNombreDirector(null);
+            }
+            enviarCorreo(datosCorreo);
         } else {
             registrarHistoricoSolicitud(solicitud);
         }
@@ -1317,9 +1377,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
         List<HistorialEstadoSolicitudes> historico = historialEstadoSolicitudesRepository.findBySolicitudOrderByFechaCreacionAsc(solicitud);
         if (estado.equals(ESTADO_SOLICITUD.RADICADA.getDescripcion())) {
-            if (firmas.getFirmaTutor() != null && firmas.getFirmaDirector() == null) {
+            if (firmas.getFirmaTutor() && !firmas.getFirmaDirector()) {
                 estado = "Avalada Tutor";
-            } else if (firmas.getFirmaDirector() != null && firmas.getFirmaTutor() == null) {
+            } else if (firmas.getFirmaDirector() && !firmas.getFirmaTutor()) {
                 estado = "Avalada Director";
             } else {
                 String estadoFinal = "";
@@ -1342,4 +1402,51 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         }
         return estado;
     }  
+
+    private void enviarCorreo(DatosEnvioCorreo datosCorreo) {
+        logger.info("Se va enviar correo de la solicitud radicada.");
+        EmailRequest emailRequest = new EmailRequest();
+        ArrayList<String> correos = new ArrayList<>();
+        String asunto = "";
+        String mensaje = "";        
+        if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.ESTUDIANTE.getDescripcion()){
+            correos.add(datosCorreo.getCorreoEstudiante());
+            asunto = "Confirmación de radicación de solicitud";
+            mensaje = "Te confirmamos que tu solicitud ha sido radicada con éxito en nuestro sistema.<br>"
+                + "Radicado de solicitud: " + datosCorreo.getRadicado();
+        } else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.TUTOR.getDescripcion()) {
+            correos.add(datosCorreo.getCorreoTutor());        
+            asunto = "Solicitud de aval para " + datosCorreo.getNombreEstudiante();
+            mensaje = "Estimado/a " + datosCorreo.getNombreTutor() + ".<br>" +
+                "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante() + " ha radicado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
+                "Solicitamos su amable colaboración para revisar y firmar la solicitud adjunta.<br>" +
+                "<br>Agradecemos su pronta atención a este asunto.";
+        } else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.DIRECTOR.getDescripcion()) {
+            correos.add(datosCorreo.getCorreoDirector());        
+            asunto = "Solicitud de aval para " + datosCorreo.getNombreEstudiante();
+            mensaje = "Estimado/a " + datosCorreo.getNombreDirector() + ".<br>" +
+                "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante() + " ha radicado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
+                "Solicitamos su amable colaboración para revisar y firmar la solicitud adjunta.<br>" +
+                "<br>Agradecemos su pronta atención a este asunto.";                
+        }else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.COORDINADOR.getDescripcion()){
+            correos.add(datosCorreo.getCorreoCoordiandor());        
+            asunto = "Solicitud de aval a coordinación";
+            mensaje = "Estimado/a " + datosCorreo.getNombreCoordinador() + ".<br>" +
+                "Adjunto a este correo, encontrará la solicitud de " + datosCorreo.getTipoSolicitud() + " de " + datosCorreo.getNombreEstudiante() + ".<br>";
+                if (datosCorreo.getNombreDirector() != null){
+                    mensaje +="Esta solicitud ha sido debidamente firmada por el tutor " + datosCorreo.getNombreTutor() + " y el director " + datosCorreo.getNombreDirector() + ".<br>";
+                } else {
+                    mensaje +="Esta solicitud ha sido debidamente firmada por el tutor " + datosCorreo.getNombreTutor() + ".<br>";
+                }
+                mensaje+="<br>" +
+                "Solicitamos su amable aval para poder continuar con el trámite.<br>" +
+                "<br>Agradecemos su atención a este asunto.";
+        }
+        emailRequest.setCorreos(correos);
+        emailRequest.setAsunto(asunto);
+        emailRequest.setMensaje(mensaje);
+        emailRequest.setDocumentos(datosCorreo.getDocumentos());
+        mensajeriaService.enviarEmail(emailRequest);
+        logger.info("Envio correo exitoso.");
+    }
 }

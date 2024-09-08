@@ -1,5 +1,6 @@
 package com.maestria.gestionSolicitudes.dto.rest.request;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.Data;
@@ -25,6 +26,12 @@ public class SolicitudRequestDto {
     private SolicitudBecaRequest datosSolicitudBeca;
     private Boolean requiereFirmaDirector;
     private Integer idDirector;
-    private String firmaEstudiante;
+    private Boolean firmaEstudiante;
     private String oficioPdf;
+    private Integer numPaginaTutor;
+    private Integer numPaginaDirector;
+    private BigDecimal posXTutor;
+    private BigDecimal posYTutor;
+    private BigDecimal posXDirector;
+    private BigDecimal posYDirector;
 }

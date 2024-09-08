@@ -1,5 +1,7 @@
 package com.maestria.gestionSolicitudes.domain;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,12 +33,31 @@ public class FirmaSolicitud {
     @JoinColumn(name = "id_solicitud")
     private Solicitudes solicitud;
 
-    @Column(name = "firma_tutor")
-    private String firmaTutor;
+    @Column(name = "num_pagina_tutor")
+    private Integer numPaginaTutor;
+
+    @Column(name = "pos_x_tutor")
+    private BigDecimal posXTutor;
+
+    @Column(name = "pos_y_tutor")
+    private BigDecimal posYTutor;
+
+    @Column(name = "num_pagina_director")
+    private Integer numPaginaDirector;
+
+    @Column(name = "pos_x_director")
+    private BigDecimal posXDirector;
+
+    @Column(name = "pos_y_director")
+    private BigDecimal posYDirector;
 
     @Column(name = "firma_estudiante")
-    private String firmaEstudiante;
+    private Boolean firmaEstudiante;
+
+    @Column(name = "firma_tutor")
+    private Boolean firmaTutor;
 
     @Column(name = "firma_director")
-    private String firmaDirector;
+    private Boolean firmaDirector;
+    
 }

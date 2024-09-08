@@ -17,9 +17,9 @@ public class DatosComunSolicitud {
     private String nombreTutor;
     private String nombreDirector;
     private Boolean requiereFirmaDirector;
-    private String firmaSolicitante;
-    private String firmaTutor;
-    private String firmaDirector;
+    private Boolean firmaSolicitante;
+    private Boolean firmaTutor;
+    private Boolean firmaDirector;
     private String estadoSolicitud;
     private String oficioPdf;
 }

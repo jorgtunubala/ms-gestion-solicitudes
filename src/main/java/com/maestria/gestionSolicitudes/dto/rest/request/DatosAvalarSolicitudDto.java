@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class DatosAvalarSolicitudDto {
     private Integer idSolicitud;
-    private String firmaTutor;
-    private String firmaDirector;
+    private Boolean firmaTutor;
+    private Boolean firmaDirector;
     private String documentoPdfSolicitud;
 }

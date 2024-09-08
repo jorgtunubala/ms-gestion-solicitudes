@@ -8,12 +8,12 @@ server:
 # Configuración de la base de datos
 spring:
   datasource:
-    url: jdbc:mysql://dockertest.unicauca.edu.co:4207/computacion
-    username: computacion
-    password: DB-C0mput4c10N
-    #url: jdbc:mysql://localhost:3306/maestriacomputacion
-    #username: root
-    #password: mysql
+    #url: jdbc:mysql://dockertest.unicauca.edu.co:4207/computacion
+    #username: computacion
+    #password: DB-C0mput4c10N
+    url: jdbc:mysql://localhost:3306/maestriacomputacion
+    username: root
+    password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: true
@@ -44,3 +44,8 @@ gestion-asignaturas:
     obtener-asignatura: asignaturasExternas/obtener-asignatura/{idAsignatura}
     docentes-asignaturas: asignaturas/docentes-asignaturas
     asignaturas-adicionar: asignaturas/asignaturas-adicionar/{lista}
+
+mensajeria:
+  url: http://localhost:443/maestria-computacion/
+  resources:
+    enviar-email: mensajeria/enviar-email
