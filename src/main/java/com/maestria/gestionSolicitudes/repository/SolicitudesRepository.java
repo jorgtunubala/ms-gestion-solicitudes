@@ -14,8 +14,8 @@ public interface SolicitudesRepository extends JpaRepository<Solicitudes, Intege
         SELECT s FROM Solicitudes s 
         inner join FirmaSolicitud fs on fs.solicitud.id = s.id 
         WHERE s.estado = ?2
-        AND (s.idTutor = ?1 AND fs.firmaTutor is null) 
-        OR (s.idDirector = ?1 AND fs.firmaDirector is null)        
+        AND (s.idTutor = ?1 AND fs.firmaTutor = false) 
+        OR (s.idDirector = ?1 AND fs.firmaDirector = false)        
         ORDER BY s.fechaCreacion ASC
         """)           
     List<Solicitudes> findAllByIdTutorOrderByFechaCreacionAsc(Integer idTutor, String estado);
