@@ -1377,9 +1377,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
         List<HistorialEstadoSolicitudes> historico = historialEstadoSolicitudesRepository.findBySolicitudOrderByFechaCreacionAsc(solicitud);
         if (estado.equals(ESTADO_SOLICITUD.RADICADA.getDescripcion())) {
-            if (firmas.getFirmaTutor() && !firmas.getFirmaDirector()) {
+            if (firmas.getFirmaTutor() != null && firmas.getFirmaTutor()  
+                && firmas.getFirmaDirector()!=null && !firmas.getFirmaDirector()) {
                 estado = "Avalada Tutor";
-            } else if (firmas.getFirmaDirector() && !firmas.getFirmaTutor()) {
+            } else if (firmas.getFirmaDirector() != null && firmas.getFirmaDirector() 
+                && firmas.getFirmaTutor() != null && !firmas.getFirmaTutor()) {
                 estado = "Avalada Director";
             } else {
                 String estadoFinal = "";
