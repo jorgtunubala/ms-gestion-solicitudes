@@ -589,6 +589,12 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosComun.setFirmaSolicitante(firmaSolicitud.getFirmaEstudiante());
                 datosComun.setFirmaTutor(firmaSolicitud.getFirmaTutor());
                 datosComun.setFirmaDirector(firmaSolicitud.getFirmaDirector());
+                datosComun.setNumPaginaTutor(firmaSolicitud.getNumPaginaTutor());
+                datosComun.setNumPaginaDirector(firmaSolicitud.getNumPaginaDirector());
+                datosComun.setPosXTutor(firmaSolicitud.getPosXTutor());
+                datosComun.setPosYTutor(firmaSolicitud.getPosYTutor());
+                datosComun.setPosXDirector(firmaSolicitud.getPosXDirector());
+                datosComun.setPosYDirector(firmaSolicitud.getPosYDirector());
                 datosComun.setOficioPdf(solicitud.getDocumentoFirmado());
                 datosComun.setEstadoSolicitud(solicitud.getEstado());
                 response.setDatosComunSolicitud(datosComun);
