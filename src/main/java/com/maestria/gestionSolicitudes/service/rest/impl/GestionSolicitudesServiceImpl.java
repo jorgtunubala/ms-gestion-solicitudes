@@ -1408,8 +1408,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             mensaje = "Estimado/a " + datosCorreo.getNombreEstudiante() + ".<br>" 
                 +  "Le informamos que su solicitud ha sido registrada satisfactoriamente en nuestro sistema.<br>"
                 + "El código de seguimiento de su solicitud es: " + datosCorreo.getRadicado() + ".<br>"
-                + "Puede utilizar este código para consultar el estado de su trámite en cualquier momento.<br>";
-            emailRequest.setDocumentos(datosCorreo.getDocumentos());
+                + "Puede utilizar este código para consultar el estado de su trámite en cualquier momento.<br>";            
         } else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.TUTOR.getDescripcion()) {
             correos.add(datosCorreo.getCorreoTutor());        
             asunto = "Solicitud de aval para " + datosCorreo.getNombreEstudiante();
