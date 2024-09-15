@@ -6,12 +6,14 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -285,29 +287,12 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             throw e;
         }
         if (registro) {            
-            DatosEnvioCorreo datosCorreo = new DatosEnvioCorreo();
-            datosCorreo.setTipoSolicitud(registroSolicitud.getTipoSolicitud().getNombre());
-            datosCorreo.setRadicado(registroSolicitud.getRadicado());
-            datosCorreo.setDirigidoA(DESTINATARIO_CORREO.ESTUDIANTE.getDescripcion());
-            Map<String, String> documentos = Base64.obtenerBase64(registroSolicitud.getDocumentoFirmado());
-            datosCorreo.setDocumentos(documentos);
-            InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
-                    .obtenerInformacionEstudiantePorId(registroSolicitud.getIdEstudiante());
-            datosCorreo.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-            InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
-            datosCorreo.setNombreTutor(infoTutor.obtenerNombreCompleto());
+            // Crear CompletableFutures para cada correo
+            CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
+            CompletableFuture<Void> correoTutor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.TUTOR)));
+            CompletableFuture<Void> correoDirector = null;
             if (registroSolicitud.getRequiereFirmaDirector()) {
-                InformacionPersonalDto infoDirector = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
-                datosCorreo.setNombreDirector(infoDirector.obtenerNombreCompleto());
-            } else {
-                datosCorreo.setNombreDirector(null);
-            }
-            enviarCorreo(datosCorreo); // Enviar correo a Estudiante
-            datosCorreo.setDirigidoA(DESTINATARIO_CORREO.TUTOR.getDescripcion());
-            enviarCorreo(datosCorreo); // Enviar correo a Tutor
-            if (registroSolicitud.getRequiereFirmaDirector()) {
-                datosCorreo.setDirigidoA(DESTINATARIO_CORREO.DIRECTOR.getDescripcion());
-                enviarCorreo(datosCorreo); // Enviar correo a Director
+                correoDirector = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.DIRECTOR)));
             }
             return radicado;
         } else {
@@ -969,7 +954,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             } else {
                 datosCorreo.setNombreDirector(null);
             }
-            enviarCorreo(datosCorreo);
+            CompletableFuture<Void> correoCoordiandor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(solicitud, DESTINATARIO_CORREO.COORDINADOR)));
         } else {
             registrarHistoricoSolicitud(solicitud);
         }
@@ -1411,50 +1396,90 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         return estado;
     }  
 
-    private void enviarCorreo(DatosEnvioCorreo datosCorreo) {
-        logger.info("Se va enviar correo de la solicitud radicada.");
+    private EmailRequest crearEmailRequest(DatosEnvioCorreo datosCorreo) {        
         EmailRequest emailRequest = new EmailRequest();
+        emailRequest.setDocumentos(new HashMap<>());
         ArrayList<String> correos = new ArrayList<>();
         String asunto = "";
         String mensaje = "";        
         if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.ESTUDIANTE.getDescripcion()){
             correos.add(datosCorreo.getCorreoEstudiante());
             asunto = "Confirmación de radicación de solicitud";
-            mensaje = "Te confirmamos que tu solicitud ha sido radicada con éxito en nuestro sistema.<br>"
-                + "Radicado de solicitud: " + datosCorreo.getRadicado();
+            mensaje = "Estimado/a " + datosCorreo.getNombreEstudiante() + ".<br>" 
+                +  "Le informamos que su solicitud ha sido registrada satisfactoriamente en nuestro sistema.<br>"
+                + "El código de seguimiento de su solicitud es: " + datosCorreo.getRadicado() + ".<br>"
+                + "Puede utilizar este código para consultar el estado de su trámite en cualquier momento.<br>";
+            emailRequest.setDocumentos(datosCorreo.getDocumentos());
         } else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.TUTOR.getDescripcion()) {
             correos.add(datosCorreo.getCorreoTutor());        
             asunto = "Solicitud de aval para " + datosCorreo.getNombreEstudiante();
             mensaje = "Estimado/a " + datosCorreo.getNombreTutor() + ".<br>" +
-                "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante() + " ha radicado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
-                "Solicitamos su amable colaboración para revisar y firmar la solicitud adjunta.<br>" +
+                "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante() + " ha generado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
+                "Solicitamos su amable colaboración para revisar y firmar la solicitud.<br>" +
                 "<br>Agradecemos su pronta atención a este asunto.";
         } else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.DIRECTOR.getDescripcion()) {
             correos.add(datosCorreo.getCorreoDirector());        
             asunto = "Solicitud de aval para " + datosCorreo.getNombreEstudiante();
             mensaje = "Estimado/a " + datosCorreo.getNombreDirector() + ".<br>" +
-                "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante() + " ha radicado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
-                "Solicitamos su amable colaboración para revisar y firmar la solicitud adjunta.<br>" +
+                "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante() + " ha generado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
+                "Solicitamos su amable colaboración para revisar y firmar la solicitud.<br>" +
                 "<br>Agradecemos su pronta atención a este asunto.";                
         }else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.COORDINADOR.getDescripcion()){
             correos.add(datosCorreo.getCorreoCoordiandor());        
             asunto = "Solicitud de aval a coordinación";
             mensaje = "Estimado/a " + datosCorreo.getNombreCoordinador() + ".<br>" +
-                "Adjunto a este correo, encontrará la solicitud de " + datosCorreo.getTipoSolicitud() + " de " + datosCorreo.getNombreEstudiante() + ".<br>";
+                "Por medio de la presente, se le informa que se ha registrado en el sistema una solicitud de " + datosCorreo.getTipoSolicitud() + " a nombre de " + datosCorreo.getNombreEstudiante() + ".<br>";
                 if (datosCorreo.getNombreDirector() != null){
                     mensaje +="Esta solicitud ha sido debidamente firmada por el tutor " + datosCorreo.getNombreTutor() + " y el director " + datosCorreo.getNombreDirector() + ".<br>";
                 } else {
                     mensaje +="Esta solicitud ha sido debidamente firmada por el tutor " + datosCorreo.getNombreTutor() + ".<br>";
                 }
                 mensaje+="<br>" +
-                "Solicitamos su amable aval para poder continuar con el trámite.<br>" +
+                "Solicitamos su amable autorización para continuar con el trámite correspondiente.<br>" +
                 "<br>Agradecemos su atención a este asunto.";
         }
         emailRequest.setCorreos(correos);
         emailRequest.setAsunto(asunto);
-        emailRequest.setMensaje(mensaje);
-        emailRequest.setDocumentos(datosCorreo.getDocumentos());
-        mensajeriaService.enviarEmail(emailRequest);
-        logger.info("Envio correo exitoso.");
+        emailRequest.setMensaje(mensaje);        
+        return emailRequest;        
     }
+
+    // Método asíncrono para enviar el correo
+    @Async
+    public CompletableFuture<Void> enviarCorreoAsincrono(EmailRequest emailRequest) {
+        logger.info("Se va enviar correo de la solicitud radicada.");
+        return CompletableFuture.runAsync(() -> {
+            try {
+                mensajeriaService.enviarEmail(emailRequest);
+                logger.info("Envio correo exitoso.");
+            } catch (Exception e) {
+                logger.error("Error al enviar correo", e);
+            }
+        });
+    }
+
+    private DatosEnvioCorreo crearDatosEnvioCorreo(Solicitudes registroSolicitud, DESTINATARIO_CORREO destinatario){
+        DatosEnvioCorreo datosCorreo = new DatosEnvioCorreo();
+        datosCorreo.setTipoSolicitud(registroSolicitud.getTipoSolicitud().getNombre());
+        datosCorreo.setRadicado(registroSolicitud.getRadicado());        
+        InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
+                .obtenerInformacionEstudiantePorId(registroSolicitud.getIdEstudiante());
+        datosCorreo.setNombreEstudiante(estudiante.obtenerNombreCompleto());
+        InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
+        datosCorreo.setNombreTutor(infoTutor.obtenerNombreCompleto());
+        if (registroSolicitud.getRequiereFirmaDirector()) {
+            InformacionPersonalDto infoDirector = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
+            datosCorreo.setNombreDirector(infoDirector.obtenerNombreCompleto());
+        } else {
+            datosCorreo.setNombreDirector(null);
+        }
+        if (destinatario.equals(DESTINATARIO_CORREO.ESTUDIANTE)){            
+            datosCorreo.setDirigidoA(destinatario.getDescripcion());
+        } else if(destinatario.equals(DESTINATARIO_CORREO.TUTOR)){
+            datosCorreo.setDirigidoA(destinatario.getDescripcion());
+        } else if(destinatario.equals(DESTINATARIO_CORREO.DIRECTOR)){
+            datosCorreo.setDirigidoA(destinatario.getDescripcion());
+        }
+        return datosCorreo;
+    }        
 }
