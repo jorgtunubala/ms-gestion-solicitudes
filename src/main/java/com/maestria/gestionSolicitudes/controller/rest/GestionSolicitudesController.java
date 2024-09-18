@@ -11,20 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
-import com.maestria.gestionSolicitudes.dto.rest.request.DatosAvalarSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.request.EstadoSolicitudRequest;
-import com.maestria.gestionSolicitudes.dto.rest.request.RechazarSolicitudRequest;
-import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
-import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.response.DatosGestionSolicitudResponse;
-import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoRequeridoSolicitudDto;
-import com.maestria.gestionSolicitudes.dto.rest.response.DocumentosRequeridosResponse;
-import com.maestria.gestionSolicitudes.dto.rest.response.InformacionPersonalResponse;
-import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudHistoricoResponse;
-import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudPendientesAval;
-import com.maestria.gestionSolicitudes.dto.rest.response.TipoSolicitudResponse;
-import com.maestria.gestionSolicitudes.dto.rest.response.TutorDto;
-import com.maestria.gestionSolicitudes.dto.rest.response.TutorResponse;
+import com.maestria.gestionSolicitudes.dto.rest.request.*;
+import com.maestria.gestionSolicitudes.dto.rest.response.*;
+import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnComiteService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
 
 @RestController
@@ -33,6 +22,9 @@ public class GestionSolicitudesController {
     
     @Autowired
     private GestionSolicitudesService gestionSolicitudesService;
+
+    @Autowired
+    private GestionSolicitudesEnComiteService gestionSolicitudesEnComiteService;
 
     @GetMapping("/tiposSolicitud")
     public TipoSolicitudResponse obtenerTiposSolicitud() {
@@ -115,6 +107,16 @@ public class GestionSolicitudesController {
     @PostMapping("/rechazar-solicitud")
     public Boolean rechazarSolicitud(@RequestBody RechazarSolicitudRequest rechazarSolicitudRequest) throws Exception {
         return gestionSolicitudesService.rechazarSolicitud(rechazarSolicitudRequest);
+    }
+
+    @GetMapping("/obtener-solicitudes-en-comite/{idSolicitud}")
+    public SolicitudEnComiteResponse obtenerSolicitudesEnComite(@PathVariable Integer idSolicitud) throws Exception {
+        return gestionSolicitudesEnComiteService.obtenerSolicitudEnComite(idSolicitud);
+    }
+
+    @PostMapping("/save-solicitud-en-comite")
+    public Boolean registrarSolicitudEnComite(@RequestBody SolicitudEnComiteResponse datosSolicitudComite) throws Exception {
+        return gestionSolicitudesEnComiteService.guardarSolicitudEnComite(datosSolicitudComite);
     }
 }
 
