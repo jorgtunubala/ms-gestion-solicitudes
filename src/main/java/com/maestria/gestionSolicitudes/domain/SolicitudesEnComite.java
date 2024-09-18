@@ -34,7 +34,7 @@ public class SolicitudesEnComite {
     private Solicitudes solicitud;
 
     @Column(name = "avalado_comite")
-    private Boolean AvaladoComite;
+    private String AvaladoComite;
 
     @Column(name = "concepto_comite")
     private String conceptoComite;

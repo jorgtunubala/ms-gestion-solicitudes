@@ -6,7 +6,7 @@ import lombok.Data;
 public class SolicitudEnComiteResponse {
     private Integer idSolicitud;
     private Boolean enComite;
-    private Boolean avaladoComite;
+    private String avaladoComite;
     private String conceptoComite;
     private String numeroActa;
     private String fechaAval;
