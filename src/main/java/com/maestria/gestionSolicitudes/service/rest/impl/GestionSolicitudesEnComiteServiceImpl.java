@@ -41,23 +41,33 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
             solicitudesEnComiteRes.setAvaladoComite(solicitudComite.getAvaladoComite());
             solicitudesEnComiteRes.setConceptoComite(solicitudComite.getConceptoComite());
             solicitudesEnComiteRes.setNumeroActa(solicitudComite.getNumeroActa());
-            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");        
-            solicitudesEnComiteRes.setFechaAval(formatter.format(solicitudComite.getFechaAval()));
+            if (solicitudComite.getFechaAval() != null){
+                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");        
+                solicitudesEnComiteRes.setFechaAval(formatter.format(solicitudComite.getFechaAval()));
+            }
         }
         return solicitudesEnComiteRes;
     } 
 
     @Override
     public Boolean guardarSolicitudEnComite(SolicitudEnComiteResponse datosSolicitudEnComite){
-        try{
-            SolicitudesEnComite solicitudComite = new SolicitudesEnComite();
+        try{            
             Solicitudes solicitud = solicitudesRepository.findById(datosSolicitudEnComite.getIdSolicitud()).get();
+            Optional<SolicitudesEnComite> solicitudComiteOptional = solicitudesEnComiteRepository.findBySolicitud(solicitud);
+            SolicitudesEnComite solicitudComite;
+            if (solicitudComiteOptional.isPresent()) {
+                solicitudComite = solicitudComiteOptional.get();
+            } else {
+                solicitudComite = new SolicitudesEnComite();
+            }
             solicitudComite.setAvaladoComite(datosSolicitudEnComite.getAvaladoComite());
             solicitudComite.setSolicitud(solicitud);
             solicitudComite.setConceptoComite(datosSolicitudEnComite.getConceptoComite());
             solicitudComite.setNumeroActa(datosSolicitudEnComite.getNumeroActa());
-            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-            solicitudComite.setFechaAval(formatter.parse(datosSolicitudEnComite.getFechaAval()));
+            if (datosSolicitudEnComite.getFechaAval() != null){
+                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+                solicitudComite.setFechaAval(formatter.parse(datosSolicitudEnComite.getFechaAval()));
+            }
             solicitudesEnComiteRepository.save(solicitudComite); 
             return Boolean.TRUE;       
         } catch (EntityNotFoundException | ParseException e) {            
