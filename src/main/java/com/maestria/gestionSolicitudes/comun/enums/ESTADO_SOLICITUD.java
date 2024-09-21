@@ -4,7 +4,7 @@ public enum ESTADO_SOLICITUD {
     RADICADA("Radicada"),
     AVALADA("Avalada"),
     NO_AVALADA("No Avalada"),
-    EN_COMITE("En cómite"),
+    EN_COMITE("En comité"),
     RECHAZADA("Rechazada"),
     APROBADA("Aprobada"),
     NO_APROBADA("No Aprobada");
