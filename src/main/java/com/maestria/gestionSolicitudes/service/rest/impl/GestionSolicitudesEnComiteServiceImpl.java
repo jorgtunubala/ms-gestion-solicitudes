@@ -12,6 +12,7 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.maestria.gestionSolicitudes.comun.enums.ESTADO_SOLICITUD;
 import com.maestria.gestionSolicitudes.domain.Solicitudes;
 import com.maestria.gestionSolicitudes.domain.SolicitudesEnComite;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudEnComiteResponse;
@@ -69,6 +70,8 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                 solicitudComite.setFechaAval(formatter.parse(datosSolicitudEnComite.getFechaAval()));
             }
             solicitudesEnComiteRepository.save(solicitudComite); 
+            solicitud.setEstado(ESTADO_SOLICITUD.EN_COMITE.getDescripcion());
+            solicitudesRepository.save(solicitud);
             return Boolean.TRUE;       
         } catch (EntityNotFoundException | ParseException e) {            
             System.out.println(e.getMessage());            
