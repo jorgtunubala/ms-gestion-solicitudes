@@ -43,7 +43,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
             solicitudesEnComiteRes.setConceptoComite(solicitudComite.getConceptoComite());
             solicitudesEnComiteRes.setNumeroActa(solicitudComite.getNumeroActa());
             if (solicitudComite.getFechaAval() != null){
-                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");        
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");        
                 solicitudesEnComiteRes.setFechaAval(formatter.format(solicitudComite.getFechaAval()));
             }
         }
@@ -66,7 +66,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
             solicitudComite.setConceptoComite(datosSolicitudEnComite.getConceptoComite());
             solicitudComite.setNumeroActa(datosSolicitudEnComite.getNumeroActa());
             if (datosSolicitudEnComite.getFechaAval() != null){
-                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                 solicitudComite.setFechaAval(formatter.parse(datosSolicitudEnComite.getFechaAval()));
             }
             solicitudesEnComiteRepository.save(solicitudComite); 
