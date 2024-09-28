@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
-import javax.print.Doc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +14,7 @@ import org.springframework.stereotype.Service;
 import com.maestria.gestionSolicitudes.comun.enums.ESTADO_SOLICITUD;
 import com.maestria.gestionSolicitudes.domain.DocumentosConcejo;
 import com.maestria.gestionSolicitudes.domain.Solicitudes;
-import com.maestria.gestionSolicitudes.domain.SolicitudesEnComite;
 import com.maestria.gestionSolicitudes.domain.SolicitudesEnConcejo;
-import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudEnComiteResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudEnConcejoResponse;
 import com.maestria.gestionSolicitudes.repository.DocumentosConcejoRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesEnConcejoRepository;
@@ -53,7 +50,13 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
             if (solicitudConcejo.getFechaAval() != null){
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");        
                 solicitudesEnConcejoRes.setFechaAval(formatter.format(solicitudConcejo.getFechaAval()));
-            }            
+            }
+            List<DocumentosConcejo> documentosConcejo = documentosConcejoRepository.findBySolicitudConcejo(solicitudConcejo);
+            List<String> documentos = new ArrayList<>();
+            for (DocumentosConcejo documentoConcejo : documentosConcejo) { 
+                documentos.add(documentoConcejo.getDocumento());                
+            } 
+            solicitudesEnConcejoRes.setDocumentosConcejo(documentos);
         }
         return solicitudesEnConcejoRes;
     }
