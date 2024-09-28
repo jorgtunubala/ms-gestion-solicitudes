@@ -116,6 +116,9 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                 solicitudComite = solicitudComiteOptional.get();
             } else {
                 solicitudComite = new SolicitudesEnComite();
+                solicitud.setEstado(ESTADO_SOLICITUD.EN_COMITE.getDescripcion());
+                solicitudesRepository.save(solicitud);
+                gestionSolicitudesService.registrarHistoricoSolicitud(solicitud);
             }
             solicitudComite.setAvaladoComite(datosSolicitudEnComite.getAvaladoComite());
             solicitudComite.setSolicitud(solicitud);
@@ -125,8 +128,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                 solicitudComite.setFechaAval(formatter.parse(datosSolicitudEnComite.getFechaAval()));
             }
-            solicitudesEnComiteRepository.save(solicitudComite); 
-            solicitud.setEstado(ESTADO_SOLICITUD.EN_COMITE.getDescripcion());
+            solicitudesEnComiteRepository.save(solicitudComite);             
             if (datosSolicitudEnComite.getAsignaturasAprobadas() != null) {
                 if (solicitud.getTipoSolicitud().getCodigo().equals("AD_ASIG")) {
                     AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
@@ -151,9 +153,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                                 ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion()))
                     );
                 } 
-            }
-            solicitudesRepository.save(solicitud);
-            gestionSolicitudesService.registrarHistoricoSolicitud(solicitud);
+            }            
             return Boolean.TRUE;
         } catch (EntityNotFoundException | ParseException e) {
             System.out.println(e.getMessage());

@@ -71,6 +71,9 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                 solicitudConcejo = solicitudConcejoOptional.get();
             } else {
                 solicitudConcejo = new SolicitudesEnConcejo();
+                solicitud.setEstado(ESTADO_SOLICITUD.EN_CONCEJO.getDescripcion());
+                solicitudesRepository.save(solicitud);
+                gestionSolicitudesService.registrarHistoricoSolicitud(solicitud);
             }
             solicitudConcejo.setAvaladoConcejo(datosSolicitudEnConcejo.getAvaladoConcejo());
             solicitudConcejo.setSolicitud(solicitud);
@@ -80,8 +83,7 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                 solicitudConcejo.setFechaAval(formatter.parse(datosSolicitudEnConcejo.getFechaAval()));
             }
-            solicitudesEnConcejoRepository.save(solicitudConcejo); 
-            solicitud.setEstado(ESTADO_SOLICITUD.EN_CONCEJO.getDescripcion());
+            solicitudesEnConcejoRepository.save(solicitudConcejo);             
             if(datosSolicitudEnConcejo.getDocumentosConcejo() != null) {
                 List<DocumentosConcejo> documentosConcejo = new ArrayList<>();
                 for (String documento : datosSolicitudEnConcejo.getDocumentosConcejo()) {
@@ -91,9 +93,7 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                     documentosConcejo.add(documentoConcejo);
                 }
                 documentosConcejoRepository.saveAll(documentosConcejo);
-            }
-            solicitudesRepository.save(solicitud);
-            gestionSolicitudesService.registrarHistoricoSolicitud(solicitud);
+            }            
             return Boolean.TRUE;
         } catch (EntityNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
