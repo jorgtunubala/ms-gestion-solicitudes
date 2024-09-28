@@ -50,7 +50,7 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
             solicitudesEnConcejoRes.setAvaladoConcejo(solicitudConcejo.getAvaladoConcejo());
             solicitudesEnConcejoRes.setConceptoConcejo(solicitudConcejo.getConceptoConcejo());
             solicitudesEnConcejoRes.setNumeroActa(solicitudConcejo.getNumeroActa());
-            if (solicitudesEnConcejoRes.getFechaAval() != null){
+            if (solicitudConcejo.getFechaAval() != null){
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");        
                 solicitudesEnConcejoRes.setFechaAval(formatter.format(solicitudConcejo.getFechaAval()));
             }            
