@@ -2,6 +2,7 @@ package com.maestria.gestionSolicitudes.service.rest;
 
 import java.util.List;
 
+import com.maestria.gestionSolicitudes.domain.Solicitudes;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.DatosAvalarSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.RechazarSolicitudRequest;
@@ -32,4 +33,6 @@ public interface GestionSolicitudesService {
     List<SolicitudPendientesAval> obtenerDatosSolicitudPendientesCoordinador(String estado) throws Exception;
 
     boolean rechazarSolicitud(RechazarSolicitudRequest rechazarSolicitudRequest) throws Exception;
+
+    void registrarHistoricoSolicitud(Solicitudes solicitud);
 }

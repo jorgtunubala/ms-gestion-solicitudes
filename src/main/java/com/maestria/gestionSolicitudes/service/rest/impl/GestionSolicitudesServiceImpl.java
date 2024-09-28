@@ -1256,7 +1256,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         return registro;
     }
 
-    private void registrarHistoricoSolicitud(Solicitudes solicitud) {
+    @Override
+    public void registrarHistoricoSolicitud(Solicitudes solicitud) {
         HistorialEstadoSolicitudes historico = new HistorialEstadoSolicitudes();
         historico.setSolicitud(solicitud);
         String estado = validarEstadoHistorico(solicitud);
@@ -1288,7 +1289,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 info.setRadicado(radicado);
                 info.setEstadoSolicitud(historico.getEstado());
                 info.setFechaHora(historico.getFechaCreacion().toString());
-                info.setPdfBase64(historico.getPdfBase64());
+                //info.setPdfBase64(historico.getPdfBase64());
                 info.setDescripcion(historico.getDescripcion());
                 info.setComentarios(historico.getComentarios());
                 response.add(info);

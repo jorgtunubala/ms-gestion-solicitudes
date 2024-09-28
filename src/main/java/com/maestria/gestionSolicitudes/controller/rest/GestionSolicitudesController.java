@@ -126,12 +126,7 @@ public class GestionSolicitudesController {
     @PostMapping("/save-solicitud-en-comite")
     public Boolean registrarSolicitudEnComite(@RequestBody SolicitudEnComiteResponse datosSolicitudComite) throws Exception {
         return gestionSolicitudesEnComiteService.guardarSolicitudEnComite(datosSolicitudComite);
-    }
-
-    @PostMapping("/send-email")
-    public Boolean enviarEmail(@RequestBody EmailRequest emailRequest) throws Exception {
-        return mensajeriaService.enviarEmail(emailRequest);
-    }
+    }    
 
     @GetMapping("/obtener-solicitudes-en-concejo/{idSolicitud}")
     public SolicitudEnConcejoResponse obtenerSolicitudesEnConcejo(@PathVariable Integer idSolicitud) throws Exception {

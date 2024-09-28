@@ -23,6 +23,7 @@ import com.maestria.gestionSolicitudes.repository.DocumentosConcejoRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesEnConcejoRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesRepository;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnConcejoService;
+import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
 
 @Service
 public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitudesEnConcejoService {
@@ -33,7 +34,9 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
     private SolicitudesEnConcejoRepository solicitudesEnConcejoRepository;
     @Autowired
     private DocumentosConcejoRepository documentosConcejoRepository;
-    
+    @Autowired
+    private GestionSolicitudesService gestionSolicitudesService;
+
 
     @Override
     public SolicitudEnConcejoResponse obtenerSolicitudEnConcejo(Integer idSolicitud) {
@@ -87,6 +90,7 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                 documentosConcejoRepository.saveAll(documentosConcejo);
             }
             solicitudesRepository.save(solicitud);
+            gestionSolicitudesService.registrarHistoricoSolicitud(solicitud);
             return Boolean.TRUE;
         } catch (EntityNotFoundException | ParseException e) {
             System.out.println(e.getMessage());

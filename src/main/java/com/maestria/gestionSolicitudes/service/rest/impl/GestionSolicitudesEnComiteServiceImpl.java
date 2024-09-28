@@ -14,7 +14,6 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.maestria.gestionSolicitudes.comun.constant.Constantes;
 import com.maestria.gestionSolicitudes.comun.enums.ESTADO_SOLICITUD;
 import com.maestria.gestionSolicitudes.domain.AdicionarAsignatura;
 import com.maestria.gestionSolicitudes.domain.AsignaturaAdicionada;
@@ -31,6 +30,7 @@ import com.maestria.gestionSolicitudes.repository.CancelarAsignaturaRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesEnComiteRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesRepository;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnComiteService;
+import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
 
 @Service
 public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudesEnComiteService {
@@ -48,6 +48,8 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
     private CancelarAsignaturaRepository cancelarAsignaturaRepository;
     @Autowired
     private AsignaturaCanceladaRepository asignaturaCanceladaRepository;
+    @Autowired
+    private GestionSolicitudesService gestionSolicitudesService;
 
 
     @Override
@@ -151,6 +153,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                 } 
             }
             solicitudesRepository.save(solicitud);
+            gestionSolicitudesService.registrarHistoricoSolicitud(solicitud);
             return Boolean.TRUE;
         } catch (EntityNotFoundException | ParseException e) {
             System.out.println(e.getMessage());
