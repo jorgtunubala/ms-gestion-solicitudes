@@ -10,10 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.maestria.gestionSolicitudes.dto.client.EmailRequest;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
+import com.maestria.gestionSolicitudes.service.client.MensajeriaService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnComiteService;
+import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnConcejoService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
 
 @RestController
@@ -25,6 +28,12 @@ public class GestionSolicitudesController {
 
     @Autowired
     private GestionSolicitudesEnComiteService gestionSolicitudesEnComiteService;
+    @Autowired
+    private GestionSolicitudesEnConcejoService gestionSolicitudesEnConcejoService;
+
+
+    @Autowired
+    private MensajeriaService mensajeriaService;
 
     @GetMapping("/tiposSolicitud")
     public TipoSolicitudResponse obtenerTiposSolicitud() {
@@ -117,6 +126,21 @@ public class GestionSolicitudesController {
     @PostMapping("/save-solicitud-en-comite")
     public Boolean registrarSolicitudEnComite(@RequestBody SolicitudEnComiteResponse datosSolicitudComite) throws Exception {
         return gestionSolicitudesEnComiteService.guardarSolicitudEnComite(datosSolicitudComite);
+    }
+
+    @PostMapping("/send-email")
+    public Boolean enviarEmail(@RequestBody EmailRequest emailRequest) throws Exception {
+        return mensajeriaService.enviarEmail(emailRequest);
+    }
+
+    @GetMapping("/obtener-solicitudes-en-concejo/{idSolicitud}")
+    public SolicitudEnConcejoResponse obtenerSolicitudesEnConcejo(@PathVariable Integer idSolicitud) throws Exception {
+        return gestionSolicitudesEnConcejoService.obtenerSolicitudEnConcejo(idSolicitud);
+    }
+
+    @PostMapping("/save-solicitud-en-concejo")
+    public Boolean registrarSolicitudEnConcejo(@RequestBody SolicitudEnConcejoResponse datosSolicitudConcejo) throws Exception {
+        return gestionSolicitudesEnConcejoService.guardarSolicitudEnConcejo(datosSolicitudConcejo);
     }
 }
 

@@ -1,5 +1,7 @@
 package com.maestria.gestionSolicitudes.domain;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,7 +33,16 @@ public class SolicitudesEnConcejo {
     @JoinColumn(name = "id_solicitud")
     private Solicitudes solicitud;
 
-    @Column(name = "resolucion")
-    private String resolucion;
+    @Column(name = "avalado_concejo")
+    private String avaladoConcejo;
+
+    @Column(name = "concepto_concejo")
+    private String conceptoConcejo;
+
+    @Column(name = "numero_acta")
+    private String numeroActa;
+
+    @Column(name = "fecha_aval")
+    private Date fechaAval;
     
 }

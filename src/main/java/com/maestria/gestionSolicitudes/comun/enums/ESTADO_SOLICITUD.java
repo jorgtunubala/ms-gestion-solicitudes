@@ -5,6 +5,7 @@ public enum ESTADO_SOLICITUD {
     AVALADA("Avalada"),
     NO_AVALADA("No Avalada"),
     EN_COMITE("En comité"),
+    EN_CONCEJO("En concejo"),
     RECHAZADA("Rechazada"),
     APROBADA("Aprobada"),
     NO_APROBADA("No Aprobada");
