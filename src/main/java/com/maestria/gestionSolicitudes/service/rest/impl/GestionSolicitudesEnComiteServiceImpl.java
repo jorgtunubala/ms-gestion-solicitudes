@@ -141,6 +141,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                             .ifPresent(asignaturaAdicionada -> asignaturaAdicionada.setEstado(asignaturaAprobar.getAprobado() ? 
                                 ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion()))
                     );
+                    asignaturaAdicionadaRepository.saveAll(asignaturaAdicionadas);
                 } else if (solicitud.getTipoSolicitud().getCodigo().equals("CA_ASIG")) {
                     CancelarAsignatura cancelarAsignatura = cancelarAsignaturaRepository.findBySolicitud(solicitud);
                     List<AsignaturaCancelada> asignaturaCanceladas = asignaturaCanceladaRepository
@@ -152,6 +153,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                             .ifPresent(asignaturaCancelada -> asignaturaCancelada.setEstado(asignaturaAprobar.getAprobado() ? 
                                 ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion()))
                     );
+                    asignaturaCanceladaRepository.saveAll(asignaturaCanceladas);
                 } 
             }            
             return Boolean.TRUE;
