@@ -43,7 +43,7 @@ public class GestionSubTiposSolicitudServiceImpl implements GestionSubTiposSolic
     private SubTiposSolicitudRepository subTiposSolicitudRepository;
 
     @Override
-    public List<SubTiposSolicitudResponse> obtenerSubtiposPorTipoSolicitud() {
+    public List<SubTiposSolicitudResponse> obtenerSubtiposPorTipoSolicitud(String proceso) {
         TiposSolicitud tiposSolicitud = tiposSolicitudRepository.findByCodigo("RE_CRED_PR_DOC");
         List<SubTiposSolicitud> listaSubTipos = subTiposSolicitudRepository.findByTipoSolicitud(tiposSolicitud);
         List<SubTiposSolicitudResponse> response = new ArrayList<>();
@@ -55,7 +55,11 @@ public class GestionSubTiposSolicitudServiceImpl implements GestionSubTiposSolic
             List<String> enlaces = obtenerEnlacesSubtipos(subTiposSolicitud.getId());
             subTiposSolicitudResponse.setDocumentos(documentos);
             subTiposSolicitudResponse.setEnlaces(enlaces);
-            response.add(subTiposSolicitudResponse);
+            if (proceso.equals("aval") && subTiposSolicitud.getRequiereAval() == true) {
+                response.add(subTiposSolicitudResponse);
+            } else if (proceso.equals("creditos")){
+                response.add(subTiposSolicitudResponse);
+            }
         }
         return response;
     }

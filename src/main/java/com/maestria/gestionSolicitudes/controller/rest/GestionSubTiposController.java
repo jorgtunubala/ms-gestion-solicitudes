@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,11 +19,11 @@ public class GestionSubTiposController {
     @Autowired
     private GestionSubTiposSolicitudService gestionSubTiposSolicitudService;
 
-    @GetMapping("/subTiposSolicitud")
-    public List<SubTiposSolicitudResponse> obtenerSubTiposSolicitud() {
+    @GetMapping("/subTiposSolicitud/{proceso}")
+    public List<SubTiposSolicitudResponse> obtenerSubTiposSolicitud(@PathVariable String proceso) {
         List<SubTiposSolicitudResponse> response = new ArrayList<>();
         try {
-            response = gestionSubTiposSolicitudService.obtenerSubtiposPorTipoSolicitud();
+            response = gestionSubTiposSolicitudService.obtenerSubtiposPorTipoSolicitud(proceso);
         } catch (Exception e) {
             e.getMessage();
         }

@@ -6,5 +6,5 @@ import com.maestria.gestionSolicitudes.dto.rest.response.SubTiposSolicitudRespon
 
 public interface GestionSubTiposSolicitudService {
     
-    List<SubTiposSolicitudResponse> obtenerSubtiposPorTipoSolicitud(); 
+    List<SubTiposSolicitudResponse> obtenerSubtiposPorTipoSolicitud(String proceso); 
 }

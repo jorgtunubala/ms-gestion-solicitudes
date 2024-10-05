@@ -3,6 +3,7 @@ package com.maestria.gestionSolicitudes.domain;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.maestria.gestionSolicitudes.comun.util.BooleanConverter;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,4 +49,8 @@ public class SubTiposSolicitud extends EntidadPrincipal {
 
     @Column(name = "estado")
     private String estado;
+
+    @Column(name = "requiere_aval")
+    @Convert(converter = BooleanConverter.class)
+    private Boolean requiereAval;
 }
