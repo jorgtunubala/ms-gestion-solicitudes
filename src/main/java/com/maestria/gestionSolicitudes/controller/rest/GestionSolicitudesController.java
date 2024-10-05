@@ -137,5 +137,10 @@ public class GestionSolicitudesController {
     public Boolean registrarSolicitudEnConcejo(@RequestBody SolicitudEnConcejoResponse datosSolicitudConcejo) throws Exception {
         return gestionSolicitudesEnConcejoService.guardarSolicitudEnConcejo(datosSolicitudConcejo);
     }
+
+    @PostMapping("/save/solicitud/{idSolicitud}/{estado}")
+    public Boolean actualizarSolicitud(@PathVariable Integer idSolicitud, @PathVariable String estado) throws Exception {
+        return gestionSolicitudesService.actualizarSolicitud(idSolicitud, estado);
+    }
 }
 

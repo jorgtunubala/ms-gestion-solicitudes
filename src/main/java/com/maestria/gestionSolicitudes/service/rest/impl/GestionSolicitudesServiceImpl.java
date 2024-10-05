@@ -1480,5 +1480,19 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
         }
         return datosCorreo;
+    }
+
+    @Override
+    public Boolean actualizarSolicitud(Integer idSolicitud, String estado) {
+        try{
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+            solicitud.setEstado(estado);
+            solicitudesRepository.save(solicitud);
+            registrarHistoricoSolicitud(solicitud);
+            return true;
+        } catch(Exception e) {
+            logger.error("Ocurrió un error al actualizar la solicitud.", e);
+            return false;
+        }        
     }        
 }

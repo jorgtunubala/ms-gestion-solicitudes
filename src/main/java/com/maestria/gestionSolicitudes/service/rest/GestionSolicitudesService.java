@@ -35,4 +35,6 @@ public interface GestionSolicitudesService {
     boolean rechazarSolicitud(RechazarSolicitudRequest rechazarSolicitudRequest) throws Exception;
 
     void registrarHistoricoSolicitud(Solicitudes solicitud);
+
+    Boolean actualizarSolicitud(Integer idSolicitud, String estado);
 }
