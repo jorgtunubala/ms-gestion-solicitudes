@@ -6,4 +6,5 @@ import lombok.Data;
 public class DocumentoRequerido {
     private String nombre;
     private Boolean adjuntarDocumento;
+    private String nombreAcortado;
 }

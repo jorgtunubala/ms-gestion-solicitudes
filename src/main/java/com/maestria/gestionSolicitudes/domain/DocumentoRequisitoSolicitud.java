@@ -39,4 +39,7 @@ public class DocumentoRequisitoSolicitud extends EntidadPrincipal {
     @Column(name = "adjuntar_documento")
     @Convert(converter = BooleanConverter.class)
     private Boolean adjuntarDocumento;
+
+    @Column(name = "abreviatura_documento")
+    private String abreviaturaDocumento;
 }

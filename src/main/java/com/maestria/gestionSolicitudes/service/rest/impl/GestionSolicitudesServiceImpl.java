@@ -181,6 +181,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 DocumentoRequerido doc = new DocumentoRequerido();
                 doc.setNombre(documentoRequisitoSolicitud.getNombreDocumento());
                 doc.setAdjuntarDocumento(documentoRequisitoSolicitud.getAdjuntarDocumento());
+                doc.setNombreAcortado(documentoRequisitoSolicitud.getAbreviaturaDocumento());
                 lDocumentos.add(doc);
             }
             dSolicitudDto.setDocumentosRequeridos(lDocumentos);
