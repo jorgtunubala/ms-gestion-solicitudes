@@ -11,4 +11,5 @@ public class SolicitudPendientesAval {
     private String nombreTipoSolicitud;
     private String abreviatura;
     private String fecha;
+    private String identificacionSolicitante;
 }

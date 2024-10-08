@@ -31,6 +31,9 @@ public class AsignaturaCancelada {
     @Column(name = "noombre_asignatura")
     private String nombreAsignatura;
 
+    @Column(name = "grupo")
+    private String grupo;
+
     @Column(name = "id_docente")
     private Integer idDocente;
 

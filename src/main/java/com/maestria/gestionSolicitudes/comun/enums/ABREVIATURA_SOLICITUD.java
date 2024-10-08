@@ -26,8 +26,8 @@ public enum ABREVIATURA_SOLICITUD {
     OT_ACTI_APO("Reconocimiento Créditos Realización Otras Actividades Apoyo"),
     RE_CRED_PUB("Reconocimiento Créditos Publicaciones"),
     AV_SEMI_ACT("Aval Seminario Actualización"),
-    AP_ECON_ASI("Apoyo Económico Asistencia Congresos"),
-    PA_PUBL_EVE("Apoyo Económico Pago Publicación o Eventos"),
+    AP_ECON_ASI("Apoyo Económico"),
+    PA_PUBL_EVE("Apoyo Económico"),
     AV_COMI_PR("Aval Comite Programa"),
     SO_BECA("Solicitud de Beca"),
     SO_DESC("Solicitud de Descuento");

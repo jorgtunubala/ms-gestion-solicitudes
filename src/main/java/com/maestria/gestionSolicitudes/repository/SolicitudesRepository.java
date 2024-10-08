@@ -16,11 +16,11 @@ public interface SolicitudesRepository extends JpaRepository<Solicitudes, Intege
         WHERE s.estado = ?2
         AND (s.idTutor = ?1 AND fs.firmaTutor = false) 
         OR (s.idDirector = ?1 AND fs.firmaDirector = false)        
-        ORDER BY s.fechaCreacion ASC
+        ORDER BY s.fechaModificacion ASC
         """)           
-    List<Solicitudes> findAllByIdTutorOrderByFechaCreacionAsc(Integer idTutor, String estado);
+    List<Solicitudes> findAllByIdTutorOrderByFechaModificacionAsc(Integer idTutor, String estado);
 
     Optional<Solicitudes> findByRadicado(String radicado);
 
-    List<Solicitudes> findByEstado(String estado);
+    List<Solicitudes> findByEstadoOrderByFechaModificacionAsc(String estado);
 }

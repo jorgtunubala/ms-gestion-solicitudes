@@ -6,4 +6,5 @@ import lombok.Data;
 public class InfoAdicionCancelacion {
     private String nombreAsignatura;
     private String docenteAsignatura;
+    private String grupo;
 }

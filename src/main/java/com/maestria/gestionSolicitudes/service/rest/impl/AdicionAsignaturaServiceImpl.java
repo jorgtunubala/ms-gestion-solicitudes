@@ -80,6 +80,7 @@ public class AdicionAsignaturaServiceImpl implements AdicionAsignaturaService {
                 asignaturaAdicionada.setNombreAsignatura(info.getNombreAsignatura());
                 asignaturaAdicionada.setIdDocente(info.getIdDocente());
                 asignaturaAdicionada.setEstado("Pendiente Aval");
+                asignaturaAdicionada.setGrupo(info.getGrupo());
                 asignaturaAdicionadas.add(asignaturaAdicionada);
             }
             asignaturaAdicionadaRepository.saveAll(asignaturaAdicionadas);
@@ -106,6 +107,7 @@ public class AdicionAsignaturaServiceImpl implements AdicionAsignaturaService {
                 asignaturaCancelada.setNombreAsignatura(info.getNombreAsignatura());
                 asignaturaCancelada.setIdDocente(info.getIdDocente());
                 asignaturaCancelada.setEstado("Pendiente Aval");
+                asignaturaCancelada.setGrupo(info.getGrupo());
                 asignaturasCanceladas.add(asignaturaCancelada);
             }
             asignaturaCanceladaRepository.saveAll(asignaturasCanceladas);

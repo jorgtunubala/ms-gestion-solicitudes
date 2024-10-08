@@ -1,7 +1,9 @@
 package com.maestria.gestionSolicitudes.service.rest.impl;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -527,7 +529,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(String correo) throws Exception {
         List<SolicitudPendientesAval> solicitudes = new ArrayList<>();
         InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(correo);
-        List<Solicitudes> solicitudesPendientes = solicitudesRepository.findAllByIdTutorOrderByFechaCreacionAsc(infoTutor.getId(), ESTADO_SOLICITUD.RADICADA.getDescripcion());
+        List<Solicitudes> solicitudesPendientes = solicitudesRepository.findAllByIdTutorOrderByFechaModificacionAsc(infoTutor.getId(), ESTADO_SOLICITUD.RADICADA.getDescripcion());
         for (Solicitudes solicitud : solicitudesPendientes) {
             TiposSolicitud tipoSolicitud = tipoSolicitudRepository.findById(solicitud.getTipoSolicitud().getId()).get();
             InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
@@ -539,8 +541,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitudPendiente.setNombreTipoSolicitud(tipoSolicitud.getNombre());
             solicitudPendiente.setAbreviatura(ABREVIATURA_SOLICITUD.valueOf(tipoSolicitud.getCodigo()).getDescripcion());
             solicitudPendiente.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            solicitudPendiente.setFecha(solicitud.getFechaCreacion().format(formatter));            
+            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            solicitudPendiente.setFecha(solicitud.getFechaModificacion().toString());
+            solicitudPendiente.setIdentificacionSolicitante(estudiante.getNumeroDocumento());
             solicitudes.add(solicitudPendiente);
         }
         return solicitudes;
@@ -596,6 +599,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
                                 .obtenerTutor(asignaturasAdicionadas.getIdDocente().toString());
                             info.setDocenteAsignatura(infoDocente.obtenerNombreCompleto());
+                            info.setGrupo(asignaturasAdicionadas.getGrupo());
                             lInfoAdiciones.add(info);
                         }
                         datosAdicionAsignatura.setListaAsignaturas(lInfoAdiciones);
@@ -614,6 +618,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
                                 .obtenerTutor(asignaturasCanceladas.getIdDocente().toString());
                             info.setDocenteAsignatura(infoDocente.obtenerNombreCompleto());
+                            info.setGrupo(asignaturasCanceladas.getGrupo());
                             lInfoCancelacion.add(info);
                         }
                         datosCancelacionAsignatura.setListaAsignaturas(lInfoCancelacion);
@@ -936,6 +941,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             registrarHistoricoSolicitud(solicitud);
             solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
             solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
+            solicitud.setFechaModificacion(LocalDateTime.now());
             solicitudesRepository.save(solicitud);
             registrarHistoricoSolicitud(solicitud);
             DatosEnvioCorreo datosCorreo = new DatosEnvioCorreo();
@@ -1304,7 +1310,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     public List<SolicitudPendientesAval> obtenerDatosSolicitudPendientesCoordinador(String estado) throws Exception {
         List<SolicitudPendientesAval> solicitudes = new ArrayList<>();
         List<Solicitudes> solicitudesPendientes = solicitudesRepository.
-                    findByEstado(ESTADO_SOLICITUD.getDescripcionPorCodigo(estado));
+                findByEstadoOrderByFechaModificacionAsc(ESTADO_SOLICITUD.getDescripcionPorCodigo(estado));
         for (Solicitudes solicitud : solicitudesPendientes) {
             TiposSolicitud tipoSolicitud = tipoSolicitudRepository.findById(solicitud.getTipoSolicitud().getId()).get();
             InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
@@ -1354,6 +1360,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             mensajeComentario+=rechazarSolicitudRequest.getComentario();
             solicitud.setComentario(mensajeComentario);
             solicitud.setEstado(ESTADO_SOLICITUD.getDescripcionPorCodigo(rechazarSolicitudRequest.getEstado()));
+            solicitud.setFechaModificacion(LocalDateTime.now());
             solicitud.setIdRevisor(tutor.getId());
             solicitudesRepository.save(solicitud);
             registrarHistoricoSolicitud(solicitud);
@@ -1488,6 +1495,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         try{
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
             solicitud.setEstado(estado);
+            solicitud.setFechaModificacion(LocalDateTime.now());
             solicitudesRepository.save(solicitud);
             registrarHistoricoSolicitud(solicitud);
             return true;
