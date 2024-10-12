@@ -3,6 +3,7 @@ package com.maestria.gestionSolicitudes.service.client;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.maestria.gestionSolicitudes.comun.util.Base64;
@@ -16,6 +17,7 @@ public class GestionEnvioCorreoServiceImpl implements GestionEnvioCorreoService 
     private MensajeriaService mensajeriaService;
 
     @Override
+    @Async
     public Boolean enviarCorreo(EnvioCorreoRequest envioCorreoRequest) {
         String destino = envioCorreoRequest.getDestinatario();
         String oficio = envioCorreoRequest.getOficio();

@@ -1,6 +1,7 @@
 package com.maestria.gestionSolicitudes.comun.enums;
 
 public enum ESTADO_SOLICITUD {
+    CREADA("Creada"),
     RADICADA("Radicada"),
     AVALADA("Avalada"),
     NO_AVALADA("No Avalada"),
