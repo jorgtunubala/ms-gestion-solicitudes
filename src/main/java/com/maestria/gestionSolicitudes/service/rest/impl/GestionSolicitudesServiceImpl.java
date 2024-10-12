@@ -278,8 +278,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 //solicitudesRepository.save(registroSolicitud);
                 logger.info("Se registró correctamente la solicitud.");
 
-                // registrar en el historico
-                registroSolicitud.setEstado(ESTADO_SOLICITUD.CREADA.getDescripcion());
+                // registrar en el historico                
                 registrarHistoricoSolicitud(registroSolicitud);
             } else {                
                 logger.error("Ocurrió un error al registrar la solicitud.");
@@ -1269,6 +1268,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         HistorialEstadoSolicitudes historico = new HistorialEstadoSolicitudes();
         historico.setSolicitud(solicitud);
         String estado = validarEstadoHistorico(solicitud);
+        if (estado.equals("Radicada")) {
+            estado = "Creada";
+        }
         historico.setEstado(estado);
         if (!solicitud.getEstado().equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())
                 && !solicitud.getEstado().equals(ESTADO_SOLICITUD.NO_APROBADA.getDescripcion())
