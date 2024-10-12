@@ -258,7 +258,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitud.setIdEstudiante(datosSolicitud.getIdEstudiante());
             solicitud.setTipoSolicitud(tipoSolicitud);
             solicitud.setIdTutor(datosSolicitud.getIdTutor());            
-            solicitud.setEstado(ESTADO_SOLICITUD.CREADA.getDescripcion());
+            solicitud.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
             solicitud.setIdDirector(datosSolicitud.getIdDirector());
             solicitud.setDocumentoFirmado(datosSolicitud.getOficioPdf());
@@ -279,6 +279,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 logger.info("Se registró correctamente la solicitud.");
 
                 // registrar en el historico
+                registroSolicitud.setEstado(ESTADO_SOLICITUD.CREADA.getDescripcion());
                 registrarHistoricoSolicitud(registroSolicitud);
             } else {                
                 logger.error("Ocurrió un error al registrar la solicitud.");
@@ -1375,7 +1376,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         String estado = solicitud.getEstado();
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
         List<HistorialEstadoSolicitudes> historico = historialEstadoSolicitudesRepository.findBySolicitudOrderByFechaCreacionAsc(solicitud);
-        if (estado.equals(ESTADO_SOLICITUD.CREADA.getDescripcion())) {
+        if (estado.equals(ESTADO_SOLICITUD.RADICADA.getDescripcion())) {
             if (firmas.getFirmaTutor() != null && firmas.getFirmaTutor()  
                 && firmas.getFirmaDirector()!=null && !firmas.getFirmaDirector()) {
                 estado = "Avalada Tutor";
