@@ -85,6 +85,10 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
             }
             solicitudesEnConcejoRepository.save(solicitudConcejo);             
             if(datosSolicitudEnConcejo.getDocumentosConcejo() != null) {
+                List<DocumentosConcejo> documentosC = documentosConcejoRepository.findBySolicitudConcejo(solicitudConcejo);
+                if (!documentosC.isEmpty()) {
+                    documentosConcejoRepository.deleteAll(documentosC);
+                }
                 List<DocumentosConcejo> documentosConcejo = new ArrayList<>();
                 for (String documento : datosSolicitudEnConcejo.getDocumentosConcejo()) {
                     DocumentosConcejo documentoConcejo = new DocumentosConcejo();
