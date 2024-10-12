@@ -1324,8 +1324,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitudPendiente.setNombreTipoSolicitud(tipoSolicitud.getNombre());
             solicitudPendiente.setAbreviatura(ABREVIATURA_SOLICITUD.valueOf(tipoSolicitud.getCodigo()).getDescripcion());
             solicitudPendiente.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            solicitudPendiente.setFecha(solicitud.getFechaCreacion().format(formatter));            
+            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            solicitudPendiente.setFecha(solicitud.getFechaModificacion().toString());
+            solicitudPendiente.setIdentificacionSolicitante(estudiante.getNumeroDocumento());            
             solicitudes.add(solicitudPendiente);
         }
         return solicitudes;
