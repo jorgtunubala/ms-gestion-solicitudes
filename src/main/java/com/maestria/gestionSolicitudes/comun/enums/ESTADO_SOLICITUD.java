@@ -9,7 +9,9 @@ public enum ESTADO_SOLICITUD {
     EN_CONCEJO("En concejo"),
     RECHAZADA("Rechazada"),
     APROBADA("Aprobada"),
-    NO_APROBADA("No Aprobada");
+    NO_APROBADA("No Aprobada"),
+    RESUELTA("Resuelta"),
+    ANULADA("Anulada");
 
     private final String descripcion;
 
