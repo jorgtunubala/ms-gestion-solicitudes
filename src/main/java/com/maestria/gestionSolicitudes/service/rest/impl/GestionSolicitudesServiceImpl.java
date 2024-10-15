@@ -914,6 +914,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
         Boolean firmaTutor = dAvalarSolicitudDto.getFirmaTutor();
         Boolean firmaDirector = dAvalarSolicitudDto.getFirmaDirector();
+        solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
+        solicitudesRepository.save(solicitud);
         if (solicitud.getRequiereFirmaDirector()){
             if (firmaTutor && firmaDirector) {
                 firmas.setFirmaTutor(firmaTutor);
@@ -939,7 +941,6 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         if ((firmas.getFirmaTutor() && firmas.getFirmaDirector()) || 
             (firmas.getFirmaTutor() && !solicitud.getRequiereFirmaDirector())) {
             registrarHistoricoSolicitud(solicitud);
-            solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
             solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
             solicitud.setFechaModificacion(LocalDateTime.now());
             solicitudesRepository.save(solicitud);
