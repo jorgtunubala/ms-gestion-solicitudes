@@ -8,4 +8,5 @@ import lombok.Data;
 public class CancelarAsignaturaRequest {
     private List<InfoAdicionAsignaturaRequest> listaAsignaturas;
     private String motivo;
+    private String documentoAdjunto;
 }

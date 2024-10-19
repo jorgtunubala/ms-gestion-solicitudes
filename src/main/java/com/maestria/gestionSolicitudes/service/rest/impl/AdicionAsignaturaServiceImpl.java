@@ -98,6 +98,7 @@ public class AdicionAsignaturaServiceImpl implements AdicionAsignaturaService {
             CancelarAsignatura cancelarAsignatura = new CancelarAsignatura();
             cancelarAsignatura.setSolicitud(solicitud);
             cancelarAsignatura.setMotivo(datosCancelarAsignatura.getMotivo());
+            cancelarAsignatura.setDocumentoAdjunto(datosCancelarAsignatura.getDocumentoAdjunto());
             cancelarAsignatura = cancelarAsignaturaRepository.save(cancelarAsignatura);
             List<AsignaturaCancelada> asignaturasCanceladas = new ArrayList<>();
             for (InfoAdicionAsignaturaRequest info : datosCancelarAsignatura.getListaAsignaturas()) {

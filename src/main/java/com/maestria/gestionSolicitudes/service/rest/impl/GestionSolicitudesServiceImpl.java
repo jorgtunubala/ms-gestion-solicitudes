@@ -612,6 +612,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                                         .findByCancelarAsignatura(cancelarAsignatura);                                                
                         DatosSolicitudAdicionCancelacionAsignatura datosCancelacionAsignatura = new DatosSolicitudAdicionCancelacionAsignatura();
                         datosCancelacionAsignatura.setMotivo(cancelarAsignatura.getMotivo());
+                        datosCancelacionAsignatura.setDocumentoAdjunto(cancelarAsignatura.getDocumentoAdjunto());
                         List<InfoAdicionCancelacion> lInfoCancelacion = new ArrayList<>();
                         for (AsignaturaCancelada asignaturasCanceladas : asignaturaCanceladas) {                            
                             InfoAdicionCancelacion info = new InfoAdicionCancelacion();
@@ -663,7 +664,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             DatosSolicitudAplazarSemestre datosAplazarS = new DatosSolicitudAplazarSemestre();
                             datosAplazarS.setSemestre(aplazarSemestre.getSemestre());
                             datosAplazarS.setMotivo(aplazarSemestre.getMotivo());
-                            response.setDatosSolicitudAplazarSemestre(datosAplazarS);
+                            datosAplazarS.setDocumentoAdjunto(aplazarSemestre.getDocumentoAdjunto());
+                            response.setDatosSolicitudAplazarSemestre(datosAplazarS);                            
                         }
                         break;
 
@@ -990,7 +992,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             AplazarSemestre aplazarSemestre = new AplazarSemestre();
             aplazarSemestre.setSolicitud(solicitud);
             aplazarSemestre.setSemestre(datosAplazarSemestre.getSemestre());
-            aplazarSemestre.setMotivo(datosAplazarSemestre.getMotivo());        
+            aplazarSemestre.setMotivo(datosAplazarSemestre.getMotivo());   
+            aplazarSemestre.setDocumentoAdjunto(datosAplazarSemestre.getDocumentoAdjunto());
             aplazarSemestreRepository.save(aplazarSemestre);
             registro = true;
         } catch (Exception e){

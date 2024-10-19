@@ -27,4 +27,7 @@ public class CancelarAsignatura {
 
     @Column(name = "motivo")
     private String motivo;
+
+    @Column(name = "documento_adjunto")
+    private String documentoAdjunto;
 }
