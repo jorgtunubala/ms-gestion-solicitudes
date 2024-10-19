@@ -11,4 +11,5 @@ public class AsignaturaExternaResponseDto {
     private Double calificacion;
     private String programa;
     private String institucion;
+    private String contenidoProgramatico;
 }

@@ -671,11 +671,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
                     case "CU_ASIG":
                         CursarAsignatura cursarAsignatura = cursarAsignaturaRepository.findBySolicitud(solicitud);
+                        List<DatosCursarAsignatura> datosCursarAsignaturaList = datosCursarAsignaturaRepository.findAllByCursarAsignatura(cursarAsignatura);
                         DatosSolicitudCursarAsignaturas datosSolicitudCursarAsignaturas = new DatosSolicitudCursarAsignaturas();
                         datosSolicitudCursarAsignaturas.setMotivo(cursarAsignatura.getMotivo());
                         List<DatosCursarAsignatura> listDatosCursarAsignaturas = datosCursarAsignaturaRepository
                                                                         .findAllByCursarAsignatura(cursarAsignatura);
                         List<DatosAsignaturaOtroPrograma> listAsignaturaOtroPrograma = new ArrayList<>();
+                        List<String> documentosAdjuntos = new ArrayList<>();
+                        for (DatosCursarAsignatura dCursarAsig : datosCursarAsignaturaList) {
+                            documentosAdjuntos.add(dCursarAsig.getCartaAceptacion());
+                        }
                         for (DatosCursarAsignatura infoDatosCursarAsig : listDatosCursarAsignaturas) {
                             DatosAsignaturaOtroPrograma infoAsigOtroPrograma = new DatosAsignaturaOtroPrograma();
                             AsignaturaExternaResponseDto asignaturaExterna = gestionAsignaturasService.
@@ -687,14 +692,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             infoAsigOtroPrograma.setNombrePrograma(asignaturaExterna.getPrograma());
                             infoAsigOtroPrograma.setNombreDocente(infoDatosCursarAsig.getNombreDocente());
                             listAsignaturaOtroPrograma.add(infoAsigOtroPrograma);
+                            documentosAdjuntos.add(asignaturaExterna.getContenidoProgramatico());
                         }
-                        datosSolicitudCursarAsignaturas.setDatosAsignaturaOtroProgramas(listAsignaturaOtroPrograma);
-                        List<DocumentosCursarAsignatura> listDocumentosCursarAsignatura = documentosCursarAsignaturaRepository
-                                                                .findAllByCursarAsignatura(cursarAsignatura);
-                        List<String> documentosAdjuntos = new ArrayList<>();
-                        for (DocumentosCursarAsignatura documentos : listDocumentosCursarAsignatura) {
-                            documentosAdjuntos.add(documentos.getDocumento());
-                        }
+                        datosSolicitudCursarAsignaturas.setDatosAsignaturaOtroProgramas(listAsignaturaOtroPrograma);                                                           
                         datosSolicitudCursarAsignaturas.setDocumentosAdjuntos(documentosAdjuntos);
                         response.setDatosSolicitudCursarAsignaturas(datosSolicitudCursarAsignaturas);
                         break;
