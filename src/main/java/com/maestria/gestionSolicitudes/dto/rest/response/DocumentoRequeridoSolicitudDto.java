@@ -13,4 +13,5 @@ public class DocumentoRequeridoSolicitudDto {
     private List<DocumentoRequerido> documentosRequeridos;
     private List<String> notas;
     private List<EnlacesTiposSolicitud> enlaces;
+    private List<String> enlacesRequeridos;
 }

@@ -180,12 +180,17 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             // Anexamos los documentos requeridos de la solicitud
             List<DocumentoRequisitoSolicitud> lRequisitoSolicituds = dSolicitudRepository.findByRequisitoSolicitudId(requisitoSolicitud.getId());
             List<DocumentoRequerido> lDocumentos = new ArrayList<>();
+            List<String> lEnlaces = new ArrayList<>();
             for (DocumentoRequisitoSolicitud documentoRequisitoSolicitud : lRequisitoSolicituds) {
                 DocumentoRequerido doc = new DocumentoRequerido();
-                doc.setNombre(documentoRequisitoSolicitud.getNombreDocumento());
-                doc.setAdjuntarDocumento(documentoRequisitoSolicitud.getAdjuntarDocumento());
-                doc.setNombreAcortado(documentoRequisitoSolicitud.getAbreviaturaDocumento());
-                lDocumentos.add(doc);
+                if (!documentoRequisitoSolicitud.getEnlace()){ // Si no es un documento de agregar enlace se envia como documento
+                    doc.setNombre(documentoRequisitoSolicitud.getNombreDocumento());
+                    doc.setAdjuntarDocumento(documentoRequisitoSolicitud.getAdjuntarDocumento());
+                    doc.setNombreAcortado(documentoRequisitoSolicitud.getAbreviaturaDocumento());
+                    lDocumentos.add(doc);
+                } else {
+                    lEnlaces.add(documentoRequisitoSolicitud.getNombreDocumento()); // se envia en formato para agregar enlaces
+                }
             }
             dSolicitudDto.setDocumentosRequeridos(lDocumentos);
             // Buscamos Notas que pueden estar asociadas a la solicitud.

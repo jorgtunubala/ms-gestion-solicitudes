@@ -42,4 +42,8 @@ public class DocumentoRequisitoSolicitud extends EntidadPrincipal {
 
     @Column(name = "abreviatura_documento")
     private String abreviaturaDocumento;
+
+    @Column(name = "enlace")
+    @Convert(converter = BooleanConverter.class)
+    private Boolean enlace;
 }
