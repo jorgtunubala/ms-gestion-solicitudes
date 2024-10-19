@@ -36,4 +36,10 @@ public class AvalComitePrograma {
 
     @Column(name = "horas_reconocer")
     private BigDecimal horasReconocer;
+
+    @Column(name = "descripcion_actividad")
+    private String descripcionActividad;
+
+    @Column(name = "documento_adjunto")
+    private String documentoAdjunto;
 }

@@ -1260,6 +1260,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 aval.setSubTiposSolicitud(subtipo);                
                 aval.setIntensidadHoraria(avales.getIntensidadHoraria());                
                 aval.setHorasReconocer(avales.getHorasReconocer());
+                aval.setDescripcionActividad(avales.getDescripcionActividad());
+                aval.setDocumentoAdjunto(avales.getDocumentoAdjunto());
 
                 // Guardar datos de la entidad
                 aval = avalComiteProgramaRepository.save(aval);
