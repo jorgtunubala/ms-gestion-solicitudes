@@ -18,16 +18,16 @@ public interface ApoyoEconomicoPublicacionEventoMapper {
         @Mapping(target = "solicitud", ignore = true),
         @Mapping(target = "id", ignore = true),
         @Mapping(target = "idDirector", source = "idDirectorGrupo"),
-        @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "stringToLocalDate"),
-        @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "stringToLocalDate")
+        @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "stringToLocalDate", defaultValue = "null"),
+        @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "stringToLocalDate", defaultValue = "null")
     })
     ApoyoEconomicoPublicacionEvento dtoToEntity(ApoyoEconomicoPublicacionEventoRequest apoyoEconomicoPublicacionEventoRequest);
 
     @Mapping(target = "idDirectorGrupo", source = "idDirector")
     @Mapping(target = "documentosAdjuntos", ignore = true)
     @Mapping(target = "nombreDirectorGrupo", ignore = true)
-    @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "localDateToString")
-    @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "localDateToString") 
+    @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "localDateToString", defaultValue = "null")
+    @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "localDateToString", defaultValue = "null")
     ApoyoEconomicoPublicacionEventoRequest entidadAdto(ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento);
 
     @Named("stringToLocalDate")
