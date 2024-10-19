@@ -18,28 +18,16 @@ public interface ApoyoEconomicoPublicacionEventoMapper {
         @Mapping(target = "solicitud", ignore = true),
         @Mapping(target = "id", ignore = true),
         @Mapping(target = "idDirector", source = "idDirectorGrupo"),
-        @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "stringToLocalDate", defaultValue = "null"),
-        @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "stringToLocalDate", defaultValue = "null")
+        @Mapping(target = "fechaInicio", ignore = true),
+        @Mapping(target = "fechaFin", ignore = true)
     })
     ApoyoEconomicoPublicacionEvento dtoToEntity(ApoyoEconomicoPublicacionEventoRequest apoyoEconomicoPublicacionEventoRequest);
 
     @Mapping(target = "idDirectorGrupo", source = "idDirector")
     @Mapping(target = "documentosAdjuntos", ignore = true)
     @Mapping(target = "nombreDirectorGrupo", ignore = true)
-    @Mapping(target = "fechaInicio", source = "fechaInicio", qualifiedByName = "localDateToString", defaultValue = "null")
-    @Mapping(target = "fechaFin", source = "fechaFin", qualifiedByName = "localDateToString", defaultValue = "null")
+    @Mapping(target = "fechaInicio", ignore = true)
+    @Mapping(target = "fechaFin", ignore = true)
     ApoyoEconomicoPublicacionEventoRequest entidadAdto(ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento);
 
-    @Named("stringToLocalDate")
-    default LocalDate stringToLocalDate(String fecha) {
-        return LocalDate.parse(fecha);
-    }
-
-    @Named("localDateToString")
-    default String localDateToString(LocalDate fecha) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        
-        // Convertir LocalDate a String en formato "dd/MM/yyyy"
-        return fecha.format(formatter);
-    }
 }

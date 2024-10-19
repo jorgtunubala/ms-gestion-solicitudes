@@ -1,5 +1,6 @@
 package com.maestria.gestionSolicitudes.service.rest.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -837,6 +838,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
                                             .obtenerTutor(responseApoyoEconomicoPubEvento.getIdDirectorGrupo().toString());
                             responseApoyoEconomicoPubEvento.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
+                            responseApoyoEconomicoPubEvento.setFechaInicio(localDateToString(apoyoEconomicoPublicacionEvento.getFechaInicio()));
+                            responseApoyoEconomicoPubEvento.setFechaFin(localDateToString(apoyoEconomicoPublicacionEvento.getFechaFin()));
                             List<DocumentosApoyoEconomicoPublicacionEvento> documentosApoyosEconomicoPubEvento = documentosApoyoEconomicoPublicacionEventoRepository.
                                     findAllByApoyoEconomicoPublicacionEvento(apoyoEconomicoPublicacionEvento);
                             List<String> documentos = new ArrayList<>();
@@ -1176,6 +1179,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
             ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoMapper.dtoToEntity(apoyoEconomicoPublicacionEventoRequest);
             apoyoEconomicoPublicacionEvento.setSolicitud(solicitud);
+            if (apoyoEconomicoPublicacionEventoRequest.getFechaInicio() != null) {
+                apoyoEconomicoPublicacionEvento.setFechaInicio(stringToLocalDate(apoyoEconomicoPublicacionEventoRequest.getFechaInicio()));
+                apoyoEconomicoPublicacionEvento.setFechaFin(stringToLocalDate(apoyoEconomicoPublicacionEventoRequest.getFechaFin()));
+            }
             apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoRepository.save(apoyoEconomicoPublicacionEvento);
 
             // Procedemos a guardar los ducumentos adjuntos de la solicitud
@@ -1509,4 +1516,15 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             return false;
         }        
     }        
+
+    private String localDateToString(LocalDate fecha) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        
+        // Convertir LocalDate a String en formato "dd/MM/yyyy"
+        return fecha.format(formatter);
+    }
+
+    private LocalDate stringToLocalDate(String fecha) {
+        return LocalDate.parse(fecha);
+    }    
 }
