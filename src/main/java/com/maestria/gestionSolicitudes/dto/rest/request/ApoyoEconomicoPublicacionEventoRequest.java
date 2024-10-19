@@ -20,5 +20,7 @@ public class ApoyoEconomicoPublicacionEventoRequest {
     private String numeroCuenta;
     private String numeroCedulaAsociada;
     private String direccionResidencia;
+    private String finalidadApoyo;
+    private String grupoInvestigacion;
     private List<String> documentosAdjuntos;
 }
