@@ -193,6 +193,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 }
             }
             dSolicitudDto.setDocumentosRequeridos(lDocumentos);
+            dSolicitudDto.setEnlacesRequeridos(lEnlaces);
             // Buscamos Notas que pueden estar asociadas a la solicitud.
             List<NotaDocumentoRequerido> lNotaDocumentoRequeridos = notaDocumentoRequeridoRepository.findByRequisitoSolicitudId(requisitoSolicitud.getTipoSolicitud().getId());
             List<String> notas = new ArrayList<>();
