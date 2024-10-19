@@ -838,8 +838,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
                                             .obtenerTutor(responseApoyoEconomicoPubEvento.getIdDirectorGrupo().toString());
                             responseApoyoEconomicoPubEvento.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
-                            responseApoyoEconomicoPubEvento.setFechaInicio(localDateToString(apoyoEconomicoPublicacionEvento.getFechaInicio()));
-                            responseApoyoEconomicoPubEvento.setFechaFin(localDateToString(apoyoEconomicoPublicacionEvento.getFechaFin()));
+                            if (responseApoyoEconomicoPubEvento.getFechaInicio()!=null){
+                                responseApoyoEconomicoPubEvento.setFechaInicio(localDateToString(apoyoEconomicoPublicacionEvento.getFechaInicio()));
+                                responseApoyoEconomicoPubEvento.setFechaFin(localDateToString(apoyoEconomicoPublicacionEvento.getFechaFin()));
+                            }
                             List<DocumentosApoyoEconomicoPublicacionEvento> documentosApoyosEconomicoPubEvento = documentosApoyoEconomicoPublicacionEventoRepository.
                                     findAllByApoyoEconomicoPublicacionEvento(apoyoEconomicoPublicacionEvento);
                             List<String> documentos = new ArrayList<>();
