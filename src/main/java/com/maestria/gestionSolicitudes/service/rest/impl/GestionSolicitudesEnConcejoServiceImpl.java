@@ -93,10 +93,8 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                                     .obtenerTutor(asignaturaAdicionada.getIdDocente().toString());
                     asignaturas.setNombreDocente(infoDocente.obtenerNombreCompleto());
                     asignaturas
-                            .setAprobado(asignaturaAdicionada.getEstado().equals(ESTADO_SOLICITUD.APROBADA.getDescripcion())
-                                    ? Boolean.TRUE
-                                    : Boolean.FALSE);
-                    if (asignaturas.getAprobado()){ //Solo muestra en concejo las aprobadas por comite
+                            .setAprobado(asignaturaAdicionada.getAprobadoComite());
+                    if (asignaturaAdicionada.getAprobadoComite()){ //Solo muestra en concejo las aprobadas por comite
                         asignaturasAprobadas.add(asignaturas);
                     }
                 }
@@ -114,11 +112,9 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                     InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
                                     .obtenerTutor(asignaturaCancelada.getIdDocente().toString());
                     asignaturas.setNombreDocente(infoDocente.obtenerNombreCompleto());
-                    asignaturas.setAprobado(
-                            asignaturaCancelada.getEstado().equals(ESTADO_SOLICITUD.APROBADA.getDescripcion())
-                                    ? Boolean.TRUE
-                                    : Boolean.FALSE);
-                    if (asignaturas.getAprobado()){ //Solo muestra en concejo las aprobadas por comite
+                    asignaturas
+                            .setAprobado(asignaturaCancelada.getAprobadoComite());
+                    if (asignaturaCancelada.getAprobadoComite()){ //Solo muestra en concejo las aprobadas por comite
                         asignaturasAprobadas.add(asignaturas);
                     }
                 }

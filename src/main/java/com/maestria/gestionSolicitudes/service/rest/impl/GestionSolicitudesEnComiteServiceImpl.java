@@ -85,9 +85,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                                 .obtenerTutor(asignaturaAdicionada.getIdDocente().toString());
                 asignaturas.setNombreDocente(infoDocente.obtenerNombreCompleto());
                 asignaturas
-                        .setAprobado(asignaturaAdicionada.getEstado().equals(ESTADO_SOLICITUD.APROBADA.getDescripcion())
-                                ? Boolean.TRUE
-                                : Boolean.FALSE);
+                        .setAprobado(asignaturaAdicionada.getAprobadoComite());
                 asignaturasAprobadas.add(asignaturas);
             }
 
@@ -105,9 +103,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                                 .obtenerTutor(asignaturaCancelada.getIdDocente().toString());
                 asignaturas.setNombreDocente(infoDocente.obtenerNombreCompleto());
                 asignaturas.setAprobado(
-                        asignaturaCancelada.getEstado().equals(ESTADO_SOLICITUD.APROBADA.getDescripcion())
-                                ? Boolean.TRUE
-                                : Boolean.FALSE);
+                        asignaturaCancelada.getAprobadoComite());
                 asignaturasAprobadas.add(asignaturas);
             }
         }
@@ -147,8 +143,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                         asignaturaAdicionadas.stream()
                             .filter(asignaturaAdicionada -> asignaturaAdicionada.getId().equals(asignaturaAprobar.getIdAsignatura()))
                             .findFirst()
-                            .ifPresent(asignaturaAdicionada -> asignaturaAdicionada.setEstado(asignaturaAprobar.getAprobado() ? 
-                                ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion()))
+                            .ifPresent(asignaturaAdicionada -> asignaturaAdicionada.setAprobadoComite(asignaturaAprobar.getAprobado()))
                     );
                     asignaturaAdicionadaRepository.saveAll(asignaturaAdicionadas);
                 } else if (solicitud.getTipoSolicitud().getCodigo().equals("CA_ASIG")) {
@@ -159,8 +154,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                         asignaturaCanceladas.stream()
                             .filter(asignaturaCancelada -> asignaturaCancelada.getId().equals(asignaturaAprobar.getIdAsignatura()))
                             .findFirst()
-                            .ifPresent(asignaturaCancelada -> asignaturaCancelada.setEstado(asignaturaAprobar.getAprobado() ? 
-                                ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion()))
+                            .ifPresent(asignaturaAdicionada -> asignaturaAdicionada.setAprobadoComite(asignaturaAprobar.getAprobado()))
                     );
                     asignaturaCanceladaRepository.saveAll(asignaturaCanceladas);
                 } 
