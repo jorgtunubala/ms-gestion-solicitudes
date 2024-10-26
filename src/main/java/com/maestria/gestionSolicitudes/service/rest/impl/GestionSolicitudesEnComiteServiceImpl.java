@@ -2,9 +2,6 @@ package com.maestria.gestionSolicitudes.service.rest.impl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +18,7 @@ import com.maestria.gestionSolicitudes.domain.AsignaturaCancelada;
 import com.maestria.gestionSolicitudes.domain.CancelarAsignatura;
 import com.maestria.gestionSolicitudes.domain.Solicitudes;
 import com.maestria.gestionSolicitudes.domain.SolicitudesEnComite;
+import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.AprobarAsignaturaRequest;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudEnComiteResponse;
 import com.maestria.gestionSolicitudes.repository.AdicionarAsignaturaRepository;
@@ -29,6 +27,7 @@ import com.maestria.gestionSolicitudes.repository.AsignaturaCanceladaRepository;
 import com.maestria.gestionSolicitudes.repository.CancelarAsignaturaRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesEnComiteRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesRepository;
+import com.maestria.gestionSolicitudes.service.client.GestionDocentesEstudiantesService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnComiteService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
 
@@ -50,6 +49,8 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
     private AsignaturaCanceladaRepository asignaturaCanceladaRepository;
     @Autowired
     private GestionSolicitudesService gestionSolicitudesService;
+    @Autowired
+    private GestionDocentesEstudiantesService gestionDocentesEstudiantesService;
 
 
     @Override
@@ -79,6 +80,10 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                 AprobarAsignaturaRequest asignaturas = new AprobarAsignaturaRequest();
                 asignaturas.setIdAsignatura(asignaturaAdicionada.getId());
                 asignaturas.setNombre(asignaturaAdicionada.getNombreAsignatura());
+                asignaturas.setGrupo(asignaturaAdicionada.getGrupo());
+                InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
+                                .obtenerTutor(asignaturaAdicionada.getIdDocente().toString());
+                asignaturas.setNombreDocente(infoDocente.obtenerNombreCompleto());
                 asignaturas
                         .setAprobado(asignaturaAdicionada.getEstado().equals(ESTADO_SOLICITUD.APROBADA.getDescripcion())
                                 ? Boolean.TRUE
@@ -95,6 +100,10 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                 AprobarAsignaturaRequest asignaturas = new AprobarAsignaturaRequest();
                 asignaturas.setIdAsignatura(asignaturaCancelada.getId());
                 asignaturas.setNombre(asignaturaCancelada.getNombreAsignatura());
+                asignaturas.setGrupo(asignaturaCancelada.getGrupo());
+                InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
+                                .obtenerTutor(asignaturaCancelada.getIdDocente().toString());
+                asignaturas.setNombreDocente(infoDocente.obtenerNombreCompleto());
                 asignaturas.setAprobado(
                         asignaturaCancelada.getEstado().equals(ESTADO_SOLICITUD.APROBADA.getDescripcion())
                                 ? Boolean.TRUE
