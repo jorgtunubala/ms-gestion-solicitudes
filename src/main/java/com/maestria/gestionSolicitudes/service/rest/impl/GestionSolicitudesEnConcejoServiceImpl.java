@@ -93,7 +93,7 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                                     .obtenerTutor(asignaturaAdicionada.getIdDocente().toString());
                     asignaturas.setNombreDocente(infoDocente.obtenerNombreCompleto());
                     asignaturas
-                            .setAprobado(asignaturaAdicionada.getAprobadoComite());
+                            .setAprobado(asignaturaAdicionada.getAprobadoConcejo());
                     if (asignaturaAdicionada.getAprobadoComite()){ //Solo muestra en concejo las aprobadas por comite
                         asignaturasAprobadas.add(asignaturas);
                     }
