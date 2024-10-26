@@ -96,7 +96,9 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                             .setAprobado(asignaturaAdicionada.getEstado().equals(ESTADO_SOLICITUD.APROBADA.getDescripcion())
                                     ? Boolean.TRUE
                                     : Boolean.FALSE);
-                    asignaturasAprobadas.add(asignaturas);
+                    if (asignaturas.getAprobado()){ //Solo muestra en concejo las aprobadas por comite
+                        asignaturasAprobadas.add(asignaturas);
+                    }
                 }
 
             } else if (solicitud.getTipoSolicitud().getCodigo().equals("CA_ASIG")) {
@@ -116,7 +118,9 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                             asignaturaCancelada.getEstado().equals(ESTADO_SOLICITUD.APROBADA.getDescripcion())
                                     ? Boolean.TRUE
                                     : Boolean.FALSE);
-                    asignaturasAprobadas.add(asignaturas);
+                    if (asignaturas.getAprobado()){ //Solo muestra en concejo las aprobadas por comite
+                        asignaturasAprobadas.add(asignaturas);
+                    }
                 }
             }
             solicitudesEnConcejoRes.setAsignaturasAprobadas(asignaturasAprobadas);
