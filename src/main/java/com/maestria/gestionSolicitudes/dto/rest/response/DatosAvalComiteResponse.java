@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 public class DatosAvalComiteResponse {
     private String nombreActividad;
-    private BigDecimal horasReconocer;   
+    private BigDecimal horasReconocer;
+    private String documentoAdjunto;
 }

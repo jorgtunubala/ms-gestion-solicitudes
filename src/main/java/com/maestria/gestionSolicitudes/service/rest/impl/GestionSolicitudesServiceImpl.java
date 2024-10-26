@@ -874,6 +874,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             DatosAvalComiteResponse datosAvales = new DatosAvalComiteResponse();
                             datosAvales.setNombreActividad(aval.getSubTiposSolicitud().getNombre());
                             datosAvales.setHorasReconocer(aval.getHorasReconocer());
+                            datosAvales.setDocumentoAdjunto(aval.getDocumentoAdjunto());
                             infoAvales.add(datosAvales);
                         }
                         response.setDatosAvalComite(infoAvales);
