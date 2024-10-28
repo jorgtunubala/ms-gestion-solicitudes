@@ -309,7 +309,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                 avalComiteProgramaRepository.saveAll(avalComiteProgramaList);
             } else if (solicitud.getTipoSolicitud().getCodigo().equals("RE_CRED_PR_DOC")) {                
                 List<ActividadesRealizadasPracticaDocente> actReaPracDocenteList = aPracticaDocenteRepository.findBySolicitud(solicitud);            
-                datosSolicitudEnComite.getAvalActPracticaDocente().forEach(avalAprobar -> 
+                datosSolicitudEnComite.getReconocimientoCreditosPD().forEach(avalAprobar -> 
                     actReaPracDocenteList.stream()
                         .filter(actividadPracticaDocente -> actividadPracticaDocente.getSubTiposSolicitud().getId().equals(avalAprobar.getIdSubtipo()))
                         .findFirst()
