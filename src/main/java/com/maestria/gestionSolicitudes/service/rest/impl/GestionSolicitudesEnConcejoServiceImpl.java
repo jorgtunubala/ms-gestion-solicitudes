@@ -284,95 +284,98 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
         return solicitudesEnConcejoRes;
     }
 
-    private void guardarDataEnConcejo(Solicitudes solicitud, SolicitudEnConcejoResponse datosSolicitudEnConcejo){
-        if (datosSolicitudEnConcejo.getAsignaturasAprobadas() != null) {
-            if (solicitud.getTipoSolicitud().getCodigo().equals("AD_ASIG")) {
-                AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
-                List<AsignaturaAdicionada> asignaturaAdicionadas = asignaturaAdicionadaRepository
-                .findByAdicionarAsignatura(adicionarAsignatura);                    
-            datosSolicitudEnConcejo.getAsignaturasAprobadas().forEach(asignaturaAprobar -> 
-                asignaturaAdicionadas.stream()
-                    .filter(asignaturaAdicionada -> asignaturaAdicionada.getId().equals(asignaturaAprobar.getIdAsignatura()))
+    private void guardarDataEnConcejo(Solicitudes solicitud, SolicitudEnConcejoResponse datosSolicitudEnConcejo) {
+        if (solicitud.getTipoSolicitud().getCodigo().equals("AD_ASIG")) {
+            AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
+            List<AsignaturaAdicionada> asignaturaAdicionadas = asignaturaAdicionadaRepository
+                    .findByAdicionarAsignatura(adicionarAsignatura);
+            datosSolicitudEnConcejo.getAsignaturasAprobadas()
+                    .forEach(asignaturaAprobar -> asignaturaAdicionadas.stream()
+                            .filter(asignaturaAdicionada -> asignaturaAdicionada.getId()
+                                    .equals(asignaturaAprobar.getIdAsignatura()))
+                            .findFirst()
+                            .ifPresent(asignaturaAdicionada -> {
+                                asignaturaAdicionada.setAprobadoConcejo(asignaturaAprobar.getAprobado());
+                                asignaturaAdicionada.setEstado(
+                                        asignaturaAprobar.getAprobado() ? ESTADO_SOLICITUD.APROBADA.getDescripcion()
+                                                : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
+                            }));
+            asignaturaAdicionadaRepository.saveAll(asignaturaAdicionadas);
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("CA_ASIG")) {
+            CancelarAsignatura cancelarAsignatura = cancelarAsignaturaRepository.findBySolicitud(solicitud);
+            List<AsignaturaCancelada> asignaturaCanceladas = asignaturaCanceladaRepository
+                    .findByCancelarAsignatura(cancelarAsignatura);
+            datosSolicitudEnConcejo.getAsignaturasAprobadas().forEach(asignaturaAprobar -> asignaturaCanceladas.stream()
+                    .filter(asignaturaCancelada -> asignaturaCancelada.getId()
+                            .equals(asignaturaAprobar.getIdAsignatura()))
                     .findFirst()
-                    .ifPresent(asignaturaAdicionada -> {
-                        asignaturaAdicionada.setAprobadoConcejo(asignaturaAprobar.getAprobado());
-                        asignaturaAdicionada.setEstado(asignaturaAprobar.getAprobado() ? 
-                            ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
-                    })
-                );
-                asignaturaAdicionadaRepository.saveAll(asignaturaAdicionadas);
-            } else if (solicitud.getTipoSolicitud().getCodigo().equals("CA_ASIG")) {
-                CancelarAsignatura cancelarAsignatura = cancelarAsignaturaRepository.findBySolicitud(solicitud);
-                List<AsignaturaCancelada> asignaturaCanceladas = asignaturaCanceladaRepository
-                        .findByCancelarAsignatura(cancelarAsignatura);   
-                        datosSolicitudEnConcejo.getAsignaturasAprobadas().forEach(asignaturaAprobar -> 
-                    asignaturaCanceladas.stream()
-                        .filter(asignaturaCancelada -> asignaturaCancelada.getId().equals(asignaturaAprobar.getIdAsignatura()))
-                        .findFirst()
-                        .ifPresent(asignaturaCancelada -> {
-                            asignaturaCancelada.setAprobadoConcejo(asignaturaAprobar.getAprobado());
-                            asignaturaCancelada.setEstado(asignaturaAprobar.getAprobado() ? 
-                                ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
-                        })
-                );
-                asignaturaCanceladaRepository.saveAll(asignaturaCanceladas);
-            } else if (solicitud.getTipoSolicitud().getCodigo().equals("HO_ASIG_ESP") ||
-                    solicitud.getTipoSolicitud().getCodigo().equals("HO_ASIG_POS")) {
-                Homologaciones homologacion = homologacionesRepository.findBySolicitud(solicitud);
-                List<AsignaturasHomologadas> asignaturaHomologadas = asignaturasHomologadasRepository
-                        .findAllByHomologacion(homologacion);
-                datosSolicitudEnConcejo.getAsignaturasHomologadas().forEach(asignaturaAprobar -> 
-                    asignaturaHomologadas.stream()
-                        .filter(asignaturaHomologada -> asignaturaHomologada.getId().equals(asignaturaAprobar.getIdHomologacion()))
-                        .findFirst()
-                        .ifPresent(asignaturaHomologada -> {
-                            asignaturaHomologada.setAprobadoConcejo(asignaturaAprobar.getAprobado());
-                            asignaturaHomologada.setEstado(asignaturaAprobar.getAprobado() ? 
-                                ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
-                        })
-                );
-                asignaturasHomologadasRepository.saveAll(asignaturaHomologadas);
-            } else if (solicitud.getTipoSolicitud().getCodigo().equals("CU_ASIG")) {
-                CursarAsignatura cursarAsignatura = cursarAsignaturaRepository.findBySolicitud(solicitud);
-                List<DatosCursarAsignatura> datosCursarAsignaturaList = datosCursarAsignaturaRepository.findAllByCursarAsignatura(cursarAsignatura);                                    
-                datosSolicitudEnConcejo.getAsignaturasOtroPrograma().forEach(asignaturaAprobar -> 
-                    datosCursarAsignaturaList.stream()
-                        .filter(datosCursarAsignatura -> datosCursarAsignatura.getId().equals(asignaturaAprobar.getIdCursarAsignatura()))
-                        .findFirst()
-                        .ifPresent(datosCursarAsignatura -> {
-                            datosCursarAsignatura.setAprobadoConcejo(asignaturaAprobar.getAprobado());
-                            datosCursarAsignatura.setEstado(asignaturaAprobar.getAprobado() ? 
-                                ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
-                        })
-                );
-                datosCursarAsignaturaRepository.saveAll(datosCursarAsignaturaList);
-            } 
+                    .ifPresent(asignaturaCancelada -> {
+                        asignaturaCancelada.setAprobadoConcejo(asignaturaAprobar.getAprobado());
+                        asignaturaCancelada
+                                .setEstado(asignaturaAprobar.getAprobado() ? ESTADO_SOLICITUD.APROBADA.getDescripcion()
+                                        : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
+                    }));
+            asignaturaCanceladaRepository.saveAll(asignaturaCanceladas);
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("HO_ASIG_ESP") ||
+                solicitud.getTipoSolicitud().getCodigo().equals("HO_ASIG_POS")) {
+            Homologaciones homologacion = homologacionesRepository.findBySolicitud(solicitud);
+            List<AsignaturasHomologadas> asignaturaHomologadas = asignaturasHomologadasRepository
+                    .findAllByHomologacion(homologacion);
+            datosSolicitudEnConcejo.getAsignaturasHomologadas()
+                    .forEach(asignaturaAprobar -> asignaturaHomologadas.stream()
+                            .filter(asignaturaHomologada -> asignaturaHomologada.getId()
+                                    .equals(asignaturaAprobar.getIdHomologacion()))
+                            .findFirst()
+                            .ifPresent(asignaturaHomologada -> {
+                                asignaturaHomologada.setAprobadoConcejo(asignaturaAprobar.getAprobado());
+                                asignaturaHomologada.setEstado(
+                                        asignaturaAprobar.getAprobado() ? ESTADO_SOLICITUD.APROBADA.getDescripcion()
+                                                : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
+                            }));
+            asignaturasHomologadasRepository.saveAll(asignaturaHomologadas);
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("CU_ASIG")) {
+            CursarAsignatura cursarAsignatura = cursarAsignaturaRepository.findBySolicitud(solicitud);
+            List<DatosCursarAsignatura> datosCursarAsignaturaList = datosCursarAsignaturaRepository
+                    .findAllByCursarAsignatura(cursarAsignatura);
+            datosSolicitudEnConcejo.getAsignaturasOtroPrograma()
+                    .forEach(asignaturaAprobar -> datosCursarAsignaturaList.stream()
+                            .filter(datosCursarAsignatura -> datosCursarAsignatura.getId()
+                                    .equals(asignaturaAprobar.getIdCursarAsignatura()))
+                            .findFirst()
+                            .ifPresent(datosCursarAsignatura -> {
+                                datosCursarAsignatura.setAprobadoConcejo(asignaturaAprobar.getAprobado());
+                                datosCursarAsignatura.setEstado(
+                                        asignaturaAprobar.getAprobado() ? ESTADO_SOLICITUD.APROBADA.getDescripcion()
+                                                : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
+                            }));
+            datosCursarAsignaturaRepository.saveAll(datosCursarAsignaturaList);
         } else if (solicitud.getTipoSolicitud().getCodigo().equals("AV_COMI_PR")) {
             List<AvalComitePrograma> avalComiteProgramaList = avalComiteProgramaRepository.findBySolicitud(solicitud);
-            datosSolicitudEnConcejo.getAvalActPracticaDocente().forEach(avalAprobar -> 
-                avalComiteProgramaList.stream()
-                    .filter(avalComitePrograma -> avalComitePrograma.getSubTiposSolicitud().getId().equals(avalAprobar.getIdSubtipo()))
+            datosSolicitudEnConcejo.getAvalActPracticaDocente().forEach(avalAprobar -> avalComiteProgramaList.stream()
+                    .filter(avalComitePrograma -> avalComitePrograma.getSubTiposSolicitud().getId()
+                            .equals(avalAprobar.getIdSubtipo()))
                     .findFirst()
                     .ifPresent(avalComitePrograma -> {
                         avalComitePrograma.setAprobadoConcejo(avalAprobar.getAprobado());
-                        avalComitePrograma.setEstado(avalAprobar.getAprobado() ? 
-                            ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
-                    })
-            );
+                        avalComitePrograma
+                                .setEstado(avalAprobar.getAprobado() ? ESTADO_SOLICITUD.APROBADA.getDescripcion()
+                                        : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
+                    }));
             avalComiteProgramaRepository.saveAll(avalComiteProgramaList);
-        } else if (solicitud.getTipoSolicitud().getCodigo().equals("RE_CRED_PR_DOC")) {                
-            List<ActividadesRealizadasPracticaDocente> actReaPracDocenteList = aPracticaDocenteRepository.findBySolicitud(solicitud);            
-            datosSolicitudEnConcejo.getReconocimientoCreditosPD().forEach(avalAprobar -> 
-                actReaPracDocenteList.stream()
-                    .filter(actividadPracticaDocente -> actividadPracticaDocente.getSubTiposSolicitud().getId().equals(avalAprobar.getIdSubtipo()))
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("RE_CRED_PR_DOC")) {
+            List<ActividadesRealizadasPracticaDocente> actReaPracDocenteList = aPracticaDocenteRepository
+                    .findBySolicitud(solicitud);
+            datosSolicitudEnConcejo.getReconocimientoCreditosPD().forEach(avalAprobar -> actReaPracDocenteList.stream()
+                    .filter(actividadPracticaDocente -> actividadPracticaDocente.getSubTiposSolicitud().getId()
+                            .equals(avalAprobar.getIdSubtipo()))
                     .findFirst()
                     .ifPresent(avalComitePrograma -> {
                         avalComitePrograma.setAprobadoConcejo(avalAprobar.getAprobado());
-                        avalComitePrograma.setEstado(avalAprobar.getAprobado() ? 
-                            ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
+                        avalComitePrograma
+                                .setEstado(avalAprobar.getAprobado() ? ESTADO_SOLICITUD.APROBADA.getDescripcion()
+                                        : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
                         avalComitePrograma.setCreditos(avalAprobar.getCreditosReconocer());
-                    })
-            );
+                    }));
             aPracticaDocenteRepository.saveAll(actReaPracDocenteList);
         }
     }

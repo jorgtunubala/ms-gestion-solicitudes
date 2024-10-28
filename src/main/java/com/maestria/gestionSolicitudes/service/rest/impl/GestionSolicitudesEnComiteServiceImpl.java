@@ -252,72 +252,72 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
         return solicitudesEnComiteRes;
     }
 
-    private void guardarDataComite(Solicitudes solicitud, SolicitudEnComiteResponse datosSolicitudEnComite){
-        if (datosSolicitudEnComite.getAsignaturasAprobadas() != null) {
-            if (solicitud.getTipoSolicitud().getCodigo().equals("AD_ASIG")) {
-                AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
-                List<AsignaturaAdicionada> asignaturaAdicionadas = asignaturaAdicionadaRepository
-                    .findByAdicionarAsignatura(adicionarAsignatura);                    
-                datosSolicitudEnComite.getAsignaturasAprobadas().forEach(asignaturaAprobar -> 
-                    asignaturaAdicionadas.stream()
-                        .filter(asignaturaAdicionada -> asignaturaAdicionada.getId().equals(asignaturaAprobar.getIdAsignatura()))
-                        .findFirst()
-                        .ifPresent(asignaturaAdicionada -> asignaturaAdicionada.setAprobadoComite(asignaturaAprobar.getAprobado()))
-                );
-                asignaturaAdicionadaRepository.saveAll(asignaturaAdicionadas);
-            } else if (solicitud.getTipoSolicitud().getCodigo().equals("CA_ASIG")) {
-                CancelarAsignatura cancelarAsignatura = cancelarAsignaturaRepository.findBySolicitud(solicitud);
-                List<AsignaturaCancelada> asignaturaCanceladas = asignaturaCanceladaRepository
-                        .findByCancelarAsignatura(cancelarAsignatura);   
-                datosSolicitudEnComite.getAsignaturasAprobadas().forEach(asignaturaAprobar -> 
-                    asignaturaCanceladas.stream()
-                        .filter(asignaturaCancelada -> asignaturaCancelada.getId().equals(asignaturaAprobar.getIdAsignatura()))
-                        .findFirst()
-                        .ifPresent(asignaturaCancelada -> asignaturaCancelada.setAprobadoComite(asignaturaAprobar.getAprobado()))
-                );
-                asignaturaCanceladaRepository.saveAll(asignaturaCanceladas);
-            } else if (solicitud.getTipoSolicitud().getCodigo().equals("HO_ASIG_ESP") ||
-                    solicitud.getTipoSolicitud().getCodigo().equals("HO_ASIG_POS")) {
-                Homologaciones homologacion = homologacionesRepository.findBySolicitud(solicitud);
-                List<AsignaturasHomologadas> asignaturaHomologadas = asignaturasHomologadasRepository
-                        .findAllByHomologacion(homologacion);
-                datosSolicitudEnComite.getAsignaturasHomologadas().forEach(asignaturaAprobar -> 
-                    asignaturaHomologadas.stream()
-                        .filter(asignaturaHomologada -> asignaturaHomologada.getId().equals(asignaturaAprobar.getIdHomologacion()))
-                        .findFirst()
-                        .ifPresent(asignaturaHomologada -> asignaturaHomologada.setAprobadoComite(asignaturaAprobar.getAprobado()))
-                );
-                asignaturasHomologadasRepository.saveAll(asignaturaHomologadas);
-            } else if (solicitud.getTipoSolicitud().getCodigo().equals("CU_ASIG")) {
-                CursarAsignatura cursarAsignatura = cursarAsignaturaRepository.findBySolicitud(solicitud);
-                List<DatosCursarAsignatura> datosCursarAsignaturaList = datosCursarAsignaturaRepository.findAllByCursarAsignatura(cursarAsignatura);                                    
-                datosSolicitudEnComite.getAsignaturasOtroPrograma().forEach(asignaturaAprobar -> 
-                    datosCursarAsignaturaList.stream()
-                        .filter(datosCursarAsignatura -> datosCursarAsignatura.getId().equals(asignaturaAprobar.getIdCursarAsignatura()))
-                        .findFirst()
-                        .ifPresent(datosCursarAsignatura -> datosCursarAsignatura.setAprobadoComite(asignaturaAprobar.getAprobado()))
-                );
-                datosCursarAsignaturaRepository.saveAll(datosCursarAsignaturaList);
-            } else if (solicitud.getTipoSolicitud().getCodigo().equals("AV_COMI_PR")) {
-                List<AvalComitePrograma> avalComiteProgramaList = avalComiteProgramaRepository.findBySolicitud(solicitud);
-                datosSolicitudEnComite.getAvalActPracticaDocente().forEach(avalAprobar -> 
-                    avalComiteProgramaList.stream()
-                        .filter(avalComitePrograma -> avalComitePrograma.getSubTiposSolicitud().getId().equals(avalAprobar.getIdSubtipo()))
-                        .findFirst()
-                        .ifPresent(avalComitePrograma -> avalComitePrograma.setAprobadoComite(avalAprobar.getAprobado()))
-                );
-                avalComiteProgramaRepository.saveAll(avalComiteProgramaList);
-            } else if (solicitud.getTipoSolicitud().getCodigo().equals("RE_CRED_PR_DOC")) {                
-                List<ActividadesRealizadasPracticaDocente> actReaPracDocenteList = aPracticaDocenteRepository.findBySolicitud(solicitud);            
-                datosSolicitudEnComite.getReconocimientoCreditosPD().forEach(avalAprobar -> 
-                    actReaPracDocenteList.stream()
-                        .filter(actividadPracticaDocente -> actividadPracticaDocente.getSubTiposSolicitud().getId().equals(avalAprobar.getIdSubtipo()))
-                        .findFirst()
-                        .ifPresent(actividadPracticaDocente -> actividadPracticaDocente.setAprobadoComite(avalAprobar.getAprobado()))
-                );
-                aPracticaDocenteRepository.saveAll(actReaPracDocenteList);
-            }             
-
+    private void guardarDataComite(Solicitudes solicitud, SolicitudEnComiteResponse datosSolicitudEnComite) {
+        if (solicitud.getTipoSolicitud().getCodigo().equals("AD_ASIG")) {
+            AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
+            List<AsignaturaAdicionada> asignaturaAdicionadas = asignaturaAdicionadaRepository
+                    .findByAdicionarAsignatura(adicionarAsignatura);
+            datosSolicitudEnComite.getAsignaturasAprobadas().forEach(asignaturaAprobar -> asignaturaAdicionadas.stream()
+                    .filter(asignaturaAdicionada -> asignaturaAdicionada.getId()
+                            .equals(asignaturaAprobar.getIdAsignatura()))
+                    .findFirst()
+                    .ifPresent(asignaturaAdicionada -> asignaturaAdicionada
+                            .setAprobadoComite(asignaturaAprobar.getAprobado())));
+            asignaturaAdicionadaRepository.saveAll(asignaturaAdicionadas);
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("CA_ASIG")) {
+            CancelarAsignatura cancelarAsignatura = cancelarAsignaturaRepository.findBySolicitud(solicitud);
+            List<AsignaturaCancelada> asignaturaCanceladas = asignaturaCanceladaRepository
+                    .findByCancelarAsignatura(cancelarAsignatura);
+            datosSolicitudEnComite.getAsignaturasAprobadas().forEach(asignaturaAprobar -> asignaturaCanceladas.stream()
+                    .filter(asignaturaCancelada -> asignaturaCancelada.getId()
+                            .equals(asignaturaAprobar.getIdAsignatura()))
+                    .findFirst()
+                    .ifPresent(asignaturaCancelada -> asignaturaCancelada
+                            .setAprobadoComite(asignaturaAprobar.getAprobado())));
+            asignaturaCanceladaRepository.saveAll(asignaturaCanceladas);
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("HO_ASIG_ESP") ||
+                solicitud.getTipoSolicitud().getCodigo().equals("HO_ASIG_POS")) {
+            Homologaciones homologacion = homologacionesRepository.findBySolicitud(solicitud);
+            List<AsignaturasHomologadas> asignaturaHomologadas = asignaturasHomologadasRepository
+                    .findAllByHomologacion(homologacion);
+            datosSolicitudEnComite.getAsignaturasHomologadas()
+                    .forEach(asignaturaAprobar -> asignaturaHomologadas.stream()
+                            .filter(asignaturaHomologada -> asignaturaHomologada.getId()
+                                    .equals(asignaturaAprobar.getIdHomologacion()))
+                            .findFirst()
+                            .ifPresent(asignaturaHomologada -> asignaturaHomologada
+                                    .setAprobadoComite(asignaturaAprobar.getAprobado())));
+            asignaturasHomologadasRepository.saveAll(asignaturaHomologadas);
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("CU_ASIG")) {
+            CursarAsignatura cursarAsignatura = cursarAsignaturaRepository.findBySolicitud(solicitud);
+            List<DatosCursarAsignatura> datosCursarAsignaturaList = datosCursarAsignaturaRepository
+                    .findAllByCursarAsignatura(cursarAsignatura);
+            datosSolicitudEnComite.getAsignaturasOtroPrograma()
+                    .forEach(asignaturaAprobar -> datosCursarAsignaturaList.stream()
+                            .filter(datosCursarAsignatura -> datosCursarAsignatura.getId()
+                                    .equals(asignaturaAprobar.getIdCursarAsignatura()))
+                            .findFirst()
+                            .ifPresent(datosCursarAsignatura -> datosCursarAsignatura
+                                    .setAprobadoComite(asignaturaAprobar.getAprobado())));
+            datosCursarAsignaturaRepository.saveAll(datosCursarAsignaturaList);
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("AV_COMI_PR")) {
+            List<AvalComitePrograma> avalComiteProgramaList = avalComiteProgramaRepository.findBySolicitud(solicitud);
+            datosSolicitudEnComite.getAvalActPracticaDocente().forEach(avalAprobar -> avalComiteProgramaList.stream()
+                    .filter(avalComitePrograma -> avalComitePrograma.getSubTiposSolicitud().getId()
+                            .equals(avalAprobar.getIdSubtipo()))
+                    .findFirst()
+                    .ifPresent(avalComitePrograma -> avalComitePrograma.setAprobadoComite(avalAprobar.getAprobado())));
+            avalComiteProgramaRepository.saveAll(avalComiteProgramaList);
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("RE_CRED_PR_DOC")) {
+            List<ActividadesRealizadasPracticaDocente> actReaPracDocenteList = aPracticaDocenteRepository
+                    .findBySolicitud(solicitud);
+            datosSolicitudEnComite.getReconocimientoCreditosPD().forEach(avalAprobar -> actReaPracDocenteList.stream()
+                    .filter(actividadPracticaDocente -> actividadPracticaDocente.getSubTiposSolicitud().getId()
+                            .equals(avalAprobar.getIdSubtipo()))
+                    .findFirst()
+                    .ifPresent(actividadPracticaDocente -> actividadPracticaDocente
+                            .setAprobadoComite(avalAprobar.getAprobado())));
+            aPracticaDocenteRepository.saveAll(actReaPracDocenteList);
         }
     }
     
