@@ -1276,6 +1276,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 aval.setHorasReconocer(avales.getHorasReconocer());
                 aval.setDescripcionActividad(avales.getDescripcionActividad());
                 aval.setDocumentoAdjunto(avales.getDocumentoAdjunto());
+                aval.setEstado(ESTADO_SOLICITUD.PENDIENTE.getDescripcion());
 
                 // Guardar datos de la entidad
                 aval = avalComiteProgramaRepository.save(aval);

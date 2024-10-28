@@ -3,6 +3,7 @@ package com.maestria.gestionSolicitudes.domain;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -11,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.maestria.gestionSolicitudes.comun.util.BooleanConverter;
 
 import lombok.Data;
 
@@ -42,4 +45,15 @@ public class AvalComitePrograma {
 
     @Column(name = "documento_adjunto")
     private String documentoAdjunto;
+
+    @Column(name = "estado")
+    private String estado;
+
+    @Column(name = "aprobado_comite")
+    @Convert(converter = BooleanConverter.class)
+    private Boolean aprobadoComite;
+
+    @Column(name = "aprobado_concejo")
+    @Convert(converter = BooleanConverter.class)
+    private Boolean aprobadoConcejo;
 }

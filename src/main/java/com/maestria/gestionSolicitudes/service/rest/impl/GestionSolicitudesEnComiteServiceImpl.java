@@ -16,6 +16,7 @@ import com.maestria.gestionSolicitudes.domain.AdicionarAsignatura;
 import com.maestria.gestionSolicitudes.domain.AsignaturaAdicionada;
 import com.maestria.gestionSolicitudes.domain.AsignaturaCancelada;
 import com.maestria.gestionSolicitudes.domain.AsignaturasHomologadas;
+import com.maestria.gestionSolicitudes.domain.AvalComitePrograma;
 import com.maestria.gestionSolicitudes.domain.CancelarAsignatura;
 import com.maestria.gestionSolicitudes.domain.CursarAsignatura;
 import com.maestria.gestionSolicitudes.domain.DatosCursarAsignatura;
@@ -26,12 +27,14 @@ import com.maestria.gestionSolicitudes.dto.client.AsignaturaExternaResponseDto;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.AprobarAsignaturaRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.AsignaturaOtroPrograma.AprobarAsignaturaOPRequest;
+import com.maestria.gestionSolicitudes.dto.rest.request.AvalComite.AprobarAvalComiteRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.homologaciones.AprobarHomologacionRequest;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudEnComiteResponse;
 import com.maestria.gestionSolicitudes.repository.AdicionarAsignaturaRepository;
 import com.maestria.gestionSolicitudes.repository.AsignaturaAdicionadaRepository;
 import com.maestria.gestionSolicitudes.repository.AsignaturaCanceladaRepository;
 import com.maestria.gestionSolicitudes.repository.AsignaturasHomologadasRepository;
+import com.maestria.gestionSolicitudes.repository.AvalComiteProgramaRepository;
 import com.maestria.gestionSolicitudes.repository.CancelarAsignaturaRepository;
 import com.maestria.gestionSolicitudes.repository.CursarAsignaturaRepository;
 import com.maestria.gestionSolicitudes.repository.DatosCursarAsignaturaRepository;
@@ -73,6 +76,8 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
     private CursarAsignaturaRepository cursarAsignaturaRepository;
     @Autowired
     private DatosCursarAsignaturaRepository datosCursarAsignaturaRepository;
+    @Autowired
+    private AvalComiteProgramaRepository avalComiteProgramaRepository;
 
 
     @Override
@@ -130,6 +135,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
         List<AprobarAsignaturaRequest> asignaturasAprobadas = null;
         List<AprobarHomologacionRequest> homologacionesAprobadas = null;
         List<AprobarAsignaturaOPRequest> asignaturasOPAprobadas = null;
+        List<AprobarAvalComiteRequest> avalActPracticaDocente = null;
         if (solicitud.getTipoSolicitud().getCodigo().equals("AD_ASIG")) {
             asignaturasAprobadas = new ArrayList<>();
             AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
@@ -207,10 +213,22 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                     datosCursarAsignatura.getAprobadoComite());
                 asignaturasOPAprobadas.add(asignaturaOP);
             }
-        }
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("AV_COMI_PR")) {
+            avalActPracticaDocente = new ArrayList<>();
+            List<AvalComitePrograma> avalComiteProgramaList = avalComiteProgramaRepository.findBySolicitud(solicitud);
+            for (AvalComitePrograma avalComitePrograma : avalComiteProgramaList) {
+                AprobarAvalComiteRequest aval = new AprobarAvalComiteRequest();
+                aval.setIdSubtipo(avalComitePrograma.getSubTiposSolicitud().getId());
+                aval.setNombreActividad(avalComitePrograma.getSubTiposSolicitud().getNombre());                
+                aval.setAprobado(
+                    avalComitePrograma.getAprobadoComite());
+                avalActPracticaDocente.add(aval);
+            }
+        } 
         solicitudesEnComiteRes.setAsignaturasAprobadas(asignaturasAprobadas); 
         solicitudesEnComiteRes.setAsignaturasHomologadas(homologacionesAprobadas);
         solicitudesEnComiteRes.setAsignaturasOtroPrograma(asignaturasOPAprobadas);
+        solicitudesEnComiteRes.setAvalActPracticaDocente(avalActPracticaDocente);
         return solicitudesEnComiteRes;
     }
 
@@ -260,6 +278,15 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
                         .ifPresent(datosCursarAsignatura -> datosCursarAsignatura.setAprobadoComite(asignaturaAprobar.getAprobado()))
                 );
                 datosCursarAsignaturaRepository.saveAll(datosCursarAsignaturaList);
+            } else if (solicitud.getTipoSolicitud().getCodigo().equals("AV_COMI_PR")) {
+                List<AvalComitePrograma> avalComiteProgramaList = avalComiteProgramaRepository.findBySolicitud(solicitud);
+                datosSolicitudEnComite.getAvalActPracticaDocente().forEach(avalAprobar -> 
+                    avalComiteProgramaList.stream()
+                        .filter(avalComitePrograma -> avalComitePrograma.getSubTiposSolicitud().getId().equals(avalAprobar.getIdSubtipo()))
+                        .findFirst()
+                        .ifPresent(avalComitePrograma -> avalComitePrograma.setAprobadoComite(avalAprobar.getAprobado()))
+                );
+                avalComiteProgramaRepository.saveAll(avalComiteProgramaList);
             } 
 
         }
