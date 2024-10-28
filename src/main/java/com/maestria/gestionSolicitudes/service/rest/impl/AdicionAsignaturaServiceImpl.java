@@ -8,6 +8,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.maestria.gestionSolicitudes.comun.enums.ESTADO_SOLICITUD;
 import com.maestria.gestionSolicitudes.domain.AdicionarAsignatura;
 import com.maestria.gestionSolicitudes.domain.AsignaturaAdicionada;
 import com.maestria.gestionSolicitudes.domain.AsignaturaCancelada;
@@ -79,7 +80,7 @@ public class AdicionAsignaturaServiceImpl implements AdicionAsignaturaService {
                 asignaturaAdicionada.setIdAsignatura(null);
                 asignaturaAdicionada.setNombreAsignatura(info.getNombreAsignatura());
                 asignaturaAdicionada.setIdDocente(info.getIdDocente());
-                asignaturaAdicionada.setEstado("Pendiente Aval");
+                asignaturaAdicionada.setEstado(ESTADO_SOLICITUD.PENDIENTE.getDescripcion());
                 asignaturaAdicionada.setGrupo(info.getGrupo());
                 asignaturaAdicionadas.add(asignaturaAdicionada);
             }

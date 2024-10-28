@@ -1036,7 +1036,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosCursarAsignatura.setNombreDocente(infoAsignaturaExterna.getNombreDocente());
                 datosCursarAsignatura.setTituloDocente(infoAsignaturaExterna.getTituloDocente());
                 datosCursarAsignatura.setCartaAceptacion(infoAsignaturaExterna.getCartaAceptacion());
-                datosCursarAsignatura.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
+                datosCursarAsignatura.setEstado(ESTADO_SOLICITUD.PENDIENTE.getDescripcion());
                 datosCursarAsignaturaRepository.save(datosCursarAsignatura);
             }
             

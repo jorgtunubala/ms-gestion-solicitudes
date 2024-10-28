@@ -11,7 +11,8 @@ public enum ESTADO_SOLICITUD {
     APROBADA("Aprobada"),
     NO_APROBADA("No Aprobada"),
     RESUELTA("Resuelta"),
-    ANULADA("Anulada");
+    ANULADA("Anulada"),
+    PENDIENTE("Pendiente Aval");
 
     private final String descripcion;
 
