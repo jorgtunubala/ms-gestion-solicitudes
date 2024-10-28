@@ -248,6 +248,7 @@ public class GestionSolicitudesEnComiteServiceImpl implements GestionSolicitudes
         solicitudesEnComiteRes.setAsignaturasHomologadas(homologacionesAprobadas);
         solicitudesEnComiteRes.setAsignaturasOtroPrograma(asignaturasOPAprobadas);
         solicitudesEnComiteRes.setAvalActPracticaDocente(avalActPracticaDocente);
+        solicitudesEnComiteRes.setReconocimientoCreditosPD(reconocimientoCreditosPD);
         return solicitudesEnComiteRes;
     }
 
