@@ -22,4 +22,5 @@ public class SolicitudEnConcejoResponse {
     private List<AprobarHomologacionRequest> asignaturasHomologadas;
     private List<AprobarAsignaturaOPRequest> asignaturasOtroPrograma;
     private List<AprobarAvalComiteRequest> avalActPracticaDocente;
+    private List<AprobarAvalComiteRequest> reconocimientoCreditosPD;
 }

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.maestria.gestionSolicitudes.comun.enums.ESTADO_SOLICITUD;
+import com.maestria.gestionSolicitudes.domain.ActividadesRealizadasPracticaDocente;
 import com.maestria.gestionSolicitudes.domain.AdicionarAsignatura;
 import com.maestria.gestionSolicitudes.domain.AsignaturaAdicionada;
 import com.maestria.gestionSolicitudes.domain.AsignaturaCancelada;
@@ -31,6 +32,7 @@ import com.maestria.gestionSolicitudes.dto.rest.request.AsignaturaOtroPrograma.A
 import com.maestria.gestionSolicitudes.dto.rest.request.AvalComite.AprobarAvalComiteRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.homologaciones.AprobarHomologacionRequest;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudEnConcejoResponse;
+import com.maestria.gestionSolicitudes.repository.ActividadesRealizadasPracticaDocenteRepository;
 import com.maestria.gestionSolicitudes.repository.AdicionarAsignaturaRepository;
 import com.maestria.gestionSolicitudes.repository.AsignaturaAdicionadaRepository;
 import com.maestria.gestionSolicitudes.repository.AsignaturaCanceladaRepository;
@@ -81,6 +83,8 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
     private DatosCursarAsignaturaRepository datosCursarAsignaturaRepository;
     @Autowired
     private AvalComiteProgramaRepository avalComiteProgramaRepository;
+    @Autowired
+    private ActividadesRealizadasPracticaDocenteRepository aPracticaDocenteRepository;
 
 
     @Override
@@ -159,6 +163,7 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
         List<AprobarHomologacionRequest> homologacionesAprobadas = null;
         List<AprobarAsignaturaOPRequest> asignaturasOPAprobadas = null;
         List<AprobarAvalComiteRequest> avalActPracticaDocente = null;
+        List<AprobarAvalComiteRequest> reconocimientoCreditosPD = null;
         if (solicitud.getTipoSolicitud().getCodigo().equals("AD_ASIG")) {
             asignaturasAprobadas = new ArrayList<>();
             AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
@@ -257,11 +262,25 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                     avalActPracticaDocente.add(aval);
                 }
             }
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("RE_CRED_PR_DOC")) {
+            reconocimientoCreditosPD = new ArrayList<>();
+            List<ActividadesRealizadasPracticaDocente> actReaPracDocenteList = aPracticaDocenteRepository.findBySolicitud(solicitud);
+            for (ActividadesRealizadasPracticaDocente actividades : actReaPracDocenteList) {
+                AprobarAvalComiteRequest aval = new AprobarAvalComiteRequest();
+                aval.setIdSubtipo(actividades.getSubTiposSolicitud().getId());
+                aval.setNombreActividad(actividades.getSubTiposSolicitud().getNombre());
+                aval.setHorasReconocer(actividades.getHorasReconocer());
+                aval.setAprobado(actividades.getAprobadoConcejo());
+                if (actividades.getAprobadoComite()){ //Solo muestra en concejo las aprobadas por comite
+                    reconocimientoCreditosPD.add(aval);
+                }
+            }
         } 
         solicitudesEnConcejoRes.setAsignaturasAprobadas(asignaturasAprobadas);
         solicitudesEnConcejoRes.setAsignaturasHomologadas(homologacionesAprobadas);
         solicitudesEnConcejoRes.setAsignaturasOtroPrograma(asignaturasOPAprobadas);
         solicitudesEnConcejoRes.setAvalActPracticaDocente(avalActPracticaDocente);
+        solicitudesEnConcejoRes.setReconocimientoCreditosPD(reconocimientoCreditosPD);
         return solicitudesEnConcejoRes;
     }
 
@@ -341,6 +360,20 @@ public class GestionSolicitudesEnConcejoServiceImpl implements GestionSolicitude
                     })
             );
             avalComiteProgramaRepository.saveAll(avalComiteProgramaList);
-        } 
+        } else if (solicitud.getTipoSolicitud().getCodigo().equals("RE_CRED_PR_DOC")) {                
+            List<ActividadesRealizadasPracticaDocente> actReaPracDocenteList = aPracticaDocenteRepository.findBySolicitud(solicitud);            
+            datosSolicitudEnConcejo.getAvalActPracticaDocente().forEach(avalAprobar -> 
+                actReaPracDocenteList.stream()
+                    .filter(actividadPracticaDocente -> actividadPracticaDocente.getSubTiposSolicitud().getId().equals(avalAprobar.getIdSubtipo()))
+                    .findFirst()
+                    .ifPresent(avalComitePrograma -> {
+                        avalComitePrograma.setAprobadoConcejo(avalAprobar.getAprobado());
+                        avalComitePrograma.setEstado(avalAprobar.getAprobado() ? 
+                            ESTADO_SOLICITUD.APROBADA.getDescripcion() : ESTADO_SOLICITUD.NO_APROBADA.getDescripcion());
+                        avalComitePrograma.setCreditos(avalAprobar.getCreditosReconocer());
+                    })
+            );
+            aPracticaDocenteRepository.saveAll(actReaPracDocenteList);
+        }
     }
 }
