@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.maestria.gestionSolicitudes.dto.client.EmailRequest;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
