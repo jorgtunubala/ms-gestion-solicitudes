@@ -1295,7 +1295,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         HistorialEstadoSolicitudes historico = new HistorialEstadoSolicitudes();
         historico.setSolicitud(solicitud);
         String estado = validarEstadoHistorico(solicitud);
-        if (estado.equals("Radicada")) {
+        if (estado.equals("RADICADA")) {
             estado = "Creada";
         }
         historico.setEstado(estado);

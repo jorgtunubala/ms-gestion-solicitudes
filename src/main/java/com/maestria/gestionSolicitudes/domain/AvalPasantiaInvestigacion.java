@@ -16,7 +16,7 @@ import lombok.Data;
 
 @Entity
 @Table(name = "avales_pasantia_investigacion")
-@Data
+@Data 
 public class AvalPasantiaInvestigacion {
     @Id
     @Column(name = "id")
@@ -35,4 +35,13 @@ public class AvalPasantiaInvestigacion {
 
     @Column(name = "fecha_fin")
     private LocalDate fechaFin;  
+
+    @Column(name = "universidad_residencia")
+    private String universidadResidencia;
+
+    @Column(name = "grupo_universidad_residencia")
+    private String grupoUniversidadResidencia;
+
+    @Column(name = "nombre_docente_externo")
+    private String nombreDocenteExterno;
 }
