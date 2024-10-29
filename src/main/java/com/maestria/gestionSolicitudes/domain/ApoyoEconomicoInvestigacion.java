@@ -61,4 +61,10 @@ public class ApoyoEconomicoInvestigacion {
     @Column(name = "direccion_residencia")
     private String direccionResidencia;
 
+    @Column(name = "universidad_residencia")
+    private String universidadResidencia;
+
+    @Column(name = "grupo_universidad_residencia")
+    private String grupoUniversidadResidencia;
+
 }

@@ -19,5 +19,7 @@ public class ApoyoEconomicoRequest {
     private String numeroCuenta;
     private String numeroCedulaAsociada;
     private String direccionResidencia;
+    private String universidadResidencia;
+    private String grupoUniversidadResidencia;
     private List<String> documentosAdjuntos;
 }
