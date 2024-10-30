@@ -1,7 +1,7 @@
 package com.maestria.gestionSolicitudes.comun.enums;
 
 public enum ESTADO_DESCRIPCION {
-    RADICADA("La solicitud se ha creado correctamente y se ha enviado una copia al tutor/director relacionado para su revisión y aval."),
+    CREADA("La solicitud se ha creado correctamente y se ha enviado una copia al tutor/director relacionado para su revisión y aval."),
     AVALADA_TUTOR("La solicitud fue avalada por el tutor."),
     AVALADA_DIRECTOR("La solicitud fue avalada por el director del grupo de investigación."),
     EN_COORDINACIÓN("La solicitud ha sido radicada en la coordinación del programa y está pendiente de la revisión por parte del coordinador."),

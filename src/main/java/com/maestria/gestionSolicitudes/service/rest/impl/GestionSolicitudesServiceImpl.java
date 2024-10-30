@@ -716,6 +716,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             datosAvalPasantia.setLugarPasantia(avalPasantiaInvestigacion.getLugarPasantia());
                             datosAvalPasantia.setFechaInicio(avalPasantiaInvestigacion.getFechaInicio().format(formatter));
                             datosAvalPasantia.setFechaFin(avalPasantiaInvestigacion.getFechaFin().format(formatter));
+                            datosAvalPasantia.setUniversidadResidencia(avalPasantiaInvestigacion.getUniversidadResidencia());
+                            datosAvalPasantia.setGrupoUniversidadResidencia(avalPasantiaInvestigacion.getGrupoUniversidadResidencia());
+                            datosAvalPasantia.setNombreDocenteExterno(avalPasantiaInvestigacion.getNombreDocenteExterno());
                             List<DocumentosAvalPasantia> documentosAvalPasantias = documentosAvalPasantiaRepository.
                                     findAllByAvalPasantia(avalPasantiaInvestigacion);
                             List<String> documentos = new ArrayList<>();
@@ -1295,7 +1298,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         HistorialEstadoSolicitudes historico = new HistorialEstadoSolicitudes();
         historico.setSolicitud(solicitud);
         String estado = validarEstadoHistorico(solicitud);
-        if (estado.equals("RADICADA")) {
+        if (estado.equals("Radicada")) {
             estado = "Creada";
         }
         historico.setEstado(estado);
