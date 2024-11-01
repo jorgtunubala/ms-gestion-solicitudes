@@ -72,4 +72,10 @@ public class ApoyoEconomicoPublicacionEvento {
 
     @Column(name = "informacion_pago")
     private String informacionPago;
+
+    @Column(name = "nombre_revista")
+    private String nombreRevista;
+
+    @Column(name = "lufar_evento")
+    private String lugarEvento;
 }

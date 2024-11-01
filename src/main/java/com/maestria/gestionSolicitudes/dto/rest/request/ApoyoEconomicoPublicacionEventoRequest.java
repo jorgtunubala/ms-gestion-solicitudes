@@ -23,5 +23,7 @@ public class ApoyoEconomicoPublicacionEventoRequest {
     private String finalidadApoyo;
     private String grupoInvestigacion;
     private String informacionPago;
+    private String nombreRevista;
+    private String lugarEvento;
     private List<String> documentosAdjuntos;
 }
