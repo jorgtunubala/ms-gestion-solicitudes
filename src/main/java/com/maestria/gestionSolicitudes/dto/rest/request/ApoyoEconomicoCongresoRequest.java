@@ -17,8 +17,9 @@ public class ApoyoEconomicoCongresoRequest {
     private BigDecimal valorApoyo;
     private String entidadBancaria;
     private String tipoCuenta;
-    private String numeroCuenta;
-    private String numeroCedulaAsociada;
+    private String numeroCuenta;    
     private String direccionResidencia;
+    private String grupoInvestigacion;
+    private String lugarEvento;
     private List<String> documentosAdjuntos;
 }

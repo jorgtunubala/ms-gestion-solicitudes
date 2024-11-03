@@ -56,12 +56,15 @@ public class ApoyoEconomicoCongreso {
     private String tipoCuenta;
 
     @Column(name = "numero_cuenta")
-    private String numeroCuenta;
-
-    @Column(name = "numero_cedula_asociada")
-    private String numeroCedulaAsociada;
+    private String numeroCuenta;    
 
     @Column(name = "direccion_residencia")
     private String direccionResidencia;
+
+    @Column(name = "lugar_evento")
+    private String lugarEvento;
+
+    @Column(name = "grupo_investigacion")
+    private String grupoInvestigacion;
 
 }
