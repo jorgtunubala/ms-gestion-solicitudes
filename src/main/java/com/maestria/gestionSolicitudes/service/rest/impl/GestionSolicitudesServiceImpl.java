@@ -103,6 +103,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     @Autowired
     private DocumentosRecCreditosRepository documentosRecCreditosRepository;
     @Autowired
+    private EnlacesRecCreditosRepository enlacesRecCreditosRepository;
+    @Autowired
     private ApoyoEconomicoCongresoRepository apoyoEconomicoCongresoRepository;
     @Autowired
     private DocumentosApoyoEconomicoCongresoRepository documentosApoyoEconomicoCongresoRepository;
@@ -806,7 +808,14 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             for (DocumentosRecCreditos documento : docsRecCreditos) {
                                 documentos.add(documento.getDocumento());
                             }
+                            List<EnlacesRecCreditos> enlacesRecCreditosList = enlacesRecCreditosRepository
+                                    .findAllByReconocimientoCreditos(reconocimientoCreditos);
+                            List<String> enlaces = new ArrayList<>();
+                            for (EnlacesRecCreditos enlace : enlacesRecCreditosList) {
+                                enlaces.add(enlace.getDocumento());
+                            }                            
                             reconocimientoCreditosRequest.setDocumentosAdjuntos(documentos);
+                            reconocimientoCreditosRequest.setEnlacesAdjuntos(enlaces);
                             response.setDatosReconocimientoCreditos(reconocimientoCreditosRequest);
                         }
                         break;
@@ -1137,6 +1146,14 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 docRecCreditos.setReconocimientoCreditos(reconocimientoCreditos);
                 docRecCreditos.setDocumento(documento);
                 documentosRecCreditosRepository.save(docRecCreditos);
+            }
+
+            // Procedemos a guardar los enlaces adjuntos de la solicitud
+            for (String documento : recCreditosPasantiaRequest.getEnlacesAdjuntos()) {
+                EnlacesRecCreditos enlacesRecCreditos = new EnlacesRecCreditos();
+                enlacesRecCreditos.setReconocimientoCreditos(reconocimientoCreditos);
+                enlacesRecCreditos.setDocumento(documento);
+                enlacesRecCreditosRepository.save(enlacesRecCreditos);
             }
             registro = true;
         } catch (Exception e){
