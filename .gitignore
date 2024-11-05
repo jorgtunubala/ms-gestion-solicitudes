@@ -1,5 +1,5 @@
 # Ignorar archivos de configuración de entorno
-.env
+# .env
 
 # Ignorar configuración de Visual Studio Code
 .vscode/
