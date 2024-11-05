@@ -1,6 +1,6 @@
 #Configurar puerto
 server:
-    port: 8095
+    port: ${SPRING_SERVER_SOLICITUDES_PORT}
     servlet:
         context-path: /msmaestriac
 
@@ -11,12 +11,19 @@ spring:
     #url: jdbc:mysql://dockertest.unicauca.edu.co:4207/computacion
     #username: computacion
     #password: DB-C0mput4c10N
-    url: jdbc:mysql://localhost:3306/maestriacomputacion
-    username: root
-    password: mysql
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_OAUTH2_JWT_URI}
+          audience: ${SPRING_OAUTH2_JWT_AUDIENCE}
   
   jackson:
     time-zone: "America/Bogota"
