@@ -37,4 +37,6 @@ public interface GestionSolicitudesService {
     void registrarHistoricoSolicitud(Solicitudes solicitud);
 
     Boolean actualizarSolicitud(Integer idSolicitud, String estado);
+
+    boolean verificarExistenciaSolicitud(Integer solicitudId, String correoElectronico);
 }

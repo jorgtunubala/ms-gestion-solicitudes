@@ -1565,5 +1565,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     private LocalDate stringToLocalDate(String fecha) {
         return LocalDate.parse(fecha);
-    }    
+    }
+
+    @Override
+    public boolean verificarExistenciaSolicitud(Integer solicitudId, String correoElectronico) {
+        Integer respuesta = solicitudesRepository.obtenerDirectorSolicitud(solicitudId, correoElectronico);
+        return respuesta == 1 ? true : false;
+    }
 }

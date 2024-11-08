@@ -23,4 +23,11 @@ public interface SolicitudesRepository extends JpaRepository<Solicitudes, Intege
     Optional<Solicitudes> findByRadicado(String radicado);
 
     List<Solicitudes> findByEstadoOrderByFechaModificacionAsc(String estado);
+
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+                   "FROM solicitudes s " +
+                   "INNER JOIN docentes d ON d.id = s.id_director " +
+                   "INNER JOIN personas p ON p.id = d.id_persona " +
+                   "WHERE s.id = ?1 AND p.correo_electronico = ?2", nativeQuery = true)
+    Integer obtenerDirectorSolicitud(Integer  solicitudId, String correoElectronico);
 }
