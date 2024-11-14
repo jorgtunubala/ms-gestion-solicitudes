@@ -11,10 +11,12 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="tipos_solicitudes")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class TiposSolicitud extends EntidadPrincipal {
