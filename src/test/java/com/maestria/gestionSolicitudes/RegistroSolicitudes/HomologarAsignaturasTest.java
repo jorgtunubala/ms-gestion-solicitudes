@@ -68,7 +68,7 @@ public class HomologarAsignaturasTest {
     }
     
     @Test
-    void registrarSolicitudAdicionAsignaturaConExito() throws Exception {
+    void registrarSolicitudHomologacionConExito() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -126,7 +126,133 @@ public class HomologarAsignaturasTest {
     }
 
     @Test
-    void registrarSolicitudAdicionAsignaturaConDatosFaltantes() {
+    void registrarSolicitudHomologacionSinFirma() throws Exception {
+        // Given
+        SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
+
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
+        when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
+
+
+        Solicitudes solicitud = TestUtils.crearSolicitudMock(tipoSolicitud);
+        when(solicitudesRepository.findById(anyInt())).thenReturn(Optional.of(solicitud));        
+        when(solicitudesRepository.save(any(Solicitudes.class))).thenReturn(solicitud);
+
+        // Configura el mock de registrarAdicionAsignaturas para que devuelva true (o el valor esperado)
+        when(adicionAsignaturaService.registrarAdicionAsignaturas(solicitud, solicitudDto.getDatosAdicionAsignatura())).thenReturn(true);
+        
+        // Crear un objeto mock de FirmaSolicitud
+        FirmaSolicitud firmaSolicitudMock = TestUtils.crearFirmaSolicitudMock(solicitud);
+        firmaSolicitudMock.setFirmaEstudiante(null);
+
+        // Configurar el comportamiento del repositorio para que devuelva el mock al buscar por solicitud
+        when(firmaSolicitudRepository.findBySolicitud(solicitud)).thenReturn(firmaSolicitudMock);
+
+        HistorialEstadoSolicitudes historialEstadoSolicitudes = new HistorialEstadoSolicitudes();
+        historialEstadoSolicitudes.setId(1);
+        historialEstadoSolicitudes.setEstado("Creada");
+
+        when(historialEstadoSolicitudesRepository.save(any(HistorialEstadoSolicitudes.class))).thenReturn(historialEstadoSolicitudes);
+
+        // Mock para obtener datos del estudiante
+        InformacionPersonalDto estudianteMock = new InformacionPersonalDto();
+        estudianteMock.setNombres("Ana");
+        estudianteMock.setApellidos("Gómez");
+        when(gestionDocentesEstudiantesService.obtenerInformacionEstudiantePorId(anyInt())).thenReturn(estudianteMock);
+
+
+        // Mock para obtener datos del tutor
+        InformacionPersonalDto tutorMock = new InformacionPersonalDto();
+        tutorMock.setNombres("Ana");
+        tutorMock.setApellidos("Gómez");
+        when(gestionDocentesEstudiantesService.obtenerTutor(eq("456"))).thenReturn(tutorMock);
+
+        // Mock para obtener datos del director
+        InformacionPersonalDto directorMock = new InformacionPersonalDto();
+        directorMock.setNombres("Carlos");
+        directorMock.setApellidos("López");
+        when(gestionDocentesEstudiantesService.obtenerTutor(anyString())).thenReturn(directorMock);        
+
+        // When
+        String radicado = gestionSolicitudesService.registrarSolicitud(solicitudDto);
+
+        // Then
+        verify(solicitudesRepository).save(any(Solicitudes.class));
+        // ... verificar llamadas a otros métodos y valores devueltos
+        assertNotNull(radicado);
+    }
+
+    @Test
+    void registrarSolicitudHomologacionTutorNoAsignado() throws Exception {
+        // Given
+        SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
+
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
+        when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
+
+
+        Solicitudes solicitud = TestUtils.crearSolicitudMock(tipoSolicitud);
+        solicitud.setIdTutor(null);
+        when(solicitudesRepository.findById(anyInt())).thenReturn(Optional.of(solicitud));        
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> {
+            gestionSolicitudesService.registrarSolicitud(solicitudDto);
+        });
+
+        // Then
+        assertNotNull(exception);
+        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+    }
+
+    @Test
+    void registrarSolicitudHomologacionTipoSolicitudIncorrecto() throws Exception {
+        // Given
+        SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
+
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas"); 
+        tipoSolicitud.setId(null);
+        solicitudDto.setIdTipoSolicitud(null);
+
+        Solicitudes solicitud = TestUtils.crearSolicitudMock(tipoSolicitud);
+        when(solicitudesRepository.findById(anyInt())).thenReturn(Optional.of(solicitud));        
+        when(solicitudesRepository.save(any(Solicitudes.class))).thenReturn(solicitud);
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> {
+            gestionSolicitudesService.registrarSolicitud(solicitudDto);
+        });
+
+        // Then
+        assertNotNull(exception);
+        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+    }
+
+    @Test
+    void registrarSolicitudHomologacionTutorNoDisponible() throws Exception {
+        // Given
+        SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
+
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
+        when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
+
+
+        Solicitudes solicitud = TestUtils.crearSolicitudMock(tipoSolicitud);
+        solicitud.setIdTutor(null);
+        when(solicitudesRepository.findById(anyInt())).thenReturn(Optional.of(solicitud));        
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> {
+            gestionSolicitudesService.registrarSolicitud(solicitudDto);
+        });
+
+        // Then
+        assertNotNull(exception);
+        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+    }
+
+    @Test
+    void registrarSolicitudHomologacionCamposIncompletos() {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
         solicitudDto.setIdEstudiante(null);
@@ -149,6 +275,57 @@ public class HomologarAsignaturasTest {
         assertEquals("Error al registrar la solicitud.", exception.getMessage());
     }
 
+    @Test
+    void registrarSolicitudHomologacionErrorRegistrarHistorial() throws Exception {
+        // Given
+        SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
+
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
+        when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
+
+
+        Solicitudes solicitud = TestUtils.crearSolicitudMock(tipoSolicitud);
+        solicitud.setEstado(null);
+        when(solicitudesRepository.findById(anyInt())).thenReturn(Optional.of(solicitud));                
+
+        // Configura el mock de registrarAdicionAsignaturas para que devuelva true (o el valor esperado)
+        when(adicionAsignaturaService.registrarAdicionAsignaturas(solicitud, solicitudDto.getDatosAdicionAsignatura())).thenReturn(true);
+        
+        // Crear un objeto mock de FirmaSolicitud
+        FirmaSolicitud firmaSolicitudMock = TestUtils.crearFirmaSolicitudMock(solicitud);
+
+        // Configurar el comportamiento del repositorio para que devuelva el mock al buscar por solicitud
+        when(firmaSolicitudRepository.findBySolicitud(solicitud)).thenReturn(firmaSolicitudMock);
+        when(firmaSolicitudRepository.save(any(FirmaSolicitud.class))).thenReturn(firmaSolicitudMock);   
+
+        // Mock para obtener datos del estudiante
+        InformacionPersonalDto estudianteMock = new InformacionPersonalDto();
+        estudianteMock.setNombres("Ana");
+        estudianteMock.setApellidos("Gómez");
+        when(gestionDocentesEstudiantesService.obtenerInformacionEstudiantePorId(anyInt())).thenReturn(estudianteMock);
+
+
+        // Mock para obtener datos del tutor
+        InformacionPersonalDto tutorMock = new InformacionPersonalDto();
+        tutorMock.setNombres("Ana");
+        tutorMock.setApellidos("Gómez");
+        when(gestionDocentesEstudiantesService.obtenerTutor(eq("456"))).thenReturn(tutorMock);
+
+        // Mock para obtener datos del director
+        InformacionPersonalDto directorMock = new InformacionPersonalDto();
+        directorMock.setNombres("Carlos");
+        directorMock.setApellidos("López");
+        when(gestionDocentesEstudiantesService.obtenerTutor(anyString())).thenReturn(directorMock);        
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> {
+            gestionSolicitudesService.registrarSolicitud(solicitudDto);
+        });
+
+        // Then
+        assertNotNull(exception);
+        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+    }
 
     @Test
     void registrarSolicitudErrorAlGuardarSolicitud() throws Exception {
