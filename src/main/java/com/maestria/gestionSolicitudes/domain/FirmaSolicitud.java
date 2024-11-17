@@ -51,7 +51,7 @@ public class FirmaSolicitud {
     @Column(name = "pos_y_director")
     private BigDecimal posYDirector;
 
-    @Column(name = "firma_estudiante")
+    @Column(name = "firma_estudiante", nullable = false)
     private Boolean firmaEstudiante;
 
     @Column(name = "firma_tutor")

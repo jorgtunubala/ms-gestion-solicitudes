@@ -6,15 +6,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import javax.naming.Binding;
+import javax.validation.ConstraintViolationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +34,8 @@ import com.maestria.gestionSolicitudes.comun.util.Base64;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
+import com.maestria.gestionSolicitudes.exceptions.FieldErrorException;
+import com.maestria.gestionSolicitudes.exceptions.InformationException;
 import com.maestria.gestionSolicitudes.mapper.ApoyoEconomicoCongresoMapper;
 import com.maestria.gestionSolicitudes.mapper.ApoyoEconomicoMapper;
 import com.maestria.gestionSolicitudes.mapper.ApoyoEconomicoPublicacionEventoMapper;
@@ -264,18 +271,25 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         try {
             logger.info("Inicia proceso registrar solicitud...");
             // Buscamos el tipo de solciitud a asociar en el regsitro de la solicitud.
+            if (datosSolicitud.getIdTipoSolicitud() == null) {
+                throw new Exception("Error al registrar la solicitud.");
+            }
             TiposSolicitud tipoSolicitud = tipoSolicitudRepository
                 .findById(datosSolicitud.getIdTipoSolicitud()).get();
             Solicitudes solicitud = new Solicitudes();
             // Asignamos los datos necesarios de la solicitud.
             solicitud.setIdEstudiante(datosSolicitud.getIdEstudiante());
             solicitud.setTipoSolicitud(tipoSolicitud);
-            solicitud.setIdTutor(datosSolicitud.getIdTutor());            
+            solicitud.setIdTutor(datosSolicitud.getIdTutor());
             solicitud.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
             solicitud.setIdDirector(datosSolicitud.getIdDirector());
             solicitud.setDocumentoFirmado(datosSolicitud.getOficioPdf());
             registroSolicitud = solicitudesRepository.save(solicitud);
+
+            if (registroSolicitud == null) {
+                throw new InformationException("Error al guardar la solicitud.");
+            }
 
             // Utilizamos la siguiente función para guardar otros datos de la solicitud según su tipo.
             boolean datosTipoSolicitudRegistrados = registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
@@ -295,24 +309,40 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 registrarHistoricoSolicitud(registroSolicitud);
             } else {                
                 logger.error("Ocurrió un error al registrar la solicitud.");
-                throw new Exception("Error al registrar la solicitud.");
+                throw new InformationException("Error al guardar la solicitud");
             }
         } catch (Exception e) {
-            logger.error("Ocurrió un error inesperado al registrar la solicitud.", e);
-            throw e;
+            // Verificar si la excepción es de tipo DataIntegrityViolationException
+            if (e instanceof DataIntegrityViolationException) {
+                // Manejar específicamente la excepción de integridad de datos
+                logger.error("Error de violación de restricción de datos al registrar la solicitud.", e);
+                throw new InformationException("No es posible registrar la solicitud sin un tutor. ");
+            } if (e instanceof NoSuchElementException) {
+                // Manejar específicamente la excepción de integridad de datos
+                logger.error("Error de violación de restricción de datos al registrar la solicitud.", e);
+                throw new InformationException("No existe registro asociado. ");
+            } else {
+                // Manejar las demás excepciones generales
+                logger.error("Ocurrió un error inesperado al registrar la solicitud.", e);
+                throw new InformationException(e.getMessage());
+            }
         }
         if (registro) {            
-            // Crear CompletableFutures para cada correo
-            CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
-            CompletableFuture<Void> correoTutor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.TUTOR)));
-            CompletableFuture<Void> correoDirector = null;
-            if (registroSolicitud.getRequiereFirmaDirector()) {
-                correoDirector = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.DIRECTOR)));
+            try{
+                // Crear CompletableFutures para cada correo
+                CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
+                CompletableFuture<Void> correoTutor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.TUTOR)));
+                CompletableFuture<Void> correoDirector = null;
+                if (registroSolicitud.getRequiereFirmaDirector()) {
+                    correoDirector = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.DIRECTOR)));
+                }
+                return radicado;
+            } catch (Exception e) {
+                throw new InformationException("Datos requeridos en la solicitud obligatorios están en null.");
             }
-            return radicado;
         } else {
             logger.info("Error al registrar la solicitud o enviando correo.");
-            return null;
+            throw new InformationException("Error al guardar solicitud.");
         }
     }
 
@@ -933,7 +963,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             return  Boolean.TRUE;
         } catch (Exception e) {
             logger.error("Ocurrió un error inesperado al guardar la firma del estudiante.", e);            
-            return Boolean.FALSE;
+            throw new InformationException("No es permitido registrar la solicitud sin la firma del estudiante");
         }
     }
 
@@ -1022,6 +1052,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         } catch (Exception e){
             logger.error("Ocurrió un error al intentar guardar los datos de aplazar semestre.", e);
             registro = false;
+            throw e;
         }
         return registro;
     }

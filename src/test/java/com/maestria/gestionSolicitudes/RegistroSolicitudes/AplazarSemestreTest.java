@@ -11,12 +11,14 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,14 +26,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import com.maestria.gestionSolicitudes.Util.TestUtils;
+import com.maestria.gestionSolicitudes.domain.AplazarSemestre;
 import com.maestria.gestionSolicitudes.domain.FirmaSolicitud;
 import com.maestria.gestionSolicitudes.domain.HistorialEstadoSolicitudes;
 import com.maestria.gestionSolicitudes.domain.Solicitudes;
 import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
-import com.maestria.gestionSolicitudes.dto.rest.request.CancelarAsignaturaRequest;
+import com.maestria.gestionSolicitudes.dto.rest.request.AplazarSemestreRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.InfoAdicionAsignaturaRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
+import com.maestria.gestionSolicitudes.repository.AplazarSemestreRepository;
 import com.maestria.gestionSolicitudes.repository.FirmaSolicitudRepository;
 import com.maestria.gestionSolicitudes.repository.HistorialEstadoSolicitudesRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesRepository;
@@ -41,7 +45,7 @@ import com.maestria.gestionSolicitudes.service.rest.impl.AdicionAsignaturaServic
 import com.maestria.gestionSolicitudes.service.rest.impl.GestionSolicitudesServiceImpl;
 
 @SpringBootTest
-public class CancelarAsignaturaTest {
+public class AplazarSemestreTest {
     
     @Autowired
     private GestionSolicitudesServiceImpl gestionSolicitudesService;
@@ -60,6 +64,8 @@ public class CancelarAsignaturaTest {
     private HistorialEstadoSolicitudesRepository historialEstadoSolicitudesRepository;
     @MockBean
     private GestionDocentesEstudiantesService gestionDocentesEstudiantesService;
+    @MockBean
+    private AplazarSemestreRepository aplazarSemestreRepository;
 
 
     @BeforeEach
@@ -68,11 +74,11 @@ public class CancelarAsignaturaTest {
     }
     
     @Test
-    void registrarSolicitudCancelarAsignaturaConExito() throws Exception {
+    void registrarSolicitudAplazarSemestreConExito() throws Exception {
         // Given
-        SolicitudRequestDto solicitudDto = crearSolicitudDto(2);
+        SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"CA_ASIG", "Cancelación de asignaturas");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AP_SEME", "Aplazamiento de semestre");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -80,9 +86,6 @@ public class CancelarAsignaturaTest {
         when(solicitudesRepository.findById(anyInt())).thenReturn(Optional.of(solicitud));        
         when(solicitudesRepository.save(any(Solicitudes.class))).thenReturn(solicitud);
 
-        // Configura el mock de registrarAdicionAsignaturas para que devuelva true (o el valor esperado)
-        when(adicionAsignaturaService.registrarCancelarAsignaturas(solicitud, solicitudDto.getDatosCancelarAsignatura())).thenReturn(true);
-        
         // Crear un objeto mock de FirmaSolicitud
         FirmaSolicitud firmaSolicitudMock = TestUtils.crearFirmaSolicitudMock(solicitud);
 
@@ -114,7 +117,11 @@ public class CancelarAsignaturaTest {
         InformacionPersonalDto directorMock = new InformacionPersonalDto();
         directorMock.setNombres("Carlos");
         directorMock.setApellidos("López");
-        when(gestionDocentesEstudiantesService.obtenerTutor(anyString())).thenReturn(directorMock);        
+        when(gestionDocentesEstudiantesService.obtenerTutor(anyString())).thenReturn(directorMock); 
+        
+        // Configura el Mock para `save` de aplazarSemestreRepository
+        AplazarSemestre aplazarSemestreMock = new AplazarSemestre();
+        when(aplazarSemestreRepository.save(any(AplazarSemestre.class))).thenReturn(aplazarSemestreMock);
 
         // When
         String radicado = gestionSolicitudesService.registrarSolicitud(solicitudDto);
@@ -126,18 +133,18 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaConDatosFaltantes() {
+    void registrarSolicitudAplazarSemestreConDatosFaltantes() {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
+        solicitudDto.setIdEstudiante(null);    
         solicitudDto.setIdTutor(null);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1, "CA_ASIG", "Cancelación de asignaturas");
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1, "AP_SEME", "Aplazamiento de semestre");
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
         Solicitudes solicitud = TestUtils.crearSolicitudMock(tipoSolicitud);
         when(solicitudesRepository.findById(anyInt())).thenReturn(Optional.of(solicitud));        
-        when(solicitudesRepository.save(any(Solicitudes.class))).thenReturn(solicitud);                  
 
         // When
         Exception exception = assertThrows(Exception.class, () -> {
@@ -151,7 +158,7 @@ public class CancelarAsignaturaTest {
 
 
     @Test
-    void registrarSolicitudCancelacionErrorAlGuardarSolicitud() throws Exception {
+    void registrarSolicitudErrorAlGuardarSolicitud() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
         doThrow(new DataIntegrityViolationException("Error al guardar", new SQLException()))
@@ -162,12 +169,11 @@ public class CancelarAsignaturaTest {
 
     private SolicitudRequestDto crearSolicitudDto(Integer idTipoSolicitud) {
         SolicitudRequestDto solicitudDto = TestUtils.crearSolicitudRequestDto(idTipoSolicitud);        
-        CancelarAsignaturaRequest cancelarAsignatura = new CancelarAsignaturaRequest();
-        cancelarAsignatura.setListaAsignaturas
-            (List.of(new InfoAdicionAsignaturaRequest("Base de Datos I", 2, "B")));
-        cancelarAsignatura.setMotivo("Motivo de cancelación");
-        cancelarAsignatura.setDocumentoAdjunto("DocumentoAdjuntoEnBase64");
-        solicitudDto.setDatosCancelarAsignatura(cancelarAsignatura);
+        AplazarSemestreRequest aplazarSemestre = new AplazarSemestreRequest();
+        aplazarSemestre.setSemestre("2024-2");
+        aplazarSemestre.setMotivo("Motivo");
+        aplazarSemestre.setDocumentoAdjunto("DocumentoAdjuntoBase64");
+        solicitudDto.setDatosAplazarSemestre(aplazarSemestre);
         return solicitudDto;
     }
 }
