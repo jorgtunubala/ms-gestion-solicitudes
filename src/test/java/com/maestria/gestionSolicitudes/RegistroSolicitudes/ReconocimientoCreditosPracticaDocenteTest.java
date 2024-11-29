@@ -11,7 +11,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +40,7 @@ import com.maestria.gestionSolicitudes.service.rest.impl.AdicionAsignaturaServic
 import com.maestria.gestionSolicitudes.service.rest.impl.GestionSolicitudesServiceImpl;
 
 @SpringBootTest
-public class ReconocimientoCreditosTest {
+public class ReconocimientoCreditosPracticaDocenteTest {
     
     @Autowired
     private GestionSolicitudesServiceImpl gestionSolicitudesService;
@@ -68,7 +67,7 @@ public class ReconocimientoCreditosTest {
     }
     
     @Test
-    void registrarSolicitudReconocimientoCreditoConExito() throws Exception {
+    void registrarSolicitudReconocimientoCreditosPracticaDocenteConExito() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -126,7 +125,7 @@ public class ReconocimientoCreditosTest {
     }
 
     @Test
-    void registrarSolicitudReconocimientoCreditoSinFirma() throws Exception {
+    void registrarSolicitudReconocimientoCreditosPracticaDocenteSinFirma() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -183,7 +182,7 @@ public class ReconocimientoCreditosTest {
     }
 
     @Test
-    void registrarSolicitudReconocimientoCreditoTutorNoAsignado() throws Exception {
+    void registrarSolicitudReconocimientoCreditosPracticaDocenteTutorNoAsignado() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -202,11 +201,11 @@ public class ReconocimientoCreditosTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudReconocimientoCreditoTipoSolicitudIncorrecto() throws Exception {
+    void registrarSolicitudReconocimientoCreditosPracticaDocenteTipoSolicitudIncorrecto() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -229,7 +228,7 @@ public class ReconocimientoCreditosTest {
     }
 
     @Test
-    void registrarSolicitudReconocimientoCreditoTutorNoDisponible() throws Exception {
+    void registrarSolicitudReconocimientoCreditosPracticaDocenteTutorNoDisponible() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -248,11 +247,11 @@ public class ReconocimientoCreditosTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudReconocimientoCreditoCamposIncompletos() {
+    void registrarSolicitudReconocimientoCreditosPracticaDocenteCamposIncompletos() {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
         solicitudDto.setIdEstudiante(null);
@@ -272,11 +271,11 @@ public class ReconocimientoCreditosTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudReconocimientoCreditoErrorRegistrarHistorial() throws Exception {
+    void registrarSolicitudReconocimientoCreditosPracticaDocenteErrorRegistrarHistorial() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -324,7 +323,7 @@ public class ReconocimientoCreditosTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test

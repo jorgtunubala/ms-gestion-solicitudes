@@ -40,7 +40,7 @@ import com.maestria.gestionSolicitudes.service.rest.impl.AdicionAsignaturaServic
 import com.maestria.gestionSolicitudes.service.rest.impl.GestionSolicitudesServiceImpl;
 
 @SpringBootTest
-public class CancelarAsignaturaTest {
+public class ApoyoEconomicoCongresoTest {
     
     @Autowired
     private GestionSolicitudesServiceImpl gestionSolicitudesService;
@@ -67,7 +67,7 @@ public class CancelarAsignaturaTest {
     }
     
     @Test
-    void registrarSolicitudCancelarAsignaturaConExito() throws Exception {
+    void registrarSolicitudApoyoEconomicoCongresoConExito() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -125,7 +125,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaSinFirma() throws Exception {
+    void registrarSolicitudApoyoEconomicoCongresoSinFirma() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -182,7 +182,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaTutorNoAsignado() throws Exception {
+    void registrarSolicitudApoyoEconomicoCongresoTutorNoAsignado() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -205,7 +205,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaTipoSolicitudIncorrecto() throws Exception {
+    void registrarSolicitudApoyoEconomicoCongresoTipoSolicitudIncorrecto() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -228,7 +228,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaTutorNoDisponible() throws Exception {
+    void registrarSolicitudApoyoEconomicoCongresoTutorNoDisponible() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -251,7 +251,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaCamposIncompletos() {
+    void registrarSolicitudApoyoEconomicoCongresoCamposIncompletos() {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
         solicitudDto.setIdEstudiante(null);
@@ -275,7 +275,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaErrorRegistrarHistorial() throws Exception {
+    void registrarSolicitudApoyoEconomicoCongresoErrorRegistrarHistorial() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 

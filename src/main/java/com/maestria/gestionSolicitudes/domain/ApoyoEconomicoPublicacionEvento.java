@@ -76,6 +76,6 @@ public class ApoyoEconomicoPublicacionEvento {
     @Column(name = "nombre_revista")
     private String nombreRevista;
 
-    @Column(name = "lufar_evento")
+    @Column(name = "lugar_evento")
     private String lugarEvento;
 }

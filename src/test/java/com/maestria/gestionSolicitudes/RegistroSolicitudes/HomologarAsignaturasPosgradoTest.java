@@ -11,6 +11,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +41,7 @@ import com.maestria.gestionSolicitudes.service.rest.impl.AdicionAsignaturaServic
 import com.maestria.gestionSolicitudes.service.rest.impl.GestionSolicitudesServiceImpl;
 
 @SpringBootTest
-public class CancelarAsignaturaTest {
+public class HomologarAsignaturasPosgradoTest {
     
     @Autowired
     private GestionSolicitudesServiceImpl gestionSolicitudesService;
@@ -67,7 +68,7 @@ public class CancelarAsignaturaTest {
     }
     
     @Test
-    void registrarSolicitudCancelarAsignaturaConExito() throws Exception {
+    void registrarHomologarAsignaturasPosgradoConExito() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -125,7 +126,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaSinFirma() throws Exception {
+    void registrarHomologarAsignaturasPosgradoSinFirma() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -182,7 +183,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaTutorNoAsignado() throws Exception {
+    void registrarHomologarAsignaturasPosgradoTutorNoAsignado() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -205,7 +206,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaTipoSolicitudIncorrecto() throws Exception {
+    void registrarHomologarAsignaturasPosgradoTipoSolicitudIncorrecto() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -228,7 +229,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaTutorNoDisponible() throws Exception {
+    void registrarHomologarAsignaturasPosgradoTutorNoDisponible() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -251,7 +252,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaCamposIncompletos() {
+    void registrarHomologarAsignaturasPosgradoCamposIncompletos() {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
         solicitudDto.setIdEstudiante(null);
@@ -275,7 +276,7 @@ public class CancelarAsignaturaTest {
     }
 
     @Test
-    void registrarSolicitudCancelarAsignaturaErrorRegistrarHistorial() throws Exception {
+    void registrarHomologarAsignaturasPosgradoErrorRegistrarHistorial() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 

@@ -68,7 +68,7 @@ public class CursarAsignaturasTest {
     }
     
     @Test
-    void registrarSolicitudCursarAsignaturaConExito() throws Exception {
+    void registrarSolicitudCursarAsignaturasConExito() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -126,7 +126,7 @@ public class CursarAsignaturasTest {
     }
 
     @Test
-    void registrarSolicitudCursarAsignaturaSinFirma() throws Exception {
+    void registrarSolicitudCursarAsignaturasSinFirma() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -183,7 +183,7 @@ public class CursarAsignaturasTest {
     }
 
     @Test
-    void registrarSolicitudCursarAsignaturaTutorNoAsignado() throws Exception {
+    void registrarSolicitudCursarAsignaturasTutorNoAsignado() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -202,11 +202,11 @@ public class CursarAsignaturasTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudCursarAsignaturaTipoSolicitudIncorrecto() throws Exception {
+    void registrarSolicitudCursarAsignaturasTipoSolicitudIncorrecto() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -229,7 +229,7 @@ public class CursarAsignaturasTest {
     }
 
     @Test
-    void registrarSolicitudCursarAsignaturaTutorNoDisponible() throws Exception {
+    void registrarSolicitudCursarAsignaturasTutorNoDisponible() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -248,11 +248,11 @@ public class CursarAsignaturasTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudCursarAsignaturaCamposIncompletos() {
+    void registrarSolicitudCursarAsignaturasCamposIncompletos() {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
         solicitudDto.setIdEstudiante(null);
@@ -272,11 +272,11 @@ public class CursarAsignaturasTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudCursarAsignaturaErrorRegistrarHistorial() throws Exception {
+    void registrarSolicitudCursarAsignaturasErrorRegistrarHistorial() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -324,7 +324,7 @@ public class CursarAsignaturasTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test

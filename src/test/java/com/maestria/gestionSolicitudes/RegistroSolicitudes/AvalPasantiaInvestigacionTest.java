@@ -11,7 +11,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +40,7 @@ import com.maestria.gestionSolicitudes.service.rest.impl.AdicionAsignaturaServic
 import com.maestria.gestionSolicitudes.service.rest.impl.GestionSolicitudesServiceImpl;
 
 @SpringBootTest
-public class AvalesTest {
+public class AvalPasantiaInvestigacionTest {
     
     @Autowired
     private GestionSolicitudesServiceImpl gestionSolicitudesService;
@@ -68,11 +67,11 @@ public class AvalesTest {
     }
     
     @Test
-    void registrarSolicitudAvalConExito() throws Exception {
+    void registrarSolicitudAvalPasantiaInvestigacionConExito() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AV_PASA_INV", "Aval para realizar pasantía de investigación");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -126,11 +125,11 @@ public class AvalesTest {
     }
 
     @Test
-    void registrarSolicitudAvalSinFirma() throws Exception {
+    void registrarSolicitudAvalPasantiaInvestigacionSinFirma() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AV_PASA_INV", "Aval para realizar pasantía de investigación");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -183,11 +182,11 @@ public class AvalesTest {
     }
 
     @Test
-    void registrarSolicitudAvalTutorNoAsignado() throws Exception {
+    void registrarSolicitudAvalPasantiaInvestigacionTutorNoAsignado() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AV_PASA_INV", "Aval para realizar pasantía de investigación");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -202,15 +201,15 @@ public class AvalesTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudAvalTipoSolicitudIncorrecto() throws Exception {
+    void registrarSolicitudAvalPasantiaInvestigacionTipoSolicitudIncorrecto() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AV_PASA_INV", "Aval para realizar pasantía de investigación"); 
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas"); 
         tipoSolicitud.setId(null);
         solicitudDto.setIdTipoSolicitud(null);
 
@@ -229,11 +228,11 @@ public class AvalesTest {
     }
 
     @Test
-    void registrarSolicitudAvalTutorNoDisponible() throws Exception {
+    void registrarSolicitudAvalPasantiaInvestigacionTutorNoDisponible() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AV_PASA_INV", "Aval para realizar pasantía de investigación");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -248,16 +247,16 @@ public class AvalesTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudAvalCamposIncompletos() {
+    void registrarSolicitudAvalPasantiaInvestigacionCamposIncompletos() {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
         solicitudDto.setIdEstudiante(null);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1, "AV_PASA_INV", "Aval para realizar pasantía de investigación");
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1, "AD_ASIG", "Adición de Asignaturas");
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -272,15 +271,15 @@ public class AvalesTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudAvalErrorRegistrarHistorial() throws Exception {
+    void registrarSolicitudAvalPasantiaInvestigacionErrorRegistrarHistorial() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AV_PASA_INV", "Aval para realizar pasantía de investigación");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -324,7 +323,7 @@ public class AvalesTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test

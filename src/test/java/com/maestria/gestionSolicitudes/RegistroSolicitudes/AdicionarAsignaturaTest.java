@@ -11,7 +11,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -202,7 +201,7 @@ public class AdicionarAsignaturaTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
@@ -248,7 +247,7 @@ public class AdicionarAsignaturaTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
@@ -272,7 +271,7 @@ public class AdicionarAsignaturaTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud", exception.getMessage());
     }
 
     @Test
@@ -324,7 +323,7 @@ public class AdicionarAsignaturaTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test

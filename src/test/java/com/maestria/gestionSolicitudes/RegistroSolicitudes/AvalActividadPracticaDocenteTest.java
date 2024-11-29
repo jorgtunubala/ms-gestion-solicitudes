@@ -11,7 +11,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +40,7 @@ import com.maestria.gestionSolicitudes.service.rest.impl.AdicionAsignaturaServic
 import com.maestria.gestionSolicitudes.service.rest.impl.GestionSolicitudesServiceImpl;
 
 @SpringBootTest
-public class HomologarAsignaturasTest {
+public class AvalActividadPracticaDocenteTest {
     
     @Autowired
     private GestionSolicitudesServiceImpl gestionSolicitudesService;
@@ -68,7 +67,7 @@ public class HomologarAsignaturasTest {
     }
     
     @Test
-    void registrarSolicitudHomologacionConExito() throws Exception {
+    void registrarSolicitudAvalActividadPracticaDocenteConExito() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -126,7 +125,7 @@ public class HomologarAsignaturasTest {
     }
 
     @Test
-    void registrarSolicitudHomologacionSinFirma() throws Exception {
+    void registrarSolicitudAvalActividadPracticaDocenteSinFirma() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -183,7 +182,7 @@ public class HomologarAsignaturasTest {
     }
 
     @Test
-    void registrarSolicitudHomologacionTutorNoAsignado() throws Exception {
+    void registrarSolicitudAvalActividadPracticaDocenteTutorNoAsignado() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -202,11 +201,11 @@ public class HomologarAsignaturasTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudHomologacionTipoSolicitudIncorrecto() throws Exception {
+    void registrarSolicitudAvalActividadPracticaDocenteTipoSolicitudIncorrecto() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -229,7 +228,7 @@ public class HomologarAsignaturasTest {
     }
 
     @Test
-    void registrarSolicitudHomologacionTutorNoDisponible() throws Exception {
+    void registrarSolicitudAvalActividadPracticaDocenteTutorNoDisponible() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -248,11 +247,11 @@ public class HomologarAsignaturasTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudHomologacionCamposIncompletos() {
+    void registrarSolicitudAvalActividadPracticaDocenteCamposIncompletos() {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
         solicitudDto.setIdEstudiante(null);
@@ -272,11 +271,11 @@ public class HomologarAsignaturasTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud", exception.getMessage());
     }
 
     @Test
-    void registrarSolicitudHomologacionErrorRegistrarHistorial() throws Exception {
+    void registrarSolicitudAvalActividadPracticaDocenteErrorRegistrarHistorial() throws Exception {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
@@ -324,7 +323,7 @@ public class HomologarAsignaturasTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test

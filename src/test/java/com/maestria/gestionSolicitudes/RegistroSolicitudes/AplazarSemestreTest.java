@@ -71,7 +71,7 @@ public class AplazarSemestreTest {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AP_SEME", "Aplazamiento de semestre");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -129,7 +129,7 @@ public class AplazarSemestreTest {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AP_SEME", "Aplazamiento de semestre");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -186,7 +186,7 @@ public class AplazarSemestreTest {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AP_SEME", "Aplazamiento de semestre");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -201,7 +201,7 @@ public class AplazarSemestreTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
@@ -209,7 +209,7 @@ public class AplazarSemestreTest {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AP_SEME", "Aplazamiento de semestre"); 
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas"); 
         tipoSolicitud.setId(null);
         solicitudDto.setIdTipoSolicitud(null);
 
@@ -232,7 +232,7 @@ public class AplazarSemestreTest {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AP_SEME", "Aplazamiento de semestre");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -247,7 +247,7 @@ public class AplazarSemestreTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
@@ -256,7 +256,7 @@ public class AplazarSemestreTest {
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
         solicitudDto.setIdEstudiante(null);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1, "AP_SEME", "Aplazamiento de semestre");
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1, "AD_ASIG", "Adición de Asignaturas");
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -271,7 +271,7 @@ public class AplazarSemestreTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud", exception.getMessage());
     }
 
     @Test
@@ -279,7 +279,7 @@ public class AplazarSemestreTest {
         // Given
         SolicitudRequestDto solicitudDto = crearSolicitudDto(1);
 
-        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AP_SEME", "Aplazamiento de semestre");        
+        TiposSolicitud tipoSolicitud = TestUtils.crearTiposSolicitudMock(1,"AD_ASIG", "Adición de Asignaturas");        
         when(tiposSolicitudRepository.findById(anyInt())).thenReturn(Optional.of(tipoSolicitud));
 
 
@@ -323,7 +323,7 @@ public class AplazarSemestreTest {
 
         // Then
         assertNotNull(exception);
-        assertEquals("Error al registrar la solicitud.", exception.getMessage());
+        assertEquals("Error al guardar la solicitud.", exception.getMessage());
     }
 
     @Test
