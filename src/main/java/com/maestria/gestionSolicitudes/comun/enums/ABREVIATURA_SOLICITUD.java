@@ -30,7 +30,8 @@ public enum ABREVIATURA_SOLICITUD {
     PA_PUBL_EVE("Apoyo Económico"),
     AV_COMI_PR("Aval Práctica Docente"),
     SO_BECA("Solicitud Beca/Descuento"),
-    SO_OTRA("Otra");
+    SO_OTRA("Otra"),
+    CER_VOTO("Certificado Votacion");
 
     private final String descripcion;
 

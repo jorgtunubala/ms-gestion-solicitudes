@@ -26,7 +26,7 @@ public class GestionEnvioCorreoServiceImpl implements GestionEnvioCorreoService 
         if (destino.equals("concejo")) {
             emailRequest.setAsunto("Asunto concejo");
             emailRequest.setMensaje("Enviando mensaje concejo");
-            destinatarios.add("jorgtunubala@gmail.com");
+            destinatarios.add("jcorreac@unicauca.edu.co");
             emailRequest.setCorreos(destinatarios);
             emailRequest.setDocumentos(Base64.obtenerBase64(oficio));
             mensajeriaService.enviarEmail(emailRequest);
@@ -34,7 +34,7 @@ public class GestionEnvioCorreoServiceImpl implements GestionEnvioCorreoService 
         } else if (destino.equals("solicitante")) {
             emailRequest.setAsunto("Asunto Solicitante");
             emailRequest.setMensaje("Enviando mensaje solicitante");
-            destinatarios.add("jorgtunubala@gmail.com");
+            destinatarios.add("jcorreac@unicauca.edu.co");
             emailRequest.setCorreos(destinatarios);
             emailRequest.setDocumentos(Base64.obtenerBase64(oficio));
             mensajeriaService.enviarEmail(emailRequest);

@@ -11,9 +11,9 @@ spring:
     #url: jdbc:mysql://dockertest.unicauca.edu.co:4207/computacion
     #username: computacion
     #password: DB-C0mput4c10N
-    url: jdbc:mysql://localhost:3306/maestriacomputacion
+    url: jdbc:mysql://localhost:3306/proy_maestria
     username: root
-    password: mysql
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: true

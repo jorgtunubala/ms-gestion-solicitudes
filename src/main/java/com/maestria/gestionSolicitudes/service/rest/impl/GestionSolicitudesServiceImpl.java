@@ -270,14 +270,31 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             // Asignamos los datos necesarios de la solicitud.
             solicitud.setIdEstudiante(datosSolicitud.getIdEstudiante());
             solicitud.setTipoSolicitud(tipoSolicitud);
-            solicitud.setIdTutor(datosSolicitud.getIdTutor());            
-            solicitud.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
+            solicitud.setIdTutor(datosSolicitud.getIdTutor());             
+            //condicion para certificado de votacion (AVALADA)
+            if (tipoSolicitud.getCodigo().equals("CER_VOTO")) { 
+                solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
+            } else {
+                solicitud.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
+            }            
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
             solicitud.setIdDirector(datosSolicitud.getIdDirector());
             solicitud.setDocumentoFirmado(datosSolicitud.getOficioPdf());
+            
             registroSolicitud = solicitudesRepository.save(solicitud);
+            //condicion para guardar solicitud de cer_voto
+            if (tipoSolicitud.getCodigo().equals("CER_VOTO")) { 
+                registro = Boolean.TRUE;
+                radicado = TokenAleatorio.generarCodigoAleatorio();
+                registroSolicitud.setRadicado(radicado);
+                //solicitudesRepository.save(registroSolicitud);
+                logger.info("Se registró correctamente la solicitud.");
 
-            // Utilizamos la siguiente función para guardar otros datos de la solicitud según su tipo.
+                // registrar en el historico                
+                registrarHistoricoSolicitud(registroSolicitud);
+                return radicado;
+            } else {
+                // Utilizamos la siguiente función para guardar otros datos de la solicitud según su tipo.
             boolean datosTipoSolicitudRegistrados = registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
             
             // Utilizamos la siguiente función para garantizar la firma del estudiante en la solicitud.
@@ -296,6 +313,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             } else {                
                 logger.error("Ocurrió un error al registrar la solicitud.");
                 throw new Exception("Error al registrar la solicitud.");
+                }
             }
         } catch (Exception e) {
             logger.error("Ocurrió un error inesperado al registrar la solicitud.", e);
@@ -314,6 +332,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             logger.info("Error al registrar la solicitud o enviando correo.");
             return null;
         }
+            
     }
 
     @Transactional
@@ -529,6 +548,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     throw e;
                 }
                 break;
+
 
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
