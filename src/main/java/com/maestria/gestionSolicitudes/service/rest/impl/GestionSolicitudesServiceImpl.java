@@ -292,7 +292,6 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
                 // registrar en el historico                
                 registrarHistoricoSolicitud(registroSolicitud);
-                return radicado;
             } else {
                 // Utilizamos la siguiente función para guardar otros datos de la solicitud según su tipo.
             boolean datosTipoSolicitudRegistrados = registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
@@ -590,7 +589,19 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             if (solicitudOpt.isPresent()){
                 Solicitudes solicitud = solicitudOpt.get();
                 DatosComunSolicitud datosComun = new DatosComunSolicitud();
-                InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdTutor().toString());
+                InformacionPersonalDto tutor = null;
+                // Verificar si la solicitud es de tipo CER_VOTO
+                if ("CER_VOTO".equals(solicitud.getTipoSolicitud().getCodigo())) {
+                    if (solicitud.getIdTutor() == null) {
+                        // Caso en el que IdTutor es null
+                        datosComun.setNombreTutor("No aplica");
+                    } else {
+                        tutor = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdTutor().toString());
+                    }
+                } else {
+                    // Manejar otros casos donde el tutor es obligatorio
+                    tutor = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdTutor().toString());
+                }
                 InformacionPersonalDto estudiante = gestionDocentesEstudiantesService.obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
                 datosComun.setTipoSolicitud(solicitud.getTipoSolicitud().getNombre());
                 datosComun.setRadicado(solicitud.getRadicado());
@@ -604,18 +615,24 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosComun.setCelularSolicitante(estudiante.getCelular());
                 datosComun.setTipoIdentSolicitante(estudiante.getTipoDocumento());
                 datosComun.setNumeroIdentSolicitante(estudiante.getNumeroDocumento());
-                datosComun.setNombreTutor(tutor.obtenerNombreCompleto());
+                //condicion para certificado de votación al no requerir tutor
+                if (tutor != null) {
+                    datosComun.setNombreTutor(tutor.obtenerNombreCompleto());
+                }
                 datosComun.setRequiereFirmaDirector(solicitud.getRequiereFirmaDirector());
                 FirmaSolicitud firmaSolicitud = firmaSolicitudRepository.findBySolicitud(solicitud);
-                datosComun.setFirmaSolicitante(firmaSolicitud.getFirmaEstudiante());
-                datosComun.setFirmaTutor(firmaSolicitud.getFirmaTutor());
-                datosComun.setFirmaDirector(firmaSolicitud.getFirmaDirector());
-                datosComun.setNumPaginaTutor(firmaSolicitud.getNumPaginaTutor());
-                datosComun.setNumPaginaDirector(firmaSolicitud.getNumPaginaDirector());
-                datosComun.setPosXTutor(firmaSolicitud.getPosXTutor());
-                datosComun.setPosYTutor(firmaSolicitud.getPosYTutor());
-                datosComun.setPosXDirector(firmaSolicitud.getPosXDirector());
-                datosComun.setPosYDirector(firmaSolicitud.getPosYDirector());
+                //condicion para certificado de votación al no requerir ningun tipo de firma
+                if (firmaSolicitud != null) {
+                    datosComun.setFirmaSolicitante(firmaSolicitud.getFirmaEstudiante());
+                    datosComun.setFirmaTutor(firmaSolicitud.getFirmaTutor());
+                    datosComun.setFirmaDirector(firmaSolicitud.getFirmaDirector());
+                    datosComun.setNumPaginaTutor(firmaSolicitud.getNumPaginaTutor());
+                    datosComun.setNumPaginaDirector(firmaSolicitud.getNumPaginaDirector());
+                    datosComun.setPosXTutor(firmaSolicitud.getPosXTutor());
+                    datosComun.setPosYTutor(firmaSolicitud.getPosYTutor());
+                    datosComun.setPosXDirector(firmaSolicitud.getPosXDirector());
+                    datosComun.setPosYDirector(firmaSolicitud.getPosYDirector());
+                }
                 datosComun.setOficioPdf(solicitud.getDocumentoFirmado());
                 datosComun.setEstadoSolicitud(solicitud.getEstado());
                 response.setDatosComunSolicitud(datosComun);
@@ -700,7 +717,6 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             response.setDatosSolicitudAplazarSemestre(datosAplazarS);                            
                         }
                         break;
-
                     case "CU_ASIG":
                         CursarAsignatura cursarAsignatura = cursarAsignaturaRepository.findBySolicitud(solicitud);
                         List<DatosCursarAsignatura> datosCursarAsignaturaList = datosCursarAsignaturaRepository.findAllByCursarAsignatura(cursarAsignatura);
@@ -966,17 +982,18 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         Boolean firmaDirector = dAvalarSolicitudDto.getFirmaDirector();
         solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
         solicitudesRepository.save(solicitud);
-        if (solicitud.getRequiereFirmaDirector()){
+        
+        if (solicitud.getRequiereFirmaDirector()) {
             if (firmaTutor && firmaDirector) {
                 firmas.setFirmaTutor(firmaTutor);
                 firmas.setFirmaDirector(firmaDirector);
                 firmaSolicitudRepository.save(firmas);                
                 registroFirma = Boolean.TRUE;                
-            } else if (firmaTutor){
+            } else if (firmaTutor) {
                 firmas.setFirmaTutor(firmaTutor);
                 firmaSolicitudRepository.save(firmas);
                 registroFirma = Boolean.TRUE;                
-            } else if (firmaDirector){
+            } else if (firmaDirector) {
                 firmas.setFirmaDirector(firmaDirector);
                 firmaSolicitudRepository.save(firmas);
                 registroFirma = Boolean.TRUE;                
@@ -1378,7 +1395,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     @Override
     public List<SolicitudPendientesAval> obtenerDatosSolicitudPendientesCoordinador(String estado) throws Exception {
-        List<SolicitudPendientesAval> solicitudes = new ArrayList<>();
+        List<SolicitudPendientesAval> solicitudes = new ArrayList<>();  
         List<Solicitudes> solicitudesPendientes = solicitudesRepository.
                 findByEstadoOrderByFechaModificacionAsc(ESTADO_SOLICITUD.getDescripcionPorCodigo(estado));
         for (Solicitudes solicitud : solicitudesPendientes) {
@@ -1543,8 +1560,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
                 .obtenerInformacionEstudiantePorId(registroSolicitud.getIdEstudiante());
         datosCorreo.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-        InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
-        datosCorreo.setNombreTutor(infoTutor.obtenerNombreCompleto());
+        InformacionPersonalDto infoTutor;
+        if (registroSolicitud.getIdTutor() != null) {
+            infoTutor = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
+            datosCorreo.setNombreTutor(infoTutor.obtenerNombreCompleto());
+        }
         if (registroSolicitud.getRequiereFirmaDirector()) {
             InformacionPersonalDto infoDirector = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
             datosCorreo.setNombreDirector(infoDirector.obtenerNombreCompleto());
