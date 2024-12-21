@@ -48,7 +48,7 @@ public class GestionSubTiposSolicitudServiceImpl implements GestionSubTiposSolic
         List<SubTiposSolicitud> listaSubTipos = subTiposSolicitudRepository.findByTipoSolicitud(tiposSolicitud);
         List<SubTiposSolicitudResponse> response = new ArrayList<>();
         for (SubTiposSolicitud subTiposSolicitud : listaSubTipos) {
-            SubTiposSolicitudResponse subTiposSolicitudResponse = subTiposSolicitudMapper.entidadAdto(subTiposSolicitud);
+            SubTiposSolicitudResponse subTiposSolicitudResponse = subTiposSolicitudMapper.toDto(subTiposSolicitud);
             String codigo = subTiposSolicitud.getCodigo();
             subTiposSolicitudResponse.setAbreviatura(ABREVIATURA_SUBTIPOS.getDescripcionPorCodigo(codigo));
             List<String> documentos = obtenerDocumentosSubtipos(subTiposSolicitud.getId());
