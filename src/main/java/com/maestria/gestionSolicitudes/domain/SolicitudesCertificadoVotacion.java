@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "solicitudes")
@@ -26,11 +27,12 @@ public class SolicitudesCertificadoVotacion {
     private String estado;
 
     @Column(name = "fecha_creacion")
-    private Date fechaCreacion;
+    private Timestamp fechaCreacion;
 
     @Column(name = "fecha_modificacion")
-    private Date fechaModificacion;
-
-    @Column(name = "documento_firmado")
-    private String documentoFirmado;
+    private Timestamp fechaModificacion;
+    
+    @Column(name = "id_tipo_solicitud")
+    private String idTipoSolicitud;
+     
 }

@@ -16,7 +16,7 @@ import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
 import com.maestria.gestionSolicitudes.service.client.MensajeriaService;
-import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesCertificadoVotacion;
+import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesCertificadoVotacionService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnComiteService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnConcejoService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
@@ -33,7 +33,7 @@ public class GestionSolicitudesController {
     @Autowired
     private GestionSolicitudesEnConcejoService gestionSolicitudesEnConcejoService;
     @Autowired
-    private GestionSolicitudesCertificadoVotacion gestionSolicitudesCertificadoVotacionService;
+    private GestionSolicitudesCertificadoVotacionService gestionSolicitudesCertificadoVotacionService;
 
     @Autowired
     private MensajeriaService mensajeriaService;
@@ -131,15 +131,10 @@ public class GestionSolicitudesController {
         return gestionSolicitudesEnComiteService.guardarSolicitudEnComite(datosSolicitudComite);
     }    
     
-    @GetMapping("/obtener-solicitudes-certificado-votacion/{id}")
-    public SolicitudCertificadoVotacionResponse obtenerSolicitudesCertificadoVotacion(@PathVariable Integer id) throws Exception {
-        return gestionSolicitudesCertificadoVotacionService.obtenerSolicitudCertificadoVotacion(id);
+    @GetMapping("/obtener-solicitudes-certificado-votacion")
+    public List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception {
+    return gestionSolicitudesCertificadoVotacionService.obtenerSolicitudesCertificadoVotacion();
     }
-
-    @PostMapping("/save-solicitud-certificado-votacion") 
-    public Boolean registrarSolicitudCertificadoVotacion(@RequestBody SolicitudCertificadoVotacionResponse datosSolicitudCertificadoVotacion) throws Exception {
-        return gestionSolicitudesCertificadoVotacionService.guardarSolicitudCertificadoVotacion(datosSolicitudCertificadoVotacion);
-    } 
 
     @GetMapping("/obtener-solicitudes-en-concejo/{idSolicitud}")
     public SolicitudEnConcejoResponse obtenerSolicitudesEnConcejo(@PathVariable Integer idSolicitud) throws Exception {
