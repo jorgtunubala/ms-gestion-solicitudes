@@ -3,6 +3,8 @@ package com.maestria.gestionSolicitudes.controller.rest;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +36,8 @@ public class GestionSolicitudesController {
     private GestionSolicitudesEnConcejoService gestionSolicitudesEnConcejoService;
     @Autowired
     private GestionSolicitudesCertificadoVotacionService gestionSolicitudesCertificadoVotacionService;
-
+    @Autowired
+    private GestionSolicitudesCertificadoVotacionService gestionDocumentosCertificadoVotacionService;
     @Autowired
     private MensajeriaService mensajeriaService;
 
@@ -134,6 +137,11 @@ public class GestionSolicitudesController {
     @GetMapping("/obtener-solicitudes-certificado-votacion")
     public List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception {
     return gestionSolicitudesCertificadoVotacionService.obtenerSolicitudesCertificadoVotacion();
+    }
+
+    @GetMapping("/documentos-certificado-votacion/zip")
+    public byte[] generarZipDocumentos() throws Exception {
+        return gestionDocumentosCertificadoVotacionService.obtenerTodosDocumentosZip();
     }
 
     @GetMapping("/obtener-solicitudes-en-concejo/{idSolicitud}")

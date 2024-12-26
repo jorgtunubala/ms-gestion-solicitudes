@@ -1,8 +1,6 @@
 package com.maestria.gestionSolicitudes.dto.rest.response;
 
 
-import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudCertificadoVotacionRequest;
-
 import lombok.Data;
 import java.sql.Timestamp;
 

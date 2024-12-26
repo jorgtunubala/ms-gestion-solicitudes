@@ -34,5 +34,5 @@ public class SolicitudesCertificadoVotacion {
     
     @Column(name = "id_tipo_solicitud")
     private String idTipoSolicitud;
-     
+
 }
