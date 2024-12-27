@@ -771,7 +771,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     case "AP_ECON_INV":
                         ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoInvestigacionRepository.findBySolicitud(solicitud);
                         if (apoyoEconomicoInvestigacion != null){
-                            ApoyoEconomicoRequest responseApoyoEconomico = apoyoEconomicoMapper.entidadAdto(apoyoEconomicoInvestigacion);
+                            ApoyoEconomicoRequest responseApoyoEconomico = apoyoEconomicoMapper.toDto(apoyoEconomicoInvestigacion);
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService.obtenerTutor(responseApoyoEconomico.getIdDirectorGrupo().toString());
                             responseApoyoEconomico.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
                             List<DocumentosApoyoEconomico> documentosApoyosEconomicos = documentosApoyoEconomicoRepository.
@@ -875,7 +875,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     case "AP_ECON_ASI":
                         ApoyoEconomicoCongreso apoyoEconomicoCongreso = apoyoEconomicoCongresoRepository.findBySolicitud(solicitud);
                         if (apoyoEconomicoCongreso != null){
-                            ApoyoEconomicoCongresoRequest responseApoyoEconomicoCongreso = apoyoEconomicoCongresoMapper.entidadAdto(apoyoEconomicoCongreso);
+                            ApoyoEconomicoCongresoRequest responseApoyoEconomicoCongreso = apoyoEconomicoCongresoMapper.toDto(apoyoEconomicoCongreso);
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
                                             .obtenerTutor(responseApoyoEconomicoCongreso.getIdDirectorGrupo().toString());
                             responseApoyoEconomicoCongreso.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
@@ -894,7 +894,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoRepository
                                     .findBySolicitud(solicitud);
                         if (apoyoEconomicoPublicacionEvento != null){
-                            ApoyoEconomicoPublicacionEventoRequest responseApoyoEconomicoPubEvento = apoyoEconomicoPublicacionEventoMapper.entidadAdto(apoyoEconomicoPublicacionEvento);
+                            ApoyoEconomicoPublicacionEventoRequest responseApoyoEconomicoPubEvento = apoyoEconomicoPublicacionEventoMapper.toDto(apoyoEconomicoPublicacionEvento);
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
                                             .obtenerTutor(responseApoyoEconomicoPubEvento.getIdDirectorGrupo().toString());
                             responseApoyoEconomicoPubEvento.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
@@ -1126,7 +1126,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         boolean registro = false;
         try{
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            AvalPasantiaInvestigacion avalPasantiaInvestigacion = avalPasantiaInvMapper.dtoToEntity(avalPasantiaInvRequest);
+            AvalPasantiaInvestigacion avalPasantiaInvestigacion = avalPasantiaInvMapper.toEntity(avalPasantiaInvRequest);
             avalPasantiaInvestigacion.setSolicitud(solicitud);
             avalPasantiaInvestigacion = avalPasantiaInvestigacionRepository.save(avalPasantiaInvestigacion);           
 
@@ -1149,7 +1149,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         boolean registro = false;
         try{
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoMapper.dtoToEntity(apoyoEconomicoRequest);
+            ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoMapper.toEntity(apoyoEconomicoRequest);
             apoyoEconomicoInvestigacion.setSolicitud(solicitud);
             apoyoEconomicoInvestigacion = apoyoEconomicoInvestigacionRepository.save(apoyoEconomicoInvestigacion);
 
@@ -1227,7 +1227,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         boolean registro = false;
         try{
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            ApoyoEconomicoCongreso apoyoEconomicoCongreso = apoyoEconomicoCongresoMapper.dtoToEntity(apoyoEconomicoCongresoRequest);
+            ApoyoEconomicoCongreso apoyoEconomicoCongreso = apoyoEconomicoCongresoMapper.toEntity(apoyoEconomicoCongresoRequest);
             apoyoEconomicoCongreso.setSolicitud(solicitud);
             apoyoEconomicoCongreso = apoyoEconomicoCongresoRepository.save(apoyoEconomicoCongreso);
 
@@ -1250,7 +1250,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         boolean registro = false;
         try{
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoMapper.dtoToEntity(apoyoEconomicoPublicacionEventoRequest);
+            ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoMapper.toEntity(apoyoEconomicoPublicacionEventoRequest);
             apoyoEconomicoPublicacionEvento.setSolicitud(solicitud);
             if (apoyoEconomicoPublicacionEventoRequest.getFechaInicio() != null) {
                 apoyoEconomicoPublicacionEvento.setFechaInicio(stringToLocalDate(apoyoEconomicoPublicacionEventoRequest.getFechaInicio()));
