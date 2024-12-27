@@ -20,10 +20,10 @@ public class DatosEnvioCorreo {
     String correoCoordiandor;
 
     public DatosEnvioCorreo(){
-        correoEstudiante = "jorgtunubala@gmail.com";
-        correoTutor = "jorge17al@gmail.com";
-        correoDirector = "jorgetunubala@unicauca.edu.co";
-        correoCoordiandor = "jorgtunubala@gmail.com";
-        nombreCoordinador = "Pepito Perez";
+        correoEstudiante = "juancamilocorreacuellar@gmail.com";
+        correoTutor = "juancamilocorreacuellar@gmail.com";
+        correoDirector = "juancamilocorreacuellar@gmail.com";
+        correoCoordiandor = "juancamilocorreacuellar@gmail.com";
+        nombreCoordinador = "Hugo Ordoñez";
     }
 }
