@@ -39,6 +39,8 @@ public class GestionSolicitudesController {
     @Autowired
     private GestionSolicitudesCertificadoVotacionService gestionDocumentosCertificadoVotacionService;
     @Autowired
+    private GestionSolicitudesCertificadoVotacionService gestionEstudiantesPeriodoIngresoService;
+    @Autowired
     private MensajeriaService mensajeriaService;
 
     @GetMapping("/tiposSolicitud")
@@ -136,12 +138,17 @@ public class GestionSolicitudesController {
     
     @GetMapping("/obtener-solicitudes-certificado-votacion")
     public List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception {
-    return gestionSolicitudesCertificadoVotacionService.obtenerSolicitudesCertificadoVotacion();
+        return gestionSolicitudesCertificadoVotacionService.obtenerSolicitudesCertificadoVotacion();
     }
 
     @GetMapping("/documentos-certificado-votacion/zip")
     public byte[] generarZipDocumentos() throws Exception {
         return gestionDocumentosCertificadoVotacionService.obtenerTodosDocumentosZip();
+    }
+
+    @GetMapping("/obtener-estudiantes-periodo-ingreso")
+    public List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception {
+        return gestionEstudiantesPeriodoIngresoService.obtenerEstudiantesPeriodoIngreso();
     }
 
     @GetMapping("/obtener-solicitudes-en-concejo/{idSolicitud}")

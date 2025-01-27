@@ -12,12 +12,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.Base64;
 
+import com.maestria.gestionSolicitudes.domain.Estudiantes;
 import com.maestria.gestionSolicitudes.domain.DocumentosCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.SolicitudesCertificadoVotacion;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudCertificadoVotacionResponse;
+import com.maestria.gestionSolicitudes.dto.rest.response.EstudiantesResponse;
 import com.maestria.gestionSolicitudes.repository.DocumentoCertificadoVotacionRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesCertificadoVotacionRepository;
+import com.maestria.gestionSolicitudes.repository.EstudiantesPeriodoIngresoRepository;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesCertificadoVotacionService;
 
 @Service
@@ -29,7 +32,8 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     @Autowired
     private DocumentoCertificadoVotacionRepository documentoCertificadoVotacionRepository;
 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    @Autowired
+    private EstudiantesPeriodoIngresoRepository estudiantesPeriodoIngresoRepository;
 
     @Override
     public List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception{
@@ -49,6 +53,29 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
             }
             
             return listaSolicitudes;
+            
+        } catch (Exception e) {
+            throw new Exception("Error al obtener las solicitudes de certificado de votación: " + e.getMessage());
+        }
+    }
+
+    public List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception{
+    List<EstudiantesResponse> listaEstudiantes = new ArrayList<>();
+        try {
+            // Obtener todas las solicitudes de certificado de votación
+            List<Estudiantes> estudiantes = estudiantesPeriodoIngresoRepository.findAllEstudiantesPeriodoIngresoOrderByFechaModificacion();
+
+            if (estudiantes.isEmpty()) {
+                throw new Exception("No se encontraron solicitudes de certificado de votación");
+            }
+
+            // Convertir cada solicitud a su response correspondiente
+            for (Estudiantes estudiante : estudiantes) {
+                EstudiantesResponse estudianteResponse = convertirAResponse(estudiante);
+                listaEstudiantes.add(estudianteResponse);
+            }
+            
+            return listaEstudiantes;
             
         } catch (Exception e) {
             throw new Exception("Error al obtener las solicitudes de certificado de votación: " + e.getMessage());
@@ -172,6 +199,13 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         response.setFecha_creacion(solicitud.getFechaCreacion());
         response.setFecha_modificacion(solicitud.getFechaModificacion());
         response.setId_tipo_solicitud(solicitud.getIdTipoSolicitud());
+        return response;
+    }
+
+    private EstudiantesResponse convertirAResponse(Estudiantes estudiante){
+        EstudiantesResponse response = new EstudiantesResponse();
+        response.setId(estudiante.getId());
+        response.setFecha_ingreso(estudiante.getPeriodo_ingreso());
         return response;
     }
 }

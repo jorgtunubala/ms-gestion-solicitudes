@@ -9,7 +9,7 @@ import com.maestria.gestionSolicitudes.domain.DocumentosCertificadoVotacion;
 @Repository
 public interface DocumentoCertificadoVotacionRepository extends JpaRepository<DocumentosCertificadoVotacion, Integer> {
     @Query(value = """
-        SELECT s.id, s.documento_firmado as documento_firmado
+        SELECT s.id, s.documento_firmado
         FROM solicitudes s WHERE s.estado = "Aprobada"
         ORDER BY s.fecha_modificacion desc
         """, nativeQuery = true)
