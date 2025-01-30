@@ -22,6 +22,9 @@ import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesCertificad
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnComiteService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnConcejoService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
+import org.springframework.http.HttpHeaders;
+import java.util.Map;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/gestionSolicitud")
@@ -141,9 +144,24 @@ public class GestionSolicitudesController {
         return gestionSolicitudesCertificadoVotacionService.obtenerSolicitudesCertificadoVotacion();
     }
 
-    @GetMapping("/documentos-certificado-votacion/zip")
-    public byte[] generarZipDocumentos() throws Exception {
-        return gestionDocumentosCertificadoVotacionService.obtenerTodosDocumentosZip();
+    @PostMapping("/documentos-certificado-votacion/zip")
+    public ResponseEntity<byte[]> generarZipDocumentos(@RequestBody Map<String, Object> filtros) {
+        System.out.println("Recibiendo petición con filtros: " + filtros);
+        try {
+            String period = (String) filtros.get("period");
+            List<Integer> certificateIds = (List<Integer>) filtros.get("certificateIds");
+
+            byte[] zipFile = gestionDocumentosCertificadoVotacionService.obtenerDocumentosZipFiltrados(period, certificateIds);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "certificados.zip");
+            
+            return new ResponseEntity<>(zipFile, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/obtener-estudiantes-periodo-ingreso")

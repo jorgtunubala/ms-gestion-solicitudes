@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,9 +84,20 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     }
 
     @Override
-    public byte[] obtenerTodosDocumentosZip() throws Exception {
-        List<DocumentosCertificadoVotacion> documentos = documentoCertificadoVotacionRepository.findAllDocmentosSolicitudesCer_votOrderByFechaModificacion();
-        
+    public byte[] obtenerDocumentosZipFiltrados(String period, List<Integer> certificateIds) throws Exception {
+        List<DocumentosCertificadoVotacion> documentos;
+    
+        // Obtener documentos según los filtros
+        if (period != null && certificateIds != null && !certificateIds.isEmpty()) {
+            documentos = documentoCertificadoVotacionRepository.findByPeriodAndIds(period, certificateIds);
+        } else if (period != null) {
+            documentos = documentoCertificadoVotacionRepository.findByPeriod(period);
+        } else if (certificateIds != null && !certificateIds.isEmpty()) {
+            documentos = documentoCertificadoVotacionRepository.findByIds(certificateIds);
+        } else {
+            documentos = documentoCertificadoVotacionRepository.findAllDocmentosSolicitudesCer_votOrderByFechaModificacion();
+        }
+    
         if (documentos.isEmpty()) {
             throw new Exception("No se encontraron documentos para procesar");
         }
@@ -93,9 +105,9 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(baos);
         
-        int documentosValidos = 0;
-        
         try {
+            int documentosValidos = 0;
+            
             for (DocumentosCertificadoVotacion doc : documentos) {
                 byte[] documentoPDF = doc.getDocumentoPDF();
                 
@@ -105,91 +117,48 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
                         String contenido = new String(documentoPDF, StandardCharsets.UTF_8);
                         
                         // Eliminar el prefijo del nombre del archivo si existe
-                        int indexSeparador = contenido.indexOf(":"); // Buscar el separador ':'
+                        int indexSeparador = contenido.indexOf(":");
                         if (indexSeparador != -1) {
-                            contenido = contenido.substring(indexSeparador + 1);
+                            contenido = contenido.substring(indexSeparador + 1).trim();
                         }
                         
                         // Decodificar el contenido base64
-                        byte[] pdfDecodificado = Base64.getDecoder().decode(contenido.trim());
+                        byte[] pdfDecodificado = Base64.getDecoder().decode(contenido);
                         
-                        // Verificar que sea un PDF válido
-                        if (isPDF(pdfDecodificado)) {
-                            // Crear entrada en el ZIP
-                            String nombreArchivo = "Certificado_votacion_" + doc.getId() + ".pdf";
-                            ZipEntry entry = new ZipEntry(nombreArchivo);
-                            zos.putNextEntry(entry);
-                            zos.write(pdfDecodificado);
-                            zos.closeEntry();
-                            documentosValidos++;
-                            
-                            System.out.println("Documento " + nombreArchivo + " agregado exitosamente al ZIP");
-                        } else {
-                            System.out.println("El documento " + doc.getId() + " no es un PDF válido después de decodificar");
-                            logPDFInfo(pdfDecodificado, doc.getId());
-                        }
+                        // Crear entrada ZIP con nombre único
+                        String nombreArchivo = String.format("certificado_%d.pdf", doc.getId());
+                        ZipEntry zipEntry = new ZipEntry(nombreArchivo);
+                        zos.putNextEntry(zipEntry);
                         
+                        // Escribir contenido PDF al ZIP
+                        zos.write(pdfDecodificado);
+                        zos.closeEntry();
+                        
+                        documentosValidos++;
                     } catch (IllegalArgumentException e) {
-                        System.err.println("Error decodificando base64 para documento " + doc.getId() + ": " + e.getMessage());
-                    } catch (Exception e) {
                         System.err.println("Error procesando documento " + doc.getId() + ": " + e.getMessage());
-                        e.printStackTrace();
                     }
                 }
             }
-            
-            zos.close();
             
             if (documentosValidos == 0) {
                 throw new Exception("No se encontraron documentos PDF válidos para procesar");
             }
             
+            zos.close();
             return baos.toByteArray();
             
-        } catch (Exception e) {
-            throw new Exception("Error al procesar los documentos: " + e.getMessage());
-        }
-    }
-    
-    private boolean isPDF(byte[] data) {
-        if (data == null || data.length < 5) return false;
-        
-        // Verificar la firma del PDF (%PDF-)
-        return data[0] == 0x25 && // %
-               data[1] == 0x50 && // P
-               data[2] == 0x44 && // D
-               data[3] == 0x46 && // F
-               data[4] == 0x2D;   // -
-    }
-    
-    private void logPDFInfo(byte[] documentoPDF, long docId) {
-        try {
-            System.out.println("\n=== Documento " + docId + " información ===");
-            System.out.println("Tamaño: " + documentoPDF.length + " bytes");
-            
-            // Imprimir los primeros 50 bytes en hex y ASCII
-            StringBuilder hexBuilder = new StringBuilder();
-            StringBuilder asciiBuilder = new StringBuilder();
-            
-            for (int i = 0; i < Math.min(50, documentoPDF.length); i++) {
-                byte b = documentoPDF[i];
-                hexBuilder.append(String.format("%02X ", b));
-                
-                // Para visualización ASCII, mostrar solo caracteres imprimibles
-                if (b >= 32 && b < 127) {
-                    asciiBuilder.append((char)b);
-                } else {
-                    asciiBuilder.append('.');
-                }
+        } catch (IOException e) {
+            throw new Exception("Error al crear el archivo ZIP: " + e.getMessage());
+        } finally {
+            try {
+                zos.close();
+                baos.close();
+            } catch (IOException e) {
+                System.err.println("Error cerrando streams: " + e.getMessage());
             }
-            
-            System.out.println("Hex: " + hexBuilder.toString());
-            System.out.println("ASCII: " + asciiBuilder.toString());
-            System.out.println("=====================================\n");
-        } catch (Exception e) {
-            System.err.println("Error al logear información del PDF: " + e.getMessage());
         }
-    }
+    }   
 
     private SolicitudCertificadoVotacionResponse convertirAResponse(SolicitudesCertificadoVotacion solicitud) {
         SolicitudCertificadoVotacionResponse response = new SolicitudCertificadoVotacionResponse();

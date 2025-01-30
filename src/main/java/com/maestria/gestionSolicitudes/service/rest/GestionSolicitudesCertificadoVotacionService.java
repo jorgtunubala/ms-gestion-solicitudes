@@ -9,5 +9,6 @@ import com.maestria.gestionSolicitudes.dto.rest.response.EstudiantesResponse;
 public interface GestionSolicitudesCertificadoVotacionService {
     List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception;
     List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception;
-    byte[] obtenerTodosDocumentosZip() throws Exception;
+    byte[] obtenerDocumentosZipFiltrados(String period, List<Integer> certificateIds) throws Exception;
+
 }
