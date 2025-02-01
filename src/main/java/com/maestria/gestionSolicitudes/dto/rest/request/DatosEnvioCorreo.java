@@ -18,12 +18,4 @@ public class DatosEnvioCorreo {
     String correoDirector;
     String nombreCoordinador;
     String correoCoordiandor;
-
-    public DatosEnvioCorreo(){
-        correoEstudiante = "jorgtunubala@gmail.com";
-        correoTutor = "jorge17al@gmail.com";
-        correoDirector = "jorgetunubala@unicauca.edu.co";
-        correoCoordiandor = "jorgtunubala@gmail.com";
-        nombreCoordinador = "Pepito Perez";
-    }
 }

@@ -130,6 +130,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private EnlaceTipoSolicitudRepository enlaceTipoSolicitudRepository;
     @Autowired
     private MensajeriaService mensajeriaService;
+    @Autowired
+    private CoordinadorRepository coordinadorRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -1545,18 +1547,26 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         datosCorreo.setNombreEstudiante(estudiante.obtenerNombreCompleto());
         InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
         datosCorreo.setNombreTutor(infoTutor.obtenerNombreCompleto());
+        InformacionPersonalDto infoDirector = null;
         if (registroSolicitud.getRequiereFirmaDirector()) {
-            InformacionPersonalDto infoDirector = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
+            infoDirector = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdDirector().toString());
             datosCorreo.setNombreDirector(infoDirector.obtenerNombreCompleto());
         } else {
             datosCorreo.setNombreDirector(null);
         }
         if (destinatario.equals(DESTINATARIO_CORREO.ESTUDIANTE)){            
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
+            datosCorreo.setCorreoEstudiante(estudiante.getCorreo());
         } else if(destinatario.equals(DESTINATARIO_CORREO.TUTOR)){
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
+            datosCorreo.setCorreoTutor(infoTutor.getCorreo());
         } else if(destinatario.equals(DESTINATARIO_CORREO.DIRECTOR)){
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
+            datosCorreo.setCorreoDirector(infoDirector != null ? infoDirector.getCorreo() : null);
+        } else if(destinatario.equals(DESTINATARIO_CORREO.COORDINADOR)){
+            datosCorreo.setDirigidoA(destinatario.getDescripcion());
+            datosCorreo.setNombreCoordinador(coordinadorRepository.obtenerNombreCompletoCoordinador());
+            datosCorreo.setCorreoCoordiandor(coordinadorRepository.obtenerCorreoCoordinador());
         }
         return datosCorreo;
     }
