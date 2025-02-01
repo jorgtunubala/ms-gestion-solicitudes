@@ -3,6 +3,8 @@ package com.maestria.gestionSolicitudes.controller.rest;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +18,13 @@ import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.*;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;
 import com.maestria.gestionSolicitudes.service.client.MensajeriaService;
+import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesCertificadoVotacionService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnComiteService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesEnConcejoService;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesService;
+import org.springframework.http.HttpHeaders;
+import java.util.Map;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/gestionSolicitud")
@@ -31,8 +37,12 @@ public class GestionSolicitudesController {
     private GestionSolicitudesEnComiteService gestionSolicitudesEnComiteService;
     @Autowired
     private GestionSolicitudesEnConcejoService gestionSolicitudesEnConcejoService;
-
-
+    @Autowired
+    private GestionSolicitudesCertificadoVotacionService gestionSolicitudesCertificadoVotacionService;
+    @Autowired
+    private GestionSolicitudesCertificadoVotacionService gestionDocumentosCertificadoVotacionService;
+    @Autowired
+    private GestionSolicitudesCertificadoVotacionService gestionEstudiantesPeriodoIngresoService;
     @Autowired
     private MensajeriaService mensajeriaService;
 
@@ -128,6 +138,36 @@ public class GestionSolicitudesController {
     public Boolean registrarSolicitudEnComite(@RequestBody SolicitudEnComiteResponse datosSolicitudComite) throws Exception {
         return gestionSolicitudesEnComiteService.guardarSolicitudEnComite(datosSolicitudComite);
     }    
+    
+    @GetMapping("/obtener-solicitudes-certificado-votacion")
+    public List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception {
+        return gestionSolicitudesCertificadoVotacionService.obtenerSolicitudesCertificadoVotacion();
+    }
+
+    @PostMapping("/documentos-certificado-votacion/zip")
+    public ResponseEntity<byte[]> generarZipDocumentos(@RequestBody Map<String, Object> filtros) {
+        System.out.println("Recibiendo petición con filtros: " + filtros);
+        try {
+            String period = (String) filtros.get("period");
+            List<Integer> certificateIds = (List<Integer>) filtros.get("certificateIds");
+
+            byte[] zipFile = gestionDocumentosCertificadoVotacionService.obtenerDocumentosZipFiltrados(period, certificateIds);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "certificados.zip");
+            
+            return new ResponseEntity<>(zipFile, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/obtener-estudiantes-periodo-ingreso")
+    public List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception {
+        return gestionEstudiantesPeriodoIngresoService.obtenerEstudiantesPeriodoIngreso();
+    }
 
     @GetMapping("/obtener-solicitudes-en-concejo/{idSolicitud}")
     public SolicitudEnConcejoResponse obtenerSolicitudesEnConcejo(@PathVariable Integer idSolicitud) throws Exception {

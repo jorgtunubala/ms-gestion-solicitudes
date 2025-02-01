@@ -1,6 +1,6 @@
 #Configurar puerto
 server:
-    port: ${SPRING_SERVER_SOLICITUDES_PORT}
+    port: 8095
     servlet:
         context-path: /msmaestriac
 
@@ -8,9 +8,9 @@ server:
 # Configuración de la base de datos
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:mysql://localhost:3306/proy_maestria
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: true

@@ -30,4 +30,7 @@ public interface SolicitudesRepository extends JpaRepository<Solicitudes, Intege
                    "INNER JOIN personas p ON p.id = d.id_persona " +
                    "WHERE s.id = ?1 AND p.correo_electronico = ?2", nativeQuery = true)
     Integer obtenerDirectorSolicitud(Integer  solicitudId, String correoElectronico);
+
+
+    
 }
