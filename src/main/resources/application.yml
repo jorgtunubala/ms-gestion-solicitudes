@@ -27,7 +27,7 @@ feign:
         loggerLevel: basic
 
 gestion-estudiantes-docentes:
-  url: http://ms-estudiante-docente-experto:8082/api/
+  url: http://localhost:8091/api/
   resources:
     docentes-activos: docentes/listar/{estado}
     obtener-estudiante: estudiantes/informacion-personal/{correo}
@@ -43,6 +43,6 @@ gestion-asignaturas:
     asignaturas-adicionar: asignaturas/asignaturas-adicionar/{lista}
 
 mensajeria:
-  url: https://ms-mensajeria:443/maestria-computacion/
+  url: http://localhost:443/maestria-computacion/
   resources:
     enviar-email: mensajeria/enviar-email

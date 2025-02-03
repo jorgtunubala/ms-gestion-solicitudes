@@ -159,6 +159,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             TipoSolicitudDto tiposSolicitudDto = new TipoSolicitudDto();
             tiposSolicitudDto.setIdSolicitud(tipoSolicitud.getId());
             tiposSolicitudDto.setCodigoSolicitud(tipoSolicitud.getCodigo());
+            tiposSolicitudDto.setFechaInicio(tipoSolicitud.getFechaInicio());
+            tiposSolicitudDto.setFechaFinal(tipoSolicitud.getFechaFinal());
             if (tipoSolicitud.getCodigo().equals("SO_OTRA")) {
                 tiposSolicitudDto.setNombreSolicitud("Otra");
             } else {
@@ -263,10 +265,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         Boolean registro = Boolean.FALSE;
         String radicado;
         Solicitudes registroSolicitud = new Solicitudes();
+        TiposSolicitud tipoSolicitud;
         try {
             logger.info("Inicia proceso registrar solicitud...");
             // Buscamos el tipo de solciitud a asociar en el regsitro de la solicitud.
-            TiposSolicitud tipoSolicitud = tipoSolicitudRepository
+            tipoSolicitud = tipoSolicitudRepository
                 .findById(datosSolicitud.getIdTipoSolicitud()).get();
             Solicitudes solicitud = new Solicitudes();
             // Asignamos los datos necesarios de la solicitud.
@@ -320,15 +323,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             logger.error("Ocurrió un error inesperado al registrar la solicitud.", e);
             throw e;
         }
-        if (registro) {            
-            // Crear CompletableFutures para cada correo
-            CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
-            CompletableFuture<Void> correoTutor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.TUTOR)));
-            CompletableFuture<Void> correoDirector = null;
-            if (registroSolicitud.getRequiereFirmaDirector()) {
-                correoDirector = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.DIRECTOR)));
-            }
-            return radicado;
+        if (registro) {      
+            if(tipoSolicitud.getCodigo().equals("CER_VOTO")){      
+                // Crear CompletableFutures para cada correo
+                CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
+            }    
+            else{
+                CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
+                CompletableFuture<Void> correoTutor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.TUTOR)));
+                CompletableFuture<Void> correoDirector = null;
+                if (registroSolicitud.getRequiereFirmaDirector()) {
+                    correoDirector = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.DIRECTOR)));
+                }
+            }    
+                return radicado;    
         } else {
             logger.info("Error al registrar la solicitud o enviando correo.");
             return null;
