@@ -1,5 +1,7 @@
 package com.maestria.gestionSolicitudes.domain;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,4 +34,11 @@ public class TiposSolicitud extends EntidadPrincipal {
 
     @Column(name = "estado")
     private String estado;
+    
+    @Column(name = "fecha_inicio")
+    private Timestamp fechaInicio;
+
+    @Column(name = "fecha_final")
+    private Timestamp fechaFinal;
+    
 }

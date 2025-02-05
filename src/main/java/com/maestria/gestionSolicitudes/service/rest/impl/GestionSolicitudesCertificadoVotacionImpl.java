@@ -16,11 +16,14 @@ import java.util.Base64;
 import com.maestria.gestionSolicitudes.domain.Estudiantes;
 import com.maestria.gestionSolicitudes.domain.DocumentosCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.SolicitudesCertificadoVotacion;
+import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
+import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudPorFechaDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.EstudiantesResponse;
 import com.maestria.gestionSolicitudes.repository.DocumentoCertificadoVotacionRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesCertificadoVotacionRepository;
+import com.maestria.gestionSolicitudes.repository.TiposSolicitudRepository;
 import com.maestria.gestionSolicitudes.repository.EstudiantesPeriodoIngresoRepository;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesCertificadoVotacionService;
 
@@ -30,6 +33,9 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     @Autowired
     private SolicitudesCertificadoVotacionRepository solicitudesCertificadoVotacionRepository;
 
+    @Autowired
+    private TiposSolicitudRepository tipoSolicitudRepository;
+    
     @Autowired
     private DocumentoCertificadoVotacionRepository documentoCertificadoVotacionRepository;
 
@@ -58,6 +64,24 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         } catch (Exception e) {
             throw new Exception("Error al obtener las solicitudes de certificado de votación: " + e.getMessage());
         }
+    }
+
+    //@Override
+    public List<SolicitudPorFechaDto> registrarFechaSolicitud() {   
+        List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
+        List<SolicitudPorFechaDto> solicitudFechas = new ArrayList<>();
+        for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
+            SolicitudPorFechaDto solicitudFecha = new SolicitudPorFechaDto();
+            solicitudFecha.setIdSolicitud(tipoSolicitud.getId());
+            solicitudFecha.setCodigo(tipoSolicitud.getCodigo());            
+            if (tipoSolicitud.getCodigo().equals("CER_VOTO")) {
+                solicitudFecha.setNombre("Otra");
+            } else {
+                solicitudFecha.setNombre(tipoSolicitud.getNombre());
+            }            
+            solicitudFechas.add(solicitudFecha);
+        }
+        return solicitudFechas;
     }
 
     public List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception{

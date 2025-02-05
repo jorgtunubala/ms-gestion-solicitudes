@@ -158,9 +158,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
             TipoSolicitudDto tiposSolicitudDto = new TipoSolicitudDto();
             tiposSolicitudDto.setIdSolicitud(tipoSolicitud.getId());
-            tiposSolicitudDto.setCodigoSolicitud(tipoSolicitud.getCodigo());
-            tiposSolicitudDto.setFechaInicio(tipoSolicitud.getFechaInicio());
-            tiposSolicitudDto.setFechaFinal(tipoSolicitud.getFechaFinal());
+            tiposSolicitudDto.setCodigoSolicitud(tipoSolicitud.getCodigo());            
             if (tipoSolicitud.getCodigo().equals("SO_OTRA")) {
                 tiposSolicitudDto.setNombreSolicitud("Otra");
             } else {
@@ -170,7 +168,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         }
         return tiposSolicitudDtos;
     }
-
+    
     @Override
     public DocumentoRequeridoSolicitudDto getRequisitoSolicitudAndDocumentosAndNotasPorSolicitudId(String codigo) throws Exception {
         /* 

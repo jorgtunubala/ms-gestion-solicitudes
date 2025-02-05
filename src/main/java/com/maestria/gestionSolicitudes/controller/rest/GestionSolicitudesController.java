@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,7 +33,6 @@ public class GestionSolicitudesController {
     
     @Autowired
     private GestionSolicitudesService gestionSolicitudesService;
-
     @Autowired
     private GestionSolicitudesEnComiteService gestionSolicitudesEnComiteService;
     @Autowired
@@ -43,6 +43,8 @@ public class GestionSolicitudesController {
     private GestionSolicitudesCertificadoVotacionService gestionDocumentosCertificadoVotacionService;
     @Autowired
     private GestionSolicitudesCertificadoVotacionService gestionEstudiantesPeriodoIngresoService;
+    @Autowired
+    private GestionSolicitudesCertificadoVotacionService gestionEstudiantesPeriodoIngresoServices;
     @Autowired
     private MensajeriaService mensajeriaService;
 
@@ -98,6 +100,12 @@ public class GestionSolicitudesController {
     public String registrarSolicitud(@RequestBody SolicitudRequestDto datosSolicitud) throws Exception {
         return gestionSolicitudesService.registrarSolicitud(datosSolicitud);
     }
+    
+    @PutMapping("save/fechas")
+    public List<SolicitudPorFechaDto> registrarFechaSolicitud(@RequestBody SolicitudPorFechaDto datosFechaSolicitud) throws Exception {
+        return gestionSolicitudesCertificadoVotacionService.registrarFechaSolicitud();
+    }
+        
 
     @GetMapping("/obtener-solicitudes-pendientes/{identificador}")
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(@PathVariable String identificador) throws Exception {
@@ -151,7 +159,7 @@ public class GestionSolicitudesController {
             String period = (String) filtros.get("period");
             List<Integer> certificateIds = (List<Integer>) filtros.get("certificateIds");
 
-            byte[] zipFile = gestionDocumentosCertificadoVotacionService.obtenerDocumentosZipFiltrados(period, certificateIds);
+            byte[] zipFile = gestionSolicitudesCertificadoVotacionService.obtenerDocumentosZipFiltrados(period, certificateIds);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
