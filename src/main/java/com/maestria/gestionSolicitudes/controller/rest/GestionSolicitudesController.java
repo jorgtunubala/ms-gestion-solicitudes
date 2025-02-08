@@ -101,9 +101,9 @@ public class GestionSolicitudesController {
         return gestionSolicitudesService.registrarSolicitud(datosSolicitud);
     }
     
-    @PutMapping("save/fechas")
+    @PutMapping("update/fechas")
     public List<SolicitudPorFechaDto> registrarFechaSolicitud(@RequestBody SolicitudPorFechaDto datosFechaSolicitud) throws Exception {
-        return gestionSolicitudesCertificadoVotacionService.registrarFechaSolicitud();
+        return gestionSolicitudesCertificadoVotacionService.registrarFechaSolicitud(datosFechaSolicitud);
     }
         
 

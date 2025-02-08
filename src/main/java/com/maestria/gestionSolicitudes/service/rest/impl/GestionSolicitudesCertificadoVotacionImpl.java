@@ -67,22 +67,30 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     }
 
     //@Override
-    public List<SolicitudPorFechaDto> registrarFechaSolicitud() {   
-        List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
-        List<SolicitudPorFechaDto> solicitudFechas = new ArrayList<>();
-        for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
-            SolicitudPorFechaDto solicitudFecha = new SolicitudPorFechaDto();
-            solicitudFecha.setIdSolicitud(tipoSolicitud.getId());
-            solicitudFecha.setCodigo(tipoSolicitud.getCodigo());            
-            if (tipoSolicitud.getCodigo().equals("CER_VOTO")) {
-                solicitudFecha.setNombre("Otra");
-            } else {
-                solicitudFecha.setNombre(tipoSolicitud.getNombre());
-            }            
-            solicitudFechas.add(solicitudFecha);
+    public List<SolicitudPorFechaDto> registrarFechaSolicitud(SolicitudPorFechaDto datosFechaSolicitud) {   
+    List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
+    List<SolicitudPorFechaDto> solicitudFechas = new ArrayList<>();
+
+    for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
+        // Si el ID de la solicitud coincide con el DTO recibido, actualizamos las fechas
+        if (tipoSolicitud.getId().equals(datosFechaSolicitud.getIdSolicitud())) {
+            tipoSolicitud.setFechaInicio(datosFechaSolicitud.getFechaInicio());
+            tipoSolicitud.setFechaFinal(datosFechaSolicitud.getFechaFinal());
+            tipoSolicitudRepository.save(tipoSolicitud);
         }
-        return solicitudFechas;
+
+        SolicitudPorFechaDto solicitudFecha = new SolicitudPorFechaDto();
+        solicitudFecha.setIdSolicitud(tipoSolicitud.getId());
+        solicitudFecha.setCodigo(tipoSolicitud.getCodigo());            
+        solicitudFecha.setNombre(tipoSolicitud.getNombre());  
+        solicitudFecha.setFechaInicio(tipoSolicitud.getFechaInicio());   
+        solicitudFecha.setFechaFinal(tipoSolicitud.getFechaFinal());    
+        solicitudFechas.add(solicitudFecha);
     }
+    System.out.println("Fechas actualizadas correctamente");
+    return solicitudFechas;
+}
+
 
     public List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception{
     List<EstudiantesResponse> listaEstudiantes = new ArrayList<>();

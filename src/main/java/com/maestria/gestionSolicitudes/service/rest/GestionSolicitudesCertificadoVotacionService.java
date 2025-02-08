@@ -10,6 +10,6 @@ public interface GestionSolicitudesCertificadoVotacionService {
     List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception;
     List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception;
     byte[] obtenerDocumentosZipFiltrados(String period, List<Integer> certificateIds) throws Exception;
-    List<SolicitudPorFechaDto> registrarFechaSolicitud();
+    List<SolicitudPorFechaDto> registrarFechaSolicitud(SolicitudPorFechaDto datosFechaSolicitud);
 
 }
