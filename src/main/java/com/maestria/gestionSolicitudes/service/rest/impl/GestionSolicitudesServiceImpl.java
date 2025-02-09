@@ -158,7 +158,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
             TipoSolicitudDto tiposSolicitudDto = new TipoSolicitudDto();
             tiposSolicitudDto.setIdSolicitud(tipoSolicitud.getId());
-            tiposSolicitudDto.setCodigoSolicitud(tipoSolicitud.getCodigo());            
+            tiposSolicitudDto.setCodigoSolicitud(tipoSolicitud.getCodigo());  
+            tiposSolicitudDto.setFechaInicio(tipoSolicitud.getFechaInicio());
+            tiposSolicitudDto.setFechaFinal(tipoSolicitud.getFechaFinal());          
             if (tipoSolicitud.getCodigo().equals("SO_OTRA")) {
                 tiposSolicitudDto.setNombreSolicitud("Otra");
             } else {
