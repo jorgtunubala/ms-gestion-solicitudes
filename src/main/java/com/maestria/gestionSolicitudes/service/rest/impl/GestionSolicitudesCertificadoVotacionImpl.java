@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import java.util.Map;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,16 +14,20 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.Base64;
+import java.util.Map;
 
 import com.maestria.gestionSolicitudes.domain.Estudiantes;
 import com.maestria.gestionSolicitudes.domain.DocumentosCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.SolicitudesCertificadoVotacion;
+import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
+import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudPorFechaDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.EstudiantesResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.FechaActualResponse;
 import com.maestria.gestionSolicitudes.repository.DocumentoCertificadoVotacionRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesCertificadoVotacionRepository;
+import com.maestria.gestionSolicitudes.repository.TiposSolicitudRepository;
 import com.maestria.gestionSolicitudes.repository.EstudiantesPeriodoIngresoRepository;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesCertificadoVotacionService;
 
@@ -34,6 +37,9 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     @Autowired
     private SolicitudesCertificadoVotacionRepository solicitudesCertificadoVotacionRepository;
 
+    @Autowired
+    private TiposSolicitudRepository tipoSolicitudRepository;
+    
     @Autowired
     private DocumentoCertificadoVotacionRepository documentoCertificadoVotacionRepository;
 
@@ -66,8 +72,6 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         }
     }
 
-<<<<<<< Updated upstream
-=======
     //@Override
     public List<SolicitudPorFechaDto> registrarFechaSolicitud(SolicitudPorFechaDto datosFechaSolicitud) {   
     List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
@@ -79,28 +83,27 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
             tipoSolicitud.setFechaInicio(datosFechaSolicitud.getFechaInicio());
             tipoSolicitud.setFechaFinal(datosFechaSolicitud.getFechaFinal());
             tipoSolicitudRepository.save(tipoSolicitud);
-            }
-
-            SolicitudPorFechaDto solicitudFecha = new SolicitudPorFechaDto();
-            solicitudFecha.setCodigo(tipoSolicitud.getCodigo());            
-            solicitudFecha.setFechaInicio(tipoSolicitud.getFechaInicio());   
-            solicitudFecha.setFechaFinal(tipoSolicitud.getFechaFinal());    
-            solicitudFechas.add(solicitudFecha);
         }
-        System.out.println("Fechas actualizadas correctamente");
-        return solicitudFechas;
+
+        SolicitudPorFechaDto solicitudFecha = new SolicitudPorFechaDto();
+        solicitudFecha.setCodigo(tipoSolicitud.getCodigo());            
+        solicitudFecha.setFechaInicio(tipoSolicitud.getFechaInicio());   
+        solicitudFecha.setFechaFinal(tipoSolicitud.getFechaFinal());    
+        solicitudFechas.add(solicitudFecha);
     }
+    System.out.println("Fechas actualizadas correctamente");
+    return solicitudFechas;
+}
 
 
->>>>>>> Stashed changes
     public List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception{
     List<EstudiantesResponse> listaEstudiantes = new ArrayList<>();
         try {
-            // Obtener todos los estudiantes por periodo de ingreso
+            // Obtener todas las solicitudes de certificado de votación
             List<Estudiantes> estudiantes = estudiantesPeriodoIngresoRepository.findAllEstudiantesPeriodoIngresoOrderByFechaModificacion();
 
             if (estudiantes.isEmpty()) {
-                throw new Exception("No se encontraron estudiantes en la lista");
+                throw new Exception("No se encontraron solicitudes de certificado de votación");
             }
 
             // Convertir cada solicitud a su response correspondiente
@@ -112,7 +115,7 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
             return listaEstudiantes;
             
         } catch (Exception e) {
-            throw new Exception("Error al obtener los estudiantes en la lista: " + e.getMessage());
+            throw new Exception("Error al obtener las solicitudes de certificado de votación: " + e.getMessage());
         }
     }
 
@@ -210,7 +213,7 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         response.setFecha_ingreso(estudiante.getPeriodo_ingreso());
         return response;
     }
-    
+
     public FechaActualResponse obtenerFechaActual() {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Map> response = restTemplate.getForEntity(TIME_API_URL, Map.class);
@@ -224,5 +227,4 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         throw new RuntimeException("No se pudo obtener la fecha del servidor de tiempo.");
 
     }
-    
 }

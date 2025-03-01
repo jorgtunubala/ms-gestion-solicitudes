@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +38,8 @@ public class GestionSolicitudesController {
     private GestionSolicitudesEnComiteService gestionSolicitudesEnComiteService;
     @Autowired
     private GestionSolicitudesEnConcejoService gestionSolicitudesEnConcejoService;
+    @Autowired
+    private GestionSolicitudesCertificadoVotacionService gestionDocumentosCertificadoVotacionService;
     @Autowired
     private GestionSolicitudesCertificadoVotacionService gestionSolicitudesCertificadoVotacionService;
     @Autowired
@@ -96,8 +99,6 @@ public class GestionSolicitudesController {
     public String registrarSolicitud(@RequestBody SolicitudRequestDto datosSolicitud) throws Exception {
         return gestionSolicitudesService.registrarSolicitud(datosSolicitud);
     }
-<<<<<<< Updated upstream
-=======
     
     @PutMapping("update/fechas")
     public List<SolicitudPorFechaDto> registrarFechaSolicitud(@RequestBody SolicitudPorFechaDto datosFechaSolicitud) throws Exception {
@@ -108,7 +109,6 @@ public class GestionSolicitudesController {
     public FechaActualResponse getCurrentDate() {
         return gestionSolicitudesCertificadoVotacionService.obtenerFechaActual();
     }
->>>>>>> Stashed changes
 
     @GetMapping("/obtener-solicitudes-pendientes/{identificador}")
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(@PathVariable String identificador) throws Exception {

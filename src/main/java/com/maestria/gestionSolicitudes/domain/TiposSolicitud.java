@@ -32,4 +32,18 @@ public class TiposSolicitud extends EntidadPrincipal {
 
     @Column(name = "estado")
     private String estado;
+
+    @Column(name = "fecha_inicio")
+    private String fechaInicio;
+
+    @Column(name = "fecha_final")
+    private String fechaFinal;
+    
+    public void setFechaInicio(String fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public void setFechaFinal(String fechaFinal) {
+        this.fechaFinal = fechaFinal;
+    }
 }
