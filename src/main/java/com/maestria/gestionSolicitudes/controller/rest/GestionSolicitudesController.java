@@ -33,7 +33,6 @@ public class GestionSolicitudesController {
     
     @Autowired
     private GestionSolicitudesService gestionSolicitudesService;
-
     @Autowired
     private GestionSolicitudesEnComiteService gestionSolicitudesEnComiteService;
     @Autowired
@@ -44,6 +43,8 @@ public class GestionSolicitudesController {
     private GestionSolicitudesCertificadoVotacionService gestionSolicitudesCertificadoVotacionService;
     @Autowired
     private GestionSolicitudesCertificadoVotacionService gestionEstudiantesPeriodoIngresoService;
+    @Autowired
+    private GestionSolicitudesCertificadoVotacionService gestionEstudiantesPeriodoIngresoServices;
     @Autowired
     private MensajeriaService mensajeriaService;
 
@@ -109,6 +110,7 @@ public class GestionSolicitudesController {
     public FechaActualResponse getCurrentDate() {
         return gestionSolicitudesCertificadoVotacionService.obtenerFechaActual();
     }
+        
 
     @GetMapping("/obtener-solicitudes-pendientes/{identificador}")
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(@PathVariable String identificador) throws Exception {
@@ -162,7 +164,7 @@ public class GestionSolicitudesController {
             String period = (String) filtros.get("period");
             List<Integer> certificateIds = (List<Integer>) filtros.get("certificateIds");
 
-            byte[] zipFile = gestionDocumentosCertificadoVotacionService.obtenerDocumentosZipFiltrados(period, certificateIds);
+            byte[] zipFile = gestionSolicitudesCertificadoVotacionService.obtenerDocumentosZipFiltrados(period, certificateIds);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);

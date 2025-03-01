@@ -6,5 +6,7 @@ import lombok.Data;
 public class TipoSolicitudDto {
     private Integer idSolicitud;
     private String codigoSolicitud;
-    private String nombreSolicitud;    
+    private String nombreSolicitud;
+    private String fechaInicio;
+    private String fechaFinal;
 }

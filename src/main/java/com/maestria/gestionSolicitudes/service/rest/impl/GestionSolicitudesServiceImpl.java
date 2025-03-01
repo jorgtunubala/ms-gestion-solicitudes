@@ -130,6 +130,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private EnlaceTipoSolicitudRepository enlaceTipoSolicitudRepository;
     @Autowired
     private MensajeriaService mensajeriaService;
+    @Autowired
+    private CoordinadorRepository coordinadorRepository;
 
     private final ApoyoEconomicoMapper apoyoEconomicoMapper;
     private final AvalPasantiaInvMapper avalPasantiaInvMapper;
@@ -156,7 +158,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
             TipoSolicitudDto tiposSolicitudDto = new TipoSolicitudDto();
             tiposSolicitudDto.setIdSolicitud(tipoSolicitud.getId());
-            tiposSolicitudDto.setCodigoSolicitud(tipoSolicitud.getCodigo());
+            tiposSolicitudDto.setCodigoSolicitud(tipoSolicitud.getCodigo());  
+            tiposSolicitudDto.setFechaInicio(tipoSolicitud.getFechaInicio());
+            tiposSolicitudDto.setFechaFinal(tipoSolicitud.getFechaFinal());          
             if (tipoSolicitud.getCodigo().equals("SO_OTRA")) {
                 tiposSolicitudDto.setNombreSolicitud("Otra");
             } else {
@@ -166,7 +170,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         }
         return tiposSolicitudDtos;
     }
-
+    
     @Override
     public DocumentoRequeridoSolicitudDto getRequisitoSolicitudAndDocumentosAndNotasPorSolicitudId(String codigo) throws Exception {
         /* 
@@ -321,15 +325,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             logger.error("Ocurrió un error inesperado al registrar la solicitud.", e);
             throw e;
         }
-        if (registro) {            
-            // Crear CompletableFutures para cada correo
-            CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
-            CompletableFuture<Void> correoTutor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.TUTOR)));
-            CompletableFuture<Void> correoDirector = null;
-            if (registroSolicitud.getRequiereFirmaDirector()) {
-                correoDirector = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.DIRECTOR)));
-            }
-            return radicado;
+        if (registro) {      
+            if(tipoSolicitud.getCodigo().equals("CER_VOTO")){      
+                // Crear CompletableFutures para cada correo
+                CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
+            }    
+            else{
+                CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
+                CompletableFuture<Void> correoTutor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.TUTOR)));
+                CompletableFuture<Void> correoDirector = null;
+                if (registroSolicitud.getRequiereFirmaDirector()) {
+                    correoDirector = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.DIRECTOR)));
+                }
+            }    
+                return radicado;    
         } else {
             logger.info("Error al registrar la solicitud o enviando correo.");
             return null;
@@ -1563,23 +1572,31 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
                 .obtenerInformacionEstudiantePorId(registroSolicitud.getIdEstudiante());
         datosCorreo.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-        InformacionPersonalDto infoTutor;
+        InformacionPersonalDto infoTutor = null;
+        InformacionPersonalDto infoDirector = null;
         if (registroSolicitud.getIdTutor() != null) {
             infoTutor = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
             datosCorreo.setNombreTutor(infoTutor.obtenerNombreCompleto());
         }
         if (registroSolicitud.getRequiereFirmaDirector()) {
-            InformacionPersonalDto infoDirector = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdTutor().toString());
+            infoDirector = gestionDocentesEstudiantesService.obtenerTutor(registroSolicitud.getIdDirector().toString());
             datosCorreo.setNombreDirector(infoDirector.obtenerNombreCompleto());
         } else {
             datosCorreo.setNombreDirector(null);
         }
         if (destinatario.equals(DESTINATARIO_CORREO.ESTUDIANTE)){            
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
+            datosCorreo.setCorreoEstudiante(estudiante.getCorreo());
         } else if(destinatario.equals(DESTINATARIO_CORREO.TUTOR)){
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
+            datosCorreo.setCorreoTutor(infoTutor.getCorreo());
         } else if(destinatario.equals(DESTINATARIO_CORREO.DIRECTOR)){
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
+            datosCorreo.setCorreoDirector(infoDirector != null ? infoDirector.getCorreo() : null);
+        } else if(destinatario.equals(DESTINATARIO_CORREO.COORDINADOR)){
+            datosCorreo.setDirigidoA(destinatario.getDescripcion());
+            datosCorreo.setNombreCoordinador(coordinadorRepository.obtenerNombreCompletoCoordinador());
+            datosCorreo.setCorreoCoordiandor(coordinadorRepository.obtenerCorreoCoordinador());
         }
         return datosCorreo;
     }
