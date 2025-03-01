@@ -10,4 +10,8 @@ public interface TiposSolicitudRepository extends JpaRepository<TiposSolicitud, 
 
     List<TiposSolicitud> findByEstadoOrderByNombreAsc(String estado);
     TiposSolicitud findByCodigo(String codigo);
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 }

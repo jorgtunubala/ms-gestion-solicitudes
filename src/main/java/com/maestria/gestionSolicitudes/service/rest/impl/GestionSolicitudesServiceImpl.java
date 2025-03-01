@@ -263,8 +263,13 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         Solicitudes registroSolicitud = new Solicitudes();
         try {
             logger.info("Inicia proceso registrar solicitud...");
+<<<<<<< Updated upstream
             // Buscamos el tipo de solciitud a asociar en el regsitro de la solicitud.
             TiposSolicitud tipoSolicitud = tipoSolicitudRepository
+=======
+            // Buscamos el tipo de solicitud a asociar en el regsitro de la solicitud.
+            tipoSolicitud = tipoSolicitudRepository
+>>>>>>> Stashed changes
                 .findById(datosSolicitud.getIdTipoSolicitud()).get();
             Solicitudes solicitud = new Solicitudes();
             // Asignamos los datos necesarios de la solicitud.
@@ -272,7 +277,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitud.setTipoSolicitud(tipoSolicitud);
             solicitud.setIdTutor(datosSolicitud.getIdTutor());             
             //condicion para certificado de votacion (AVALADA)
+            
             if (tipoSolicitud.getCodigo().equals("CER_VOTO")) { 
+                //validar rango de fecha para cer_voto
+                
                 solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
             } else {
                 solicitud.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
@@ -280,7 +288,6 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
             solicitud.setIdDirector(datosSolicitud.getIdDirector());
             solicitud.setDocumentoFirmado(datosSolicitud.getOficioPdf());
-            
             registroSolicitud = solicitudesRepository.save(solicitud);
             //condicion para guardar solicitud de cer_voto
             if (tipoSolicitud.getCodigo().equals("CER_VOTO")) { 

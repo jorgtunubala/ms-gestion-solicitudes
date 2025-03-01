@@ -40,8 +40,6 @@ public class GestionSolicitudesController {
     @Autowired
     private GestionSolicitudesCertificadoVotacionService gestionSolicitudesCertificadoVotacionService;
     @Autowired
-    private GestionSolicitudesCertificadoVotacionService gestionDocumentosCertificadoVotacionService;
-    @Autowired
     private GestionSolicitudesCertificadoVotacionService gestionEstudiantesPeriodoIngresoService;
     @Autowired
     private MensajeriaService mensajeriaService;
@@ -98,6 +96,19 @@ public class GestionSolicitudesController {
     public String registrarSolicitud(@RequestBody SolicitudRequestDto datosSolicitud) throws Exception {
         return gestionSolicitudesService.registrarSolicitud(datosSolicitud);
     }
+<<<<<<< Updated upstream
+=======
+    
+    @PutMapping("update/fechas")
+    public List<SolicitudPorFechaDto> registrarFechaSolicitud(@RequestBody SolicitudPorFechaDto datosFechaSolicitud) throws Exception {
+        return gestionSolicitudesCertificadoVotacionService.registrarFechaSolicitud(datosFechaSolicitud);
+    }
+
+    @GetMapping("/fechaActual")
+    public FechaActualResponse getCurrentDate() {
+        return gestionSolicitudesCertificadoVotacionService.obtenerFechaActual();
+    }
+>>>>>>> Stashed changes
 
     @GetMapping("/obtener-solicitudes-pendientes/{identificador}")
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(@PathVariable String identificador) throws Exception {
