@@ -46,8 +46,6 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     @Autowired
     private EstudiantesPeriodoIngresoRepository estudiantesPeriodoIngresoRepository;
 
-    private static final String TIME_API_URL = "https://www.timeapi.io/api/Time/current/zone?timeZone=America/Bogota";
-
     @Override
     public List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception{
     List<SolicitudCertificadoVotacionResponse> listaSolicitudes = new ArrayList<>();
@@ -214,17 +212,4 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         return response;
     }
 
-    public FechaActualResponse obtenerFechaActual() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response = restTemplate.getForEntity(TIME_API_URL, Map.class);
-
-        if (response.getBody() != null) {
-            int year = (int) response.getBody().get("year");
-            int month = (int) response.getBody().get("month");
-            int day = (int) response.getBody().get("day");
-            return new FechaActualResponse(year, month, day);
-        }
-        throw new RuntimeException("No se pudo obtener la fecha del servidor de tiempo.");
-
-    }
 }

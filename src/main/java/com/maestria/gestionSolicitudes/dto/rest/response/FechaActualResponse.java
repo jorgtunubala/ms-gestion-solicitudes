@@ -2,25 +2,26 @@ package com.maestria.gestionSolicitudes.dto.rest.response;
 
 
 public class FechaActualResponse {
-    private int year;
-    private int month;
-    private int day;
+    private String year;
+    private String month;
+    private String day;
 
-    public FechaActualResponse(int year, int month, int day) {
+    public FechaActualResponse(String year, String month, String day) {
         this.year = year;
         this.month = month;
         this.day = day;
     }
 
-    public int getYear() {
+    public String getYear() {
         return year;
     }
 
-    public int getMonth() {
+    public String getMonth() {
         return month;
     }
 
-    public int getDay() {
+    public String getDay() {
         return day;
     }
+    
 }

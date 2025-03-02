@@ -15,10 +15,13 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import com.maestria.gestionSolicitudes.service.rest.impl.GestionSolicitudesCertificadoVotacionImpl;
 import com.maestria.gestionSolicitudes.comun.enums.*;
 import com.maestria.gestionSolicitudes.comun.util.TokenAleatorio;
 import com.maestria.gestionSolicitudes.domain.*;
@@ -145,7 +148,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         this.apoyoEconomicoCongresoMapper = apoyoEconomicoCongresoMapper;
         this.apoyoEconomicoPublicacionEventoMapper = apoyoEconomicoPublicacionEventoMapper;
     }
-    
+
+    private static final String TIME_API_URL = "https://www.timeapi.io/api/Time/current/zone?timeZone=America/Bogota";
+
     @Override
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
         /*
@@ -270,18 +275,32 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             logger.info("Inicia proceso registrar solicitud...");
             // Buscamos el tipo de solicitud a asociar en el regsitro de la solicitud.
             tipoSolicitud = tipoSolicitudRepository
-                .findById(datosSolicitud.getIdTipoSolicitud()).get();
+                .findById(datosSolicitud.getIdTipoSolicitud()).get();    
             Solicitudes solicitud = new Solicitudes();
             // Asignamos los datos necesarios de la solicitud.
             solicitud.setIdEstudiante(datosSolicitud.getIdEstudiante());
             solicitud.setTipoSolicitud(tipoSolicitud);
             solicitud.setIdTutor(datosSolicitud.getIdTutor());             
-            //condicion para certificado de votacion (AVALADA)
+            //condicion para registrar solicitud por rango fecha
             
+            //condicion para certificado de votacion (AVALADA)
             if (tipoSolicitud.getCodigo().equals("CER_VOTO")) { 
-                //validar rango de fecha para cer_voto
-                
-                solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
+                FechaActualResponse fechaActual = obtenerFechaActual();
+                String fechaInicio = tipoSolicitud.getFechaInicio();
+                String fechaFinal = tipoSolicitud.getFechaFinal();
+
+                // Crear la fecha actual en formato comparable (yyyy-MM-dd)
+                String fechaActualStr = fechaActual.getYear() + "-" + 
+                        (fechaActual.getMonth().length() == 1 ? "0" + fechaActual.getMonth() : fechaActual.getMonth()) + "-" + 
+                        (fechaActual.getDay().length() == 1 ? "0" + fechaActual.getDay() : fechaActual.getDay());
+
+                if (fechaActualStr.compareTo(fechaInicio) >= 0 && fechaActualStr.compareTo(fechaFinal) <= 0) {
+                    // La fecha actual está dentro del rango permitido
+                    solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
+                } else {
+                    // La fecha actual está fuera del rango permitido
+                    throw new IllegalArgumentException("El proceso no se puede continuar porque la fecha actual está fuera del rango permitido.");
+                }
             } else {
                 solicitud.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
             }            
@@ -1631,5 +1650,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     public boolean verificarExistenciaSolicitud(Integer solicitudId, String correoElectronico) {
         Integer respuesta = solicitudesRepository.obtenerDirectorSolicitud(solicitudId, correoElectronico);
         return respuesta == 1 ? true : false;
+    }
+
+    public FechaActualResponse obtenerFechaActual() {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Map> response = restTemplate.getForEntity(TIME_API_URL, Map.class);
+
+        if (response.getBody() != null) {
+            String year = String.valueOf(response.getBody().get("year"));
+            String month = String.valueOf(response.getBody().get("month"));
+            String day = String.valueOf(response.getBody().get("day"));
+
+            return new FechaActualResponse(year, month, day);
+        }        
+        throw new RuntimeException("No se pudo obtener la fecha del servidor de tiempo.");
+
     }
 }

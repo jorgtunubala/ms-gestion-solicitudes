@@ -40,4 +40,6 @@ public interface GestionSolicitudesService {
     Boolean actualizarSolicitud(Integer idSolicitud, String estado);
 
     boolean verificarExistenciaSolicitud(Integer solicitudId, String correoElectronico);
+
+    FechaActualResponse obtenerFechaActual();
 }

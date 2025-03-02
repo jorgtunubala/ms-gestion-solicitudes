@@ -108,9 +108,8 @@ public class GestionSolicitudesController {
 
     @GetMapping("/fechaActual")
     public FechaActualResponse getCurrentDate() {
-        return gestionSolicitudesCertificadoVotacionService.obtenerFechaActual();
-    }
-        
+        return gestionSolicitudesService.obtenerFechaActual();
+    }   
 
     @GetMapping("/obtener-solicitudes-pendientes/{identificador}")
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(@PathVariable String identificador) throws Exception {
