@@ -16,19 +16,19 @@ import java.util.zip.ZipOutputStream;
 import java.util.Base64;
 import java.util.Map;
 
-import com.maestria.gestionSolicitudes.domain.Estudiantes;
+import com.maestria.gestionSolicitudes.domain.Estudiante;
 import com.maestria.gestionSolicitudes.domain.DocumentosCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.SolicitudesCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudPorFechaDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudCertificadoVotacionResponse;
-import com.maestria.gestionSolicitudes.dto.rest.response.EstudiantesResponse;
+import com.maestria.gestionSolicitudes.dto.rest.response.EstadoEstudianteResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.FechaActualResponse;
 import com.maestria.gestionSolicitudes.repository.DocumentoCertificadoVotacionRepository;
 import com.maestria.gestionSolicitudes.repository.SolicitudesCertificadoVotacionRepository;
 import com.maestria.gestionSolicitudes.repository.TiposSolicitudRepository;
-import com.maestria.gestionSolicitudes.repository.EstudiantesPeriodoIngresoRepository;
+import com.maestria.gestionSolicitudes.repository.EstadoEstudianteRepository;
 import com.maestria.gestionSolicitudes.service.rest.GestionSolicitudesCertificadoVotacionService;
 
 @Service
@@ -44,7 +44,7 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     private DocumentoCertificadoVotacionRepository documentoCertificadoVotacionRepository;
 
     @Autowired
-    private EstudiantesPeriodoIngresoRepository estudiantesPeriodoIngresoRepository;
+    private EstadoEstudianteRepository estadoEstudianteRepository;
 
     @Override
     public List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception{
@@ -52,61 +52,85 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         try {
             // Obtener todas las solicitudes de certificado de votación
             List<SolicitudesCertificadoVotacion> solicitudes = solicitudesCertificadoVotacionRepository.findAllSolicitudesOrderByFechaModificacion();
+    
+                if (solicitudes.isEmpty()) {
+                    throw new Exception("No se encontraron solicitudes de certificado de votación");
+                }
+    
+                // Convertir cada solicitud a su response correspondiente
+                for (SolicitudesCertificadoVotacion solicitud : solicitudes) {
+                    SolicitudCertificadoVotacionResponse solicitudResponse = convertirAResponse(solicitud);
+                    listaSolicitudes.add(solicitudResponse);
+                }
+                
+                return listaSolicitudes;
+                
+            } catch (Exception e) {
+            throw new Exception("Error al obtener las solicitudes de certificado de votación: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<EstadoEstudianteResponse> obtenerEstadoEstudiante() throws Exception{
+    List<EstadoEstudianteResponse> listaEstadoEstudiante = new ArrayList<>();
+        try {
+            // Obtener todas los estudiantes por su estado
+            List<Estudiante> estudiantes = estadoEstudianteRepository.findAllEstadoEstudiantesOrderByFechaModificacion();
+    
+                if (estudiantes.isEmpty()) {
+                    throw new Exception("No se encontraron estudiantes");
+                }
+    
+                // Convertir cada estudiante a su response correspondiente
+                for (Estudiante estudiante : estudiantes) {
+                    EstadoEstudianteResponse estudianteResponse = convertirAResponse(estudiante);
+                    listaEstadoEstudiante.add(estudianteResponse);
+                }
+                
+                return listaEstadoEstudiante;
+                
+            } catch (Exception e) {
+            throw new Exception("Error al obtener los estudianes por estado: " + e.getMessage());
+        }
+    }
+
+    //@Override
+    public List<SolicitudPorFechaDto> actualizarFechaSolicitud(SolicitudPorFechaDto datosFechaSolicitud) {   
+    List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
+    List<SolicitudPorFechaDto> solicitudFechas = new ArrayList<>();
+
+    for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
+        // Si el ID de la solicitud coincide con el DTO recibido, actualizamos las fechas
+            if (tipoSolicitud.getCodigo().equals(datosFechaSolicitud.getCodigo())) {
+                tipoSolicitud.setFechaInicio(datosFechaSolicitud.getFechaInicio());
+                tipoSolicitud.setFechaFinal(datosFechaSolicitud.getFechaFinal());
+                tipoSolicitudRepository.save(tipoSolicitud);
+            }
+
+            SolicitudPorFechaDto solicitudFecha = new SolicitudPorFechaDto();
+            solicitudFecha.setCodigo(tipoSolicitud.getCodigo());            
+            solicitudFecha.setFechaInicio(tipoSolicitud.getFechaInicio());   
+            solicitudFecha.setFechaFinal(tipoSolicitud.getFechaFinal());    
+            solicitudFechas.add(solicitudFecha);
+        }
+        System.out.println("Fechas actualizadas correctamente");
+        return solicitudFechas;
+    }
+
+    /* 
+    public List<SolicitudCertificadoVotacionResponse> actualizarEstadoSolicitud() throws Exception{
+    List<SolicitudCertificadoVotacionResponse> listaSolicitudes = new ArrayList<>();
+        try {
+            
+            List<Estudiantes> solicitudes = estadoEstudianteRepository.findAllEstadoEstudiantesOrderByFechaModificacion();
 
             if (solicitudes.isEmpty()) {
                 throw new Exception("No se encontraron solicitudes de certificado de votación");
             }
 
             // Convertir cada solicitud a su response correspondiente
-            for (SolicitudesCertificadoVotacion solicitud : solicitudes) {
-                SolicitudCertificadoVotacionResponse solicitudResponse = convertirAResponse(solicitud);
-                listaSolicitudes.add(solicitudResponse);
-            }
-            
-            return listaSolicitudes;
-            
-        } catch (Exception e) {
-            throw new Exception("Error al obtener las solicitudes de certificado de votación: " + e.getMessage());
-        }
-    }
-
-    //@Override
-    public List<SolicitudPorFechaDto> registrarFechaSolicitud(SolicitudPorFechaDto datosFechaSolicitud) {   
-    List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
-    List<SolicitudPorFechaDto> solicitudFechas = new ArrayList<>();
-
-    for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
-        // Si el ID de la solicitud coincide con el DTO recibido, actualizamos las fechas
-        if (tipoSolicitud.getCodigo().equals(datosFechaSolicitud.getCodigo())) {
-            tipoSolicitud.setFechaInicio(datosFechaSolicitud.getFechaInicio());
-            tipoSolicitud.setFechaFinal(datosFechaSolicitud.getFechaFinal());
-            tipoSolicitudRepository.save(tipoSolicitud);
-        }
-
-        SolicitudPorFechaDto solicitudFecha = new SolicitudPorFechaDto();
-        solicitudFecha.setCodigo(tipoSolicitud.getCodigo());            
-        solicitudFecha.setFechaInicio(tipoSolicitud.getFechaInicio());   
-        solicitudFecha.setFechaFinal(tipoSolicitud.getFechaFinal());    
-        solicitudFechas.add(solicitudFecha);
-    }
-    System.out.println("Fechas actualizadas correctamente");
-    return solicitudFechas;
-}
-
-
-    public List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception{
-    List<EstudiantesResponse> listaEstudiantes = new ArrayList<>();
-        try {
-            // Obtener todas las solicitudes de certificado de votación
-            List<Estudiantes> estudiantes = estudiantesPeriodoIngresoRepository.findAllEstudiantesPeriodoIngresoOrderByFechaModificacion();
-
-            if (estudiantes.isEmpty()) {
-                throw new Exception("No se encontraron solicitudes de certificado de votación");
-            }
-
-            // Convertir cada solicitud a su response correspondiente
             for (Estudiantes estudiante : estudiantes) {
-                EstudiantesResponse estudianteResponse = convertirAResponse(estudiante);
+                EstadoEstudianteResponse estudianteResponse = convertirAResponse(estudiante);
                 listaEstudiantes.add(estudianteResponse);
             }
             
@@ -116,7 +140,7 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
             throw new Exception("Error al obtener las solicitudes de certificado de votación: " + e.getMessage());
         }
     }
-
+*/
     @Override
     public byte[] obtenerDocumentosZipFiltrados(String period, List<Integer> certificateIds) throws Exception {
         List<DocumentosCertificadoVotacion> documentos;
@@ -193,22 +217,22 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
             }
         }
     }   
-
+    
     private SolicitudCertificadoVotacionResponse convertirAResponse(SolicitudesCertificadoVotacion solicitud) {
         SolicitudCertificadoVotacionResponse response = new SolicitudCertificadoVotacionResponse();
         response.setId(solicitud.getId());
         response.setId_Estudiante(solicitud.getIdEstudiante());
-        response.setEstado(solicitud.getEstado());
+        response.setEstado(solicitud.getEstado_solicitud());
         response.setFecha_creacion(solicitud.getFechaCreacion());
         response.setFecha_modificacion(solicitud.getFechaModificacion());
         response.setId_tipo_solicitud(solicitud.getIdTipoSolicitud());
         return response;
     }
 
-    private EstudiantesResponse convertirAResponse(Estudiantes estudiante){
-        EstudiantesResponse response = new EstudiantesResponse();
+    private EstadoEstudianteResponse convertirAResponse(Estudiante estudiante){
+        EstadoEstudianteResponse response = new EstadoEstudianteResponse();
         response.setId(estudiante.getId());
-        response.setFecha_ingreso(estudiante.getPeriodo_ingreso());
+        response.setEstado_maestria(estudiante.getEstado_maestria());
         return response;
     }
 

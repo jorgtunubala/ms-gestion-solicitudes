@@ -18,4 +18,5 @@ public interface SolicitudesCertificadoVotacionRepository extends JpaRepository<
         """, nativeQuery = true )
     List<SolicitudesCertificadoVotacion> findAllSolicitudesOrderByFechaModificacion();
 
+
 }

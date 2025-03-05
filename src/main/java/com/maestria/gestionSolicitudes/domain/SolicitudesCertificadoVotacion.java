@@ -24,7 +24,7 @@ public class SolicitudesCertificadoVotacion {
     private Integer idEstudiante;
 
     @Column(name = "estado")
-    private String estado;
+    private String estado_solicitud;
 
     @Column(name = "fecha_creacion")
     private Timestamp fechaCreacion;

@@ -38,13 +38,7 @@ public class GestionSolicitudesController {
     @Autowired
     private GestionSolicitudesEnConcejoService gestionSolicitudesEnConcejoService;
     @Autowired
-    private GestionSolicitudesCertificadoVotacionService gestionDocumentosCertificadoVotacionService;
-    @Autowired
     private GestionSolicitudesCertificadoVotacionService gestionSolicitudesCertificadoVotacionService;
-    @Autowired
-    private GestionSolicitudesCertificadoVotacionService gestionEstudiantesPeriodoIngresoService;
-    @Autowired
-    private GestionSolicitudesCertificadoVotacionService gestionEstudiantesPeriodoIngresoServices;
     @Autowired
     private MensajeriaService mensajeriaService;
 
@@ -100,11 +94,6 @@ public class GestionSolicitudesController {
     public String registrarSolicitud(@RequestBody SolicitudRequestDto datosSolicitud) throws Exception {
         return gestionSolicitudesService.registrarSolicitud(datosSolicitud);
     }
-    
-    @PutMapping("update/fechas")
-    public List<SolicitudPorFechaDto> registrarFechaSolicitud(@RequestBody SolicitudPorFechaDto datosFechaSolicitud) throws Exception {
-        return gestionSolicitudesCertificadoVotacionService.registrarFechaSolicitud(datosFechaSolicitud);
-    }
 
     @GetMapping("/fechaActual")
     public FechaActualResponse getCurrentDate() {
@@ -156,6 +145,11 @@ public class GestionSolicitudesController {
         return gestionSolicitudesCertificadoVotacionService.obtenerSolicitudesCertificadoVotacion();
     }
 
+    @GetMapping("/obtener-estado-estudiantes")
+    public List<EstadoEstudianteResponse> obtenerEstadoEstudiante() throws Exception {
+        return gestionSolicitudesCertificadoVotacionService.obtenerEstadoEstudiante();
+    }
+
     @PostMapping("/documentos-certificado-votacion/zip")
     public ResponseEntity<byte[]> generarZipDocumentos(@RequestBody Map<String, Object> filtros) {
         System.out.println("Recibiendo petición con filtros: " + filtros);
@@ -175,10 +169,15 @@ public class GestionSolicitudesController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping("/obtener-estudiantes-periodo-ingreso")
-    public List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception {
-        return gestionEstudiantesPeriodoIngresoService.obtenerEstudiantesPeriodoIngreso();
+    /* 
+    @PutMapping("/actualizar-estado-solicitud")
+    public List<SolicitudCertificadoVotacionResponse> obtenerEstadoEstudiantes() throws Exception {
+        return gestionSolicitudesCertificadoVotacionService.obtenerEstadoEstudiantes();
+    }
+*/
+    @PutMapping("update/fechas")
+    public List<SolicitudPorFechaDto> actualizarFechaSolicitud(@RequestBody SolicitudPorFechaDto datosFechaSolicitud) throws Exception {
+        return gestionSolicitudesCertificadoVotacionService.actualizarFechaSolicitud(datosFechaSolicitud);
     }
 
     @GetMapping("/obtener-solicitudes-en-concejo/{idSolicitud}")

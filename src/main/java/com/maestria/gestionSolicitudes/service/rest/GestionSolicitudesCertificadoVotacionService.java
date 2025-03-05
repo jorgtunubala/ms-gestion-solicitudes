@@ -4,13 +4,14 @@ import java.util.List;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudPorFechaDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoCertificadoVotacionResponse;
-import com.maestria.gestionSolicitudes.dto.rest.response.EstudiantesResponse;
+import com.maestria.gestionSolicitudes.dto.rest.response.EstadoEstudianteResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.FechaActualResponse;
 
 public interface GestionSolicitudesCertificadoVotacionService {
     List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception;
-    List<EstudiantesResponse> obtenerEstudiantesPeriodoIngreso() throws Exception;
+    List<EstadoEstudianteResponse> obtenerEstadoEstudiante() throws Exception;
+    //List<SolicitudCertificadoVotacionResponse> actualizarEstadoSolicitud() throws Exception;
     byte[] obtenerDocumentosZipFiltrados(String period, List<Integer> certificateIds) throws Exception;
-    List<SolicitudPorFechaDto> registrarFechaSolicitud(SolicitudPorFechaDto datosFechaSolicitud);
+    List<SolicitudPorFechaDto> actualizarFechaSolicitud(SolicitudPorFechaDto datosFechaSolicitud);
 
 }

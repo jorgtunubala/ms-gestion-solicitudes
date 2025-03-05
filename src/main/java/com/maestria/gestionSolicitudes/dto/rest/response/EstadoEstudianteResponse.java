@@ -3,7 +3,7 @@ package com.maestria.gestionSolicitudes.dto.rest.response;
 import lombok.Data;
 
 @Data
-public class EstudiantesResponse {
+public class EstadoEstudianteResponse {
     private Integer id;
-    private String fecha_ingreso;
+    private String estado_maestria;
 }

@@ -12,13 +12,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Estudiantes {
+public class Estudiante {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
     @Lob
-    @Column(name = "periodo_ingreso")
-    private String periodo_ingreso;
+    @Column(name = "estado_maestria")
+    private String estado_maestria;
 }
