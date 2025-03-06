@@ -169,14 +169,14 @@ public class GestionSolicitudesController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    /* 
-    @PutMapping("/actualizar-estado-solicitud")
-    public List<SolicitudCertificadoVotacionResponse> obtenerEstadoEstudiantes() throws Exception {
-        return gestionSolicitudesCertificadoVotacionService.obtenerEstadoEstudiantes();
+    
+    @PutMapping("/actualizar-estado-solicitud-cervoto")
+    public List<EstadoSolicitudRequest> obtenerEstadoEstudiantes(@RequestBody EstadoSolicitudRequest estadoSolicitud) throws Exception {
+        return gestionSolicitudesCertificadoVotacionService.actualizarEstadoSolicitud(estadoSolicitud);
     }
-*/
+
     @PutMapping("update/fechas")
-    public List<SolicitudPorFechaDto> actualizarFechaSolicitud(@RequestBody SolicitudPorFechaDto datosFechaSolicitud) throws Exception {
+    public List<SolicitudPorFechaRequest> actualizarFechaSolicitud(@RequestBody SolicitudPorFechaRequest datosFechaSolicitud) throws Exception {
         return gestionSolicitudesCertificadoVotacionService.actualizarFechaSolicitud(datosFechaSolicitud);
     }
 

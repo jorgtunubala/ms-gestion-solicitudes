@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class EstadoSolicitudRequest {
-    private String radicado;
+    private String codigo;
+    private String estado;
 }

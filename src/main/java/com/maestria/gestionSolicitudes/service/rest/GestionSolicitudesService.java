@@ -6,7 +6,7 @@ import com.maestria.gestionSolicitudes.domain.Solicitudes;
 import com.maestria.gestionSolicitudes.dto.client.InformacionPersonalDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.DatosAvalarSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.RechazarSolicitudRequest;
-import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudPorFechaDto;
+import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudPorFechaRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudRequestDto;
 import com.maestria.gestionSolicitudes.dto.rest.request.TipoSolicitudDto;
 import com.maestria.gestionSolicitudes.dto.rest.response.*;

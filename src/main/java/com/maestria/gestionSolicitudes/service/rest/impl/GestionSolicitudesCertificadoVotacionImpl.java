@@ -20,7 +20,8 @@ import com.maestria.gestionSolicitudes.domain.Estudiante;
 import com.maestria.gestionSolicitudes.domain.DocumentosCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.SolicitudesCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
-import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudPorFechaDto;
+import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudPorFechaRequest;
+import com.maestria.gestionSolicitudes.dto.rest.request.EstadoSolicitudRequest;
 import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.EstadoEstudianteResponse;
@@ -95,19 +96,18 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     }
 
     //@Override
-    public List<SolicitudPorFechaDto> actualizarFechaSolicitud(SolicitudPorFechaDto datosFechaSolicitud) {   
-    List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
-    List<SolicitudPorFechaDto> solicitudFechas = new ArrayList<>();
+    public List<SolicitudPorFechaRequest> actualizarFechaSolicitud(SolicitudPorFechaRequest datosFechaSolicitud) {   
+        List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
+        List<SolicitudPorFechaRequest> solicitudFechas = new ArrayList<>();
 
-    for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
-        // Si el ID de la solicitud coincide con el DTO recibido, actualizamos las fechas
+        for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
+            // Si el ID de la solicitud coincide con el DTO recibido, actualizamos las fechas
             if (tipoSolicitud.getCodigo().equals(datosFechaSolicitud.getCodigo())) {
                 tipoSolicitud.setFechaInicio(datosFechaSolicitud.getFechaInicio());
                 tipoSolicitud.setFechaFinal(datosFechaSolicitud.getFechaFinal());
                 tipoSolicitudRepository.save(tipoSolicitud);
             }
-
-            SolicitudPorFechaDto solicitudFecha = new SolicitudPorFechaDto();
+            SolicitudPorFechaRequest solicitudFecha = new SolicitudPorFechaRequest();
             solicitudFecha.setCodigo(tipoSolicitud.getCodigo());            
             solicitudFecha.setFechaInicio(tipoSolicitud.getFechaInicio());   
             solicitudFecha.setFechaFinal(tipoSolicitud.getFechaFinal());    
@@ -117,30 +117,28 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         return solicitudFechas;
     }
 
-    /* 
-    public List<SolicitudCertificadoVotacionResponse> actualizarEstadoSolicitud() throws Exception{
-    List<SolicitudCertificadoVotacionResponse> listaSolicitudes = new ArrayList<>();
-        try {
-            
-            List<Estudiantes> solicitudes = estadoEstudianteRepository.findAllEstadoEstudiantesOrderByFechaModificacion();
+    
+    public List<EstadoSolicitudRequest> actualizarEstadoSolicitud(EstadoSolicitudRequest estadoSolicitud) throws Exception{
+        List<SolicitudesCertificadoVotacion> solicitudes = solicitudesCertificadoVotacionRepository.findAllSolicitudesOrderByFechaModificacion();
+        List<EstadoSolicitudRequest> listaEstudiantes = new ArrayList<>();
 
-            if (solicitudes.isEmpty()) {
-                throw new Exception("No se encontraron solicitudes de certificado de votación");
-            }
+        for (SolicitudesCertificadoVotacion solicitud : solicitudes) {
+            // Si el ID de la solicitud coincide con el DTO recibido, actualizamos las fechas
+                if (solicitud.getIdTipoSolicitud().equals(estadoSolicitud.getCodigo())) {
+                    solicitud.setEstado_solicitud(estadoSolicitud.getEstado());
+                    solicitudesCertificadoVotacionRepository.save(solicitud);
+                }
 
-            // Convertir cada solicitud a su response correspondiente
-            for (Estudiantes estudiante : estudiantes) {
-                EstadoEstudianteResponse estudianteResponse = convertirAResponse(estudiante);
-                listaEstudiantes.add(estudianteResponse);
+                EstadoSolicitudRequest estadoSolicitudes = new EstadoSolicitudRequest();
+                estadoSolicitudes.setCodigo(solicitud.getIdTipoSolicitud());            
+                estadoSolicitudes.setEstado(solicitud.getEstado_solicitud());
+  
+                listaEstudiantes.add(estadoSolicitudes);
             }
-            
+            System.out.println("Fechas actualizadas correctamente");
             return listaEstudiantes;
-            
-        } catch (Exception e) {
-            throw new Exception("Error al obtener las solicitudes de certificado de votación: " + e.getMessage());
-        }
     }
-*/
+
     @Override
     public byte[] obtenerDocumentosZipFiltrados(String period, List<Integer> certificateIds) throws Exception {
         List<DocumentosCertificadoVotacion> documentos;
