@@ -6,4 +6,5 @@ import lombok.Data;
 public class DocumentoCertificadoVotacionResponse {
     private Integer id;
     private byte[] documentoPDF;
+    
 }

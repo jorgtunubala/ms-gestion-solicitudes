@@ -23,4 +23,5 @@ public class DocumentosCertificadoVotacion {
     @Column(name = "documento_firmado")
     private byte[] documentoPDF;
      
+    
 }

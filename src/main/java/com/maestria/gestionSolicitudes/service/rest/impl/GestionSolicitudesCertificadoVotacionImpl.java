@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -16,7 +17,7 @@ import java.util.zip.ZipOutputStream;
 import java.util.Base64;
 import java.util.Map;
 
-import com.maestria.gestionSolicitudes.domain.Estudiante;
+import com.maestria.gestionSolicitudes.domain.EstadoEstudiante;
 import com.maestria.gestionSolicitudes.domain.DocumentosCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.SolicitudesCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
@@ -76,14 +77,14 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     List<EstadoEstudianteResponse> listaEstadoEstudiante = new ArrayList<>();
         try {
             // Obtener todas los estudiantes por su estado
-            List<Estudiante> estudiantes = estadoEstudianteRepository.findAllEstadoEstudiantesOrderByFechaModificacion();
+            List<EstadoEstudiante> estudiantes = estadoEstudianteRepository.findAllEstadoEstudiantesOrderByFechaModificacion();
     
                 if (estudiantes.isEmpty()) {
                     throw new Exception("No se encontraron estudiantes");
                 }
     
                 // Convertir cada estudiante a su response correspondiente
-                for (Estudiante estudiante : estudiantes) {
+                for (EstadoEstudiante estudiante : estudiantes) {
                     EstadoEstudianteResponse estudianteResponse = convertirAResponse(estudiante);
                     listaEstadoEstudiante.add(estudianteResponse);
                 }
@@ -132,32 +133,34 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
                 EstadoSolicitudRequest estadoSolicitudes = new EstadoSolicitudRequest();
                 estadoSolicitudes.setCodigo(solicitud.getIdTipoSolicitud());            
                 estadoSolicitudes.setEstado(solicitud.getEstado_solicitud());
+                //solicitud.setFechaModificacion(LocalDateTime.now());
   
                 listaEstudiantes.add(estadoSolicitudes);
             }
-            System.out.println("Fechas actualizadas correctamente");
-            return listaEstudiantes;
+        System.out.println("estado actualizado");
+        return listaEstudiantes;
     }
 
     @Override
-    public byte[] obtenerDocumentosZipFiltrados(String period, List<Integer> certificateIds) throws Exception {
-        List<DocumentosCertificadoVotacion> documentos;
+    public byte[] obtenerDocumentosZipFiltrados(String estado_solicitud, String estado_estudiante) throws Exception {
     
-        // Obtener documentos según los filtros
-        if (period != null && certificateIds != null && !certificateIds.isEmpty()) {
-            documentos = documentoCertificadoVotacionRepository.findByPeriodAndIds(period, certificateIds);
-        } else if (period != null) {
-            documentos = documentoCertificadoVotacionRepository.findByPeriod(period);
-        } else if (certificateIds != null && !certificateIds.isEmpty()) {
-            documentos = documentoCertificadoVotacionRepository.findByIds(certificateIds);
-        } else {
-            documentos = documentoCertificadoVotacionRepository.findAllDocmentosSolicitudesCer_votOrderByFechaModificacion();
+        // Verificar que los estados sean los permitidos
+        if (!"Aprobada".equals(estado_solicitud)) {
+            throw new Exception("Solo se permiten solicitudes con estado 'Aprobada'");
         }
-    
+        
+        if (!"ACTIVO".equals(estado_estudiante)) {
+            throw new Exception("Solo se permiten estudiantes con estado 'ACTIVO'");
+        }
+
+        // Obtener documentos y estudiantes
+        List<DocumentosCertificadoVotacion> documentos = documentoCertificadoVotacionRepository.findAllDocumentosAprobadosDeEstudiantesActivos(estado_solicitud, estado_estudiante);
+
+        // Validar que existan documentos
         if (documentos.isEmpty()) {
             throw new Exception("No se encontraron documentos para procesar");
         }
-    
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(baos);
         
@@ -223,14 +226,15 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
         response.setEstado(solicitud.getEstado_solicitud());
         response.setFecha_creacion(solicitud.getFechaCreacion());
         response.setFecha_modificacion(solicitud.getFechaModificacion());
+        //response.setFecha_modificacion(solicitud.getFechaModificacion().toString());
         response.setId_tipo_solicitud(solicitud.getIdTipoSolicitud());
         return response;
     }
 
-    private EstadoEstudianteResponse convertirAResponse(Estudiante estudiante){
+    private EstadoEstudianteResponse convertirAResponse(EstadoEstudiante estudiante){
         EstadoEstudianteResponse response = new EstadoEstudianteResponse();
         response.setId(estudiante.getId());
-        response.setEstado_maestria(estudiante.getEstado_maestria());
+        response.setEstado_estudiante(estudiante.getEstado_maestria());
         return response;
     }
 

@@ -14,42 +14,14 @@ public interface DocumentoCertificadoVotacionRepository extends JpaRepository<Do
     @Query(value = """
         SELECT s.id, s.documento_firmado
         FROM solicitudes s 
-        WHERE s.estado = "Aprobada"
+        JOIN estudiantes e ON s.id_estudiante = e.id
+        WHERE s.estado = :estadoSolicitud
+        AND e.estado_maestria = :estadoEstudiante
         ORDER BY s.fecha_modificacion DESC
         """, nativeQuery = true)
-    List<DocumentosCertificadoVotacion> findAllDocmentosSolicitudesCer_votOrderByFechaModificacion();
+    List<DocumentosCertificadoVotacion> findAllDocumentosAprobadosDeEstudiantesActivos(
+        @Param("estadoSolicitud") String estadoSolicitud, 
+        @Param("estadoEstudiante") String estadoEstudiante);
 
-    @Query(value = """
-        SELECT s.id, s.documento_firmado
-        FROM solicitudes s 
-        INNER JOIN estudiantes e ON s.id_estudiante = e.id
-        WHERE s.estado = 'Aprobada'
-        AND e.periodo_ingreso = :period
-        AND s.id IN (:ids)
-        ORDER BY s.fecha_modificacion DESC
-        """, nativeQuery = true)
-    List<DocumentosCertificadoVotacion> findByPeriodAndIds(
-        @Param("period") String period, 
-        @Param("ids") List<Integer> ids
-    );
-
-    @Query(value = """
-        SELECT s.id, s.documento_firmado
-        FROM solicitudes s 
-        INNER JOIN estudiantes e ON s.id_estudiante = e.id
-        WHERE s.estado = 'Aprobada'
-        AND e.periodo_ingreso = :period
-        ORDER BY s.fecha_modificacion DESC
-        """, nativeQuery = true)
-    List<DocumentosCertificadoVotacion> findByPeriod(@Param("period") String period);
-
-    @Query(value = """
-        SELECT s.id, s.documento_firmado
-        FROM solicitudes s 
-        WHERE s.estado = 'Aprobada'
-        AND s.id IN (:ids)
-        ORDER BY s.fecha_modificacion DESC
-        """, nativeQuery = true)
-    List<DocumentosCertificadoVotacion> findByIds(@Param("ids") List<Integer> ids);
 }
 

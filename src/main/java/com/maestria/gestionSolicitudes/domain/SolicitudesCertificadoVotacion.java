@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SolicitudesCertificadoVotacion {
+public class SolicitudesCertificadoVotacion{
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,14 +25,13 @@ public class SolicitudesCertificadoVotacion {
 
     @Column(name = "estado")
     private String estado_solicitud;
-
-    @Column(name = "fecha_creacion")
-    private Timestamp fechaCreacion;
-
-    @Column(name = "fecha_modificacion")
-    private Timestamp fechaModificacion;
     
     @Column(name = "id_tipo_solicitud")
     private String idTipoSolicitud;
 
+    @Column(name = "fecha_creacion")
+    private String fechaCreacion;
+
+    @Column(name = "fecha_modificacion")
+    private String fechaModificacion;
 }

@@ -149,15 +149,15 @@ public class GestionSolicitudesController {
     public List<EstadoEstudianteResponse> obtenerEstadoEstudiante() throws Exception {
         return gestionSolicitudesCertificadoVotacionService.obtenerEstadoEstudiante();
     }
-
+     
     @PostMapping("/documentos-certificado-votacion/zip")
-    public ResponseEntity<byte[]> generarZipDocumentos(@RequestBody Map<String, Object> filtros) {
-        System.out.println("Recibiendo petición con filtros: " + filtros);
+    public ResponseEntity<byte[]> generarZipDocumentos(@RequestBody FiltrosCertificadoVotacionRequest filtros) {
+   
         try {
-            String period = (String) filtros.get("period");
-            List<Integer> certificateIds = (List<Integer>) filtros.get("certificateIds");
-
-            byte[] zipFile = gestionSolicitudesCertificadoVotacionService.obtenerDocumentosZipFiltrados(period, certificateIds);
+            String estado_solicitud = (String) filtros.getEstado_solicitud();
+            String estado_estudiante = (String) filtros.getEstado_estudiante();
+            
+            byte[] zipFile = gestionSolicitudesCertificadoVotacionService.obtenerDocumentosZipFiltrados(estado_solicitud, estado_estudiante);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -165,9 +165,9 @@ public class GestionSolicitudesController {
             
             return new ResponseEntity<>(zipFile, headers, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); 
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        } 
     }
     
     @PutMapping("/actualizar-estado-solicitud-cervoto")
