@@ -133,7 +133,7 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
                 EstadoSolicitudRequest estadoSolicitudes = new EstadoSolicitudRequest();
                 estadoSolicitudes.setCodigo(solicitud.getIdTipoSolicitud());            
                 estadoSolicitudes.setEstado(solicitud.getEstado_solicitud());
-                //solicitud.setFechaModificacion(LocalDateTime.now());
+                solicitud.setFechaModificacion(LocalDateTime.now());
   
                 listaEstudiantes.add(estadoSolicitudes);
             }

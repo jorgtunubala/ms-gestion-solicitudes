@@ -2,11 +2,15 @@ package com.maestria.gestionSolicitudes.domain;
 
 import java.sql.Date;
 import javax.persistence.*;
+
+import org.springframework.data.annotation.LastModifiedDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "solicitudes")
@@ -14,7 +18,7 @@ import java.sql.Timestamp;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SolicitudesCertificadoVotacion{
+public class SolicitudesCertificadoVotacion {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +31,17 @@ public class SolicitudesCertificadoVotacion{
     private String estado_solicitud;
     
     @Column(name = "id_tipo_solicitud")
-    private String idTipoSolicitud;
+    private Integer idTipoSolicitud;
 
     @Column(name = "fecha_creacion")
     private String fechaCreacion;
 
+    @LastModifiedDate
     @Column(name = "fecha_modificacion")
-    private String fechaModificacion;
+    private LocalDateTime fechaModificacion;
+
+    @PrePersist
+    public void prePersist() {
+        fechaModificacion = LocalDateTime.now();
+    }
 }
