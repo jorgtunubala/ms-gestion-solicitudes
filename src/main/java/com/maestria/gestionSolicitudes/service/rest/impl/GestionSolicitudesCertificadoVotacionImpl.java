@@ -23,7 +23,6 @@ import com.maestria.gestionSolicitudes.domain.SolicitudesCertificadoVotacion;
 import com.maestria.gestionSolicitudes.domain.TiposSolicitud;
 import com.maestria.gestionSolicitudes.dto.rest.request.SolicitudPorFechaRequest;
 import com.maestria.gestionSolicitudes.dto.rest.request.EstadoSolicitudRequest;
-import com.maestria.gestionSolicitudes.dto.rest.response.DocumentoCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.SolicitudCertificadoVotacionResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.EstadoEstudianteResponse;
 import com.maestria.gestionSolicitudes.dto.rest.response.FechaActualResponse;
@@ -97,7 +96,7 @@ public class GestionSolicitudesCertificadoVotacionImpl implements GestionSolicit
     }
 
     //@Override
-    public List<SolicitudPorFechaRequest> actualizarFechaSolicitud(SolicitudPorFechaRequest datosFechaSolicitud) {   
+    public List<SolicitudPorFechaRequest> habilitarSolicitudPorFecha(SolicitudPorFechaRequest datosFechaSolicitud) {   
         List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
         List<SolicitudPorFechaRequest> solicitudFechas = new ArrayList<>();
 

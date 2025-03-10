@@ -177,7 +177,7 @@ public class GestionSolicitudesController {
 
     @PutMapping("update/fechas")
     public List<SolicitudPorFechaRequest> actualizarFechaSolicitud(@RequestBody SolicitudPorFechaRequest datosFechaSolicitud) throws Exception {
-        return gestionSolicitudesCertificadoVotacionService.actualizarFechaSolicitud(datosFechaSolicitud);
+        return gestionSolicitudesCertificadoVotacionService.habilitarSolicitudPorFecha(datosFechaSolicitud);
     }
 
     @GetMapping("/obtener-solicitudes-en-concejo/{idSolicitud}")

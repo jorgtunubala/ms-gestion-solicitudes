@@ -13,6 +13,6 @@ public interface GestionSolicitudesCertificadoVotacionService {
     List<EstadoEstudianteResponse> obtenerEstadoEstudiante() throws Exception;
     List<EstadoSolicitudRequest> actualizarEstadoSolicitud(EstadoSolicitudRequest estadoSolicitud) throws Exception;
     byte[] obtenerDocumentosZipFiltrados(String estado_solicitud, String estado_estudiante) throws Exception;
-    List<SolicitudPorFechaRequest> actualizarFechaSolicitud(SolicitudPorFechaRequest datosFechaSolicitud);
+    List<SolicitudPorFechaRequest> habilitarSolicitudPorFecha(SolicitudPorFechaRequest datosFechaSolicitud);
 
 }
