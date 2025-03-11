@@ -144,12 +144,7 @@ public class GestionSolicitudesController {
     public List<SolicitudCertificadoVotacionResponse> obtenerSolicitudesCertificadoVotacion() throws Exception {
         return gestionSolicitudesCertificadoVotacionService.obtenerSolicitudesCertificadoVotacion();
     }
-
-    @GetMapping("/obtener-estado-estudiantes")
-    public List<EstadoEstudianteResponse> obtenerEstadoEstudiante() throws Exception {
-        return gestionSolicitudesCertificadoVotacionService.obtenerEstadoEstudiante();
-    }
-     
+   
     @PostMapping("/documentos-certificado-votacion/zip")
     public ResponseEntity<byte[]> generarZipDocumentos(@RequestBody FiltrosCertificadoVotacionRequest filtros) {
    
