@@ -141,8 +141,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     private final ApoyoEconomicoCongresoMapper apoyoEconomicoCongresoMapper;
     private final ApoyoEconomicoPublicacionEventoMapper apoyoEconomicoPublicacionEventoMapper;
 
-    public GestionSolicitudesServiceImpl(ApoyoEconomicoMapper apoyoEconomicoMapper, AvalPasantiaInvMapper avalPasantiaInvMapper, 
-                ApoyoEconomicoCongresoMapper apoyoEconomicoCongresoMapper, ApoyoEconomicoPublicacionEventoMapper apoyoEconomicoPublicacionEventoMapper) {
+    public GestionSolicitudesServiceImpl(ApoyoEconomicoMapper apoyoEconomicoMapper,
+            AvalPasantiaInvMapper avalPasantiaInvMapper,
+            ApoyoEconomicoCongresoMapper apoyoEconomicoCongresoMapper,
+            ApoyoEconomicoPublicacionEventoMapper apoyoEconomicoPublicacionEventoMapper) {
         this.apoyoEconomicoMapper = apoyoEconomicoMapper;
         this.avalPasantiaInvMapper = avalPasantiaInvMapper;
         this.apoyoEconomicoCongresoMapper = apoyoEconomicoCongresoMapper;
@@ -155,69 +157,76 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     public List<TipoSolicitudDto> obtenerTiposSolicitudes() {
         /*
          * Función que se encarga de retornar los tipos de solcitudes activas.
-        */
-        
-        // Buscamos en la tabla tipos_solicitudes y retornamos los tipos de solicitudes en esatado ACTIVO
+         */
+
+        // Buscamos en la tabla tipos_solicitudes y retornamos los tipos de solicitudes
+        // en esatado ACTIVO
         List<TiposSolicitud> tiposSolicitudes = tipoSolicitudRepository.findByEstadoOrderByNombreAsc("ACTIVO");
         List<TipoSolicitudDto> tiposSolicitudDtos = new ArrayList<>();
         for (TiposSolicitud tipoSolicitud : tiposSolicitudes) {
             TipoSolicitudDto tiposSolicitudDto = new TipoSolicitudDto();
             tiposSolicitudDto.setIdSolicitud(tipoSolicitud.getId());
-            tiposSolicitudDto.setCodigoSolicitud(tipoSolicitud.getCodigo());  
+            tiposSolicitudDto.setCodigoSolicitud(tipoSolicitud.getCodigo());
             tiposSolicitudDto.setFechaInicio(tipoSolicitud.getFechaInicio());
-            tiposSolicitudDto.setFechaFinal(tipoSolicitud.getFechaFinal());          
+            tiposSolicitudDto.setFechaFinal(tipoSolicitud.getFechaFinal());
             if (tipoSolicitud.getCodigo().equals("SO_OTRA")) {
                 tiposSolicitudDto.setNombreSolicitud("Otra");
             } else {
                 tiposSolicitudDto.setNombreSolicitud(tipoSolicitud.getNombre());
-            }            
+            }
             tiposSolicitudDtos.add(tiposSolicitudDto);
         }
         return tiposSolicitudDtos;
     }
-    
+
     @Override
-    public DocumentoRequeridoSolicitudDto getRequisitoSolicitudAndDocumentosAndNotasPorSolicitudId(String codigo) throws Exception {
-        /* 
-         * Función que se encarga de retornar toda la información de los requisitos 
+    public DocumentoRequeridoSolicitudDto getRequisitoSolicitudAndDocumentosAndNotasPorSolicitudId(String codigo)
+            throws Exception {
+        /*
+         * Función que se encarga de retornar toda la información de los requisitos
          * requeridos por cada solicitud.
-        */
-        
+         */
+
         // Buscamos los requisitos requeridos asociados a la solicitud.
         Optional<RequisitoSolicitud> optionalRequisitoSolicitud = requisitoSolicitudRepository.findByCodigo(codigo);
         DocumentoRequeridoSolicitudDto dSolicitudDto = new DocumentoRequeridoSolicitudDto();
-        if (optionalRequisitoSolicitud.isPresent()){
+        if (optionalRequisitoSolicitud.isPresent()) {
             RequisitoSolicitud requisitoSolicitud = optionalRequisitoSolicitud.get();
             dSolicitudDto.setTituloDocumento(requisitoSolicitud.getTituloDocumento());
             dSolicitudDto.setDescripcion(requisitoSolicitud.getDescripcion());
             dSolicitudDto.setTenerEnCuenta(requisitoSolicitud.getTenerEnCuenta());
             dSolicitudDto.setArticulo(requisitoSolicitud.getArticulo());
             // Anexamos los documentos requeridos de la solicitud
-            List<DocumentoRequisitoSolicitud> lRequisitoSolicituds = dSolicitudRepository.findByRequisitoSolicitudId(requisitoSolicitud.getId());
+            List<DocumentoRequisitoSolicitud> lRequisitoSolicituds = dSolicitudRepository
+                    .findByRequisitoSolicitudId(requisitoSolicitud.getId());
             List<DocumentoRequerido> lDocumentos = new ArrayList<>();
             List<String> lEnlaces = new ArrayList<>();
             for (DocumentoRequisitoSolicitud documentoRequisitoSolicitud : lRequisitoSolicituds) {
                 DocumentoRequerido doc = new DocumentoRequerido();
-                if (!documentoRequisitoSolicitud.getEnlace()){ // Si no es un documento de agregar enlace se envia como documento
+                if (!documentoRequisitoSolicitud.getEnlace()) { // Si no es un documento de agregar enlace se envia como
+                                                                // documento
                     doc.setNombre(documentoRequisitoSolicitud.getNombreDocumento());
                     doc.setAdjuntarDocumento(documentoRequisitoSolicitud.getAdjuntarDocumento());
                     doc.setNombreAcortado(documentoRequisitoSolicitud.getAbreviaturaDocumento());
                     lDocumentos.add(doc);
                 } else {
-                    lEnlaces.add(documentoRequisitoSolicitud.getNombreDocumento()); // se envia en formato para agregar enlaces
+                    lEnlaces.add(documentoRequisitoSolicitud.getNombreDocumento()); // se envia en formato para agregar
+                                                                                    // enlaces
                 }
             }
             dSolicitudDto.setDocumentosRequeridos(lDocumentos);
             dSolicitudDto.setEnlacesRequeridos(lEnlaces);
             // Buscamos Notas que pueden estar asociadas a la solicitud.
-            List<NotaDocumentoRequerido> lNotaDocumentoRequeridos = notaDocumentoRequeridoRepository.findByRequisitoSolicitudId(requisitoSolicitud.getTipoSolicitud().getId());
+            List<NotaDocumentoRequerido> lNotaDocumentoRequeridos = notaDocumentoRequeridoRepository
+                    .findByRequisitoSolicitudId(requisitoSolicitud.getTipoSolicitud().getId());
             List<String> notas = new ArrayList<>();
             for (NotaDocumentoRequerido notaDocumentoRequerido : lNotaDocumentoRequeridos) {
                 notas.add(notaDocumentoRequerido.getNota());
             }
             dSolicitudDto.setNotas(notas);
             TiposSolicitud tiposSolicitud = tipoSolicitudRepository.findByCodigo(codigo);
-            List<EnlaceTipoSolicitud> enlaces = enlaceTipoSolicitudRepository.findByTiposSolicitud(tiposSolicitud.getId());
+            List<EnlaceTipoSolicitud> enlaces = enlaceTipoSolicitudRepository
+                    .findByTiposSolicitud(tiposSolicitud.getId());
             List<EnlacesTiposSolicitud> listaEnlaces = new ArrayList<>();
             for (EnlaceTipoSolicitud enlace : enlaces) {
                 EnlacesTiposSolicitud enlacesTiposSolicitud = new EnlacesTiposSolicitud();
@@ -229,7 +238,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             return dSolicitudDto;
         } else {
             return null;
-        }        
+        }
     }
 
     @Override
@@ -237,27 +246,30 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         /*
          * Función que se encarga de retornar la información personal de un Estudiante
          * a partir de su correo.
-         * La función consume el servicio suministrado por el microservicio ms-gestion-docentes-estudiantes
-        */
+         * La función consume el servicio suministrado por el microservicio
+         * ms-gestion-docentes-estudiantes
+         */
         return gestionDocentesEstudiantesService.obtenerInformacionEstudiante(correo);
     }
 
     @Override
     public List<TutorDto> obtenerTutotes() throws Exception {
         /*
-         * Función que se encarga de retornar la información personal de los docentes activos.         
-         * La función consume el servicio suministrado por el microservicio ms-gestion-docentes-estudiantes
-        */
+         * Función que se encarga de retornar la información personal de los docentes
+         * activos.
+         * La función consume el servicio suministrado por el microservicio
+         * ms-gestion-docentes-estudiantes
+         */
         List<TutorDto> tutorDtos = gestionDocentesEstudiantesService.obtenerDocentesActivos("ACTIVO")
-        .stream()
-        .map(docente -> {
-            TutorDto tutorDto = new TutorDto();
-            tutorDto.setId(docente.getId());
-            tutorDto.setCodigoTutor(docente.getCodigoAcademico());
-            tutorDto.setNombreTutor(docente.obtenerNombreCompleto());
-            return tutorDto;
-        })
-        .collect(Collectors.toList());
+                .stream()
+                .map(docente -> {
+                    TutorDto tutorDto = new TutorDto();
+                    tutorDto.setId(docente.getId());
+                    tutorDto.setCodigoTutor(docente.getCodigoAcademico());
+                    tutorDto.setNombreTutor(docente.obtenerNombreCompleto());
+                    return tutorDto;
+                })
+                .collect(Collectors.toList());
         return tutorDtos;
     }
 
@@ -265,8 +277,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     @Transactional
     public String registrarSolicitud(SolicitudRequestDto datosSolicitud) throws Exception {
         /*
-         * Función que se encarga de registrar toda la información de cada solicitud de cualquier tipo.
-        */
+         * Función que se encarga de registrar toda la información de cada solicitud de
+         * cualquier tipo.
+         */
         Boolean registro = Boolean.FALSE;
         String radicado;
         Solicitudes registroSolicitud = new Solicitudes();
@@ -275,23 +288,24 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             logger.info("Inicia proceso registrar solicitud...");
             // Buscamos el tipo de solicitud a asociar en el regsitro de la solicitud.
             tipoSolicitud = tipoSolicitudRepository
-                .findById(datosSolicitud.getIdTipoSolicitud()).get();    
+                    .findById(datosSolicitud.getIdTipoSolicitud()).get();
             Solicitudes solicitud = new Solicitudes();
             // Asignamos los datos necesarios de la solicitud.
             solicitud.setIdEstudiante(datosSolicitud.getIdEstudiante());
             solicitud.setTipoSolicitud(tipoSolicitud);
-            solicitud.setIdTutor(datosSolicitud.getIdTutor());             
-            //condicion para registrar solicitud por rango fecha
-            
-            //condicion para certificado de votacion (AVALADA)
-            if (tipoSolicitud.getCodigo().equals("CER_VOTO")) { 
+            solicitud.setIdTutor(datosSolicitud.getIdTutor());
+            // condicion para registrar solicitud por rango fecha
+
+            // condicion para certificado de votacion (AVALADA)
+            if (tipoSolicitud.getCodigo().equals("CER_VOTO")) {
                 FechaActualResponse fechaActual = obtenerFechaActual();
                 String fechaInicio = tipoSolicitud.getFechaInicio();
                 String fechaFinal = tipoSolicitud.getFechaFinal();
 
                 // Crear la fecha actual en formato comparable (yyyy-MM-dd)
-                String fechaActualStr = fechaActual.getYear() + "-" + 
-                        (fechaActual.getMonth().length() == 1 ? "0" + fechaActual.getMonth() : fechaActual.getMonth()) + "-" + 
+                String fechaActualStr = fechaActual.getYear() + "-" +
+                        (fechaActual.getMonth().length() == 1 ? "0" + fechaActual.getMonth() : fechaActual.getMonth())
+                        + "-" +
                         (fechaActual.getDay().length() == 1 ? "0" + fechaActual.getDay() : fechaActual.getDay());
 
                 if (fechaActualStr.compareTo(fechaInicio) >= 0 && fechaActualStr.compareTo(fechaFinal) <= 0) {
@@ -299,79 +313,88 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
                 } else {
                     // La fecha actual está fuera del rango permitido
-                    throw new IllegalArgumentException("El proceso no se puede continuar porque la fecha actual está fuera del rango permitido.");
+                    throw new IllegalArgumentException(
+                            "El proceso no se puede continuar porque la fecha actual está fuera del rango permitido.");
                 }
             } else {
                 solicitud.setEstado(ESTADO_SOLICITUD.RADICADA.getDescripcion());
-            }            
+            }
             solicitud.setRequiereFirmaDirector(datosSolicitud.getRequiereFirmaDirector());
             solicitud.setIdDirector(datosSolicitud.getIdDirector());
             solicitud.setDocumentoFirmado(datosSolicitud.getOficioPdf());
             registroSolicitud = solicitudesRepository.save(solicitud);
-            //condicion para guardar solicitud de cer_voto
-            if (tipoSolicitud.getCodigo().equals("CER_VOTO")) { 
+            // condicion para guardar solicitud de cer_voto
+            if (tipoSolicitud.getCodigo().equals("CER_VOTO")) {
                 registro = Boolean.TRUE;
                 radicado = TokenAleatorio.generarCodigoAleatorio();
                 registroSolicitud.setRadicado(radicado);
-                //solicitudesRepository.save(registroSolicitud);
+                // solicitudesRepository.save(registroSolicitud);
                 logger.info("Se registró correctamente la solicitud.");
 
-                // registrar en el historico                
+                // registrar en el historico
                 registrarHistoricoSolicitud(registroSolicitud);
             } else {
-                // Utilizamos la siguiente función para guardar otros datos de la solicitud según su tipo.
-            boolean datosTipoSolicitudRegistrados = registrarDatosTipoSolicitud(datosSolicitud, registroSolicitud.getId(), tipoSolicitud.getCodigo());
-            
-            // Utilizamos la siguiente función para garantizar la firma del estudiante en la solicitud.
-            boolean firmaEstudianteRegistrada = registrarFirmaEstudiante(registroSolicitud, datosSolicitud);
-            
-            // Verificar si todas las operaciones fueron exitosas
-            if (datosTipoSolicitudRegistrados && firmaEstudianteRegistrada) {
-                registro = Boolean.TRUE;
-                radicado = TokenAleatorio.generarCodigoAleatorio();
-                registroSolicitud.setRadicado(radicado);
-                //solicitudesRepository.save(registroSolicitud);
-                logger.info("Se registró correctamente la solicitud.");
+                // Utilizamos la siguiente función para guardar otros datos de la solicitud
+                // según su tipo.
+                boolean datosTipoSolicitudRegistrados = registrarDatosTipoSolicitud(datosSolicitud,
+                        registroSolicitud.getId(), tipoSolicitud.getCodigo());
 
-                // registrar en el historico                
-                registrarHistoricoSolicitud(registroSolicitud);
-            } else {                
-                logger.error("Ocurrió un error al registrar la solicitud.");
-                throw new Exception("Error al registrar la solicitud.");
+                // Utilizamos la siguiente función para garantizar la firma del estudiante en la
+                // solicitud.
+                boolean firmaEstudianteRegistrada = registrarFirmaEstudiante(registroSolicitud, datosSolicitud);
+
+                // Verificar si todas las operaciones fueron exitosas
+                if (datosTipoSolicitudRegistrados && firmaEstudianteRegistrada) {
+                    registro = Boolean.TRUE;
+                    radicado = TokenAleatorio.generarCodigoAleatorio();
+                    registroSolicitud.setRadicado(radicado);
+                    // solicitudesRepository.save(registroSolicitud);
+                    logger.info("Se registró correctamente la solicitud.");
+
+                    // registrar en el historico
+                    registrarHistoricoSolicitud(registroSolicitud);
+                } else {
+                    logger.error("Ocurrió un error al registrar la solicitud.");
+                    throw new Exception("Error al registrar la solicitud.");
                 }
             }
         } catch (Exception e) {
             logger.error("Ocurrió un error inesperado al registrar la solicitud.", e);
             throw e;
         }
-        if (registro) {      
-            if(tipoSolicitud.getCodigo().equals("CER_VOTO")){      
+        if (registro) {
+            if (tipoSolicitud.getCodigo().equals("CER_VOTO")) {
                 // Crear CompletableFutures para cada correo
-                CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
-            }    
-            else{
-                CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
-                CompletableFuture<Void> correoTutor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.TUTOR)));
+                CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(
+                        crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
+            } else {
+                CompletableFuture<Void> correoEstudiante = enviarCorreoAsincrono(
+                        crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.ESTUDIANTE)));
+                CompletableFuture<Void> correoTutor = enviarCorreoAsincrono(
+                        crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.TUTOR)));
                 CompletableFuture<Void> correoDirector = null;
                 if (registroSolicitud.getRequiereFirmaDirector()) {
-                    correoDirector = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.DIRECTOR)));
+                    correoDirector = enviarCorreoAsincrono(
+                            crearEmailRequest(crearDatosEnvioCorreo(registroSolicitud, DESTINATARIO_CORREO.DIRECTOR)));
                 }
-            }    
-                return radicado;    
+            }
+            return radicado;
         } else {
             logger.info("Error al registrar la solicitud o enviando correo.");
             return null;
         }
-            
+
     }
 
     @Transactional
-    private boolean registrarDatosTipoSolicitud(SolicitudRequestDto datosSolicitud, Integer idSolicitud, String tipoSolicitud) throws Exception{
+    private boolean registrarDatosTipoSolicitud(SolicitudRequestDto datosSolicitud, Integer idSolicitud,
+            String tipoSolicitud) throws Exception {
         boolean registro = false;
         switch (tipoSolicitud) {
             case "AD_ASIG":
                 try {
-                    boolean registroAdicion = registrarAdicionAsignatura(idSolicitud, datosSolicitud.getDatosAdicionAsignatura());
+                    boolean registroAdicion = registrarAdicionAsignatura(idSolicitud,
+                            datosSolicitud.getDatosAdicionAsignatura());
                     if (registroAdicion) {
                         logger.info("Se registraron los datos de la adición asignaturas satisfactoriamente.");
                         registro = true;
@@ -384,22 +407,24 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 break;
             case "CA_ASIG":
                 try {
-                    boolean registroCancelar = registrarCancelarAsignatura(idSolicitud, datosSolicitud.getDatosCancelarAsignatura());
+                    boolean registroCancelar = registrarCancelarAsignatura(idSolicitud,
+                            datosSolicitud.getDatosCancelarAsignatura());
                     if (registroCancelar) {
                         logger.info("Se registraron los datos de la cancelación de asignaturas satisfactoriamente.");
                         registro = true;
                     }
                 } catch (Exception e) {
-                    logger.error("Ocurrió un error inesperado al guardar los datos de la cancelación de asignaturas.", e);
+                    logger.error("Ocurrió un error inesperado al guardar los datos de la cancelación de asignaturas.",
+                            e);
                     registro = false;
                     throw e;
                 }
                 break;
-            case "HO_ASIG_ESP":                
+            case "HO_ASIG_ESP":
             case "HO_ASIG_POS":
                 try {
-                    boolean registroHomologacion = solicitudesHomologacionService.
-                        registrarSolicitudHomologacion(idSolicitud, datosSolicitud.getDatosHomologacion());
+                    boolean registroHomologacion = solicitudesHomologacionService
+                            .registrarSolicitudHomologacion(idSolicitud, datosSolicitud.getDatosHomologacion());
                     if (registroHomologacion) {
                         logger.info("Se registraron los datos de la homologación satisfactoriamente.");
                         registro = true;
@@ -410,10 +435,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     throw e;
                 }
                 break;
-        
+
             case "AP_SEME":
                 try {
-                    boolean registroAplazar = registrarAplazarSemestre(idSolicitud, datosSolicitud.getDatosAplazarSemestre());
+                    boolean registroAplazar = registrarAplazarSemestre(idSolicitud,
+                            datosSolicitud.getDatosAplazarSemestre());
                     if (registroAplazar) {
                         logger.info("Se registraron los datos de la adición asignaturas satisfactoriamente.");
                         registro = true;
@@ -422,12 +448,13 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     logger.error("Ocurrió un error inesperado al guardar los datos de la adición asignaturas.", e);
                     registro = false;
                     throw e;
-                }                
+                }
                 break;
 
             case "CU_ASIG":
                 try {
-                    boolean registroCursarAsignatura = registrarCursarAsignatura(idSolicitud, datosSolicitud.getDatosCursarAsignatura());
+                    boolean registroCursarAsignatura = registrarCursarAsignatura(idSolicitud,
+                            datosSolicitud.getDatosCursarAsignatura());
                     if (registroCursarAsignatura) {
                         logger.info("Se registraron los datos de la adición asignaturas satisfactoriamente.");
                         registro = true;
@@ -436,18 +463,21 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     logger.error("Ocurrió un error inesperado al guardar los datos de la adición asignaturas.", e);
                     registro = false;
                     throw e;
-                }                
+                }
                 break;
-            
+
             case "AV_PASA_INV":
                 try {
-                    boolean registroAvalPasantia = registrarAvalPasantiaInvestigacion(idSolicitud, datosSolicitud.getDatosAvalPasantiaInv());
+                    boolean registroAvalPasantia = registrarAvalPasantiaInvestigacion(idSolicitud,
+                            datosSolicitud.getDatosAvalPasantiaInv());
                     if (registroAvalPasantia) {
                         logger.info("Se registraron los datos aval pasantia investigación correctamente.");
                         registro = true;
                     }
                 } catch (Exception e) {
-                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud aval pasantia investigación.", e);
+                    logger.error(
+                            "Ocurrió un error inesperado al guardar los datos de la solicitud aval pasantia investigación.",
+                            e);
                     registro = false;
                     throw e;
                 }
@@ -455,31 +485,38 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
             case "AP_ECON_INV":
                 try {
-                    boolean registroApoyoEconomico = registrarApoyoEconimico(idSolicitud, datosSolicitud.getDatosApoyoEconomico());
+                    boolean registroApoyoEconomico = registrarApoyoEconimico(idSolicitud,
+                            datosSolicitud.getDatosApoyoEconomico());
                     if (registroApoyoEconomico) {
                         logger.info("Se registraron los datos para el apoyo económico correctamente.");
                         registro = true;
                     }
                 } catch (Exception e) {
-                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para apoyo económico.", e);
+                    logger.error(
+                            "Ocurrió un error inesperado al guardar los datos de la solicitud para apoyo económico.",
+                            e);
                     registro = false;
                     throw e;
                 }
                 break;
 
             case "RE_CRED_PR_DOC":
-                    try {
-                        boolean registroActDocente = registrarActividadesPracticaDocente(idSolicitud, datosSolicitud.getDatosActividadDocenteRequest());
-                        if (registroActDocente) {
-                            logger.info("Se registraron los datos para el reconocimiento de créditos de práctica docente correctamente.");
-                            registro = true;
-                        }
-                    } catch (Exception e) {
-                        logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para reconocimiento de créditos por práctica docente.", e);
-                        registro = false;
-                        throw e;
+                try {
+                    boolean registroActDocente = registrarActividadesPracticaDocente(idSolicitud,
+                            datosSolicitud.getDatosActividadDocenteRequest());
+                    if (registroActDocente) {
+                        logger.info(
+                                "Se registraron los datos para el reconocimiento de créditos de práctica docente correctamente.");
+                        registro = true;
                     }
-                    break;
+                } catch (Exception e) {
+                    logger.error(
+                            "Ocurrió un error inesperado al guardar los datos de la solicitud para reconocimiento de créditos por práctica docente.",
+                            e);
+                    registro = false;
+                    throw e;
+                }
+                break;
             case "RE_CRED_PAS":
             case "RE_CRED_DIS":
             case "PR_CURS_TEO":
@@ -496,13 +533,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             case "OT_ACTI_APO":
             case "RE_CRED_PUB":
                 try {
-                    boolean registroRecCreditos = registrarReconocimientoCreditos(idSolicitud, datosSolicitud.getDatosReconocimientoCreditos());
+                    boolean registroRecCreditos = registrarReconocimientoCreditos(idSolicitud,
+                            datosSolicitud.getDatosReconocimientoCreditos());
                     if (registroRecCreditos) {
                         logger.info("Se registraron los datos para el reconocimiento de créditos correctamente.");
                         registro = true;
                     }
                 } catch (Exception e) {
-                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para reconocimiento de créditos.", e);
+                    logger.error(
+                            "Ocurrió un error inesperado al guardar los datos de la solicitud para reconocimiento de créditos.",
+                            e);
                     registro = false;
                     throw e;
                 }
@@ -510,13 +550,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
             case "AV_SEMI_ACT":
                 try {
-                    boolean registroAvalSeminario = registrarAvalSeminario(idSolicitud, datosSolicitud.getDatosAvalSeminario());
+                    boolean registroAvalSeminario = registrarAvalSeminario(idSolicitud,
+                            datosSolicitud.getDatosAvalSeminario());
                     if (registroAvalSeminario) {
                         logger.info("Se registraron los datos para el aval seminario actualización correctamente.");
                         registro = true;
                     }
                 } catch (Exception e) {
-                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para aval seminario actualización.", e);
+                    logger.error(
+                            "Ocurrió un error inesperado al guardar los datos de la solicitud para aval seminario actualización.",
+                            e);
                     registro = false;
                     throw e;
                 }
@@ -524,13 +567,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
             case "AP_ECON_ASI":
                 try {
-                    boolean registroApoyoEconomicoCongreso = registrarApoyoEconimicoCongreso(idSolicitud, datosSolicitud.getDatosApoyoEconomicoCongreso());
+                    boolean registroApoyoEconomicoCongreso = registrarApoyoEconimicoCongreso(idSolicitud,
+                            datosSolicitud.getDatosApoyoEconomicoCongreso());
                     if (registroApoyoEconomicoCongreso) {
                         logger.info("Se registraron los datos para el apoyo económico congreso correctamente.");
                         registro = true;
                     }
                 } catch (Exception e) {
-                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para apoyo económico congreso.", e);
+                    logger.error(
+                            "Ocurrió un error inesperado al guardar los datos de la solicitud para apoyo económico congreso.",
+                            e);
                     registro = false;
                     throw e;
                 }
@@ -538,13 +584,17 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
             case "PA_PUBL_EVE":
                 try {
-                    boolean registroApoyoEconomicoPubEvento = registrarApoyoEconimicoPublicacionEvento(idSolicitud, datosSolicitud.getDatosApoyoEconomicoPublicacion());
+                    boolean registroApoyoEconomicoPubEvento = registrarApoyoEconimicoPublicacionEvento(idSolicitud,
+                            datosSolicitud.getDatosApoyoEconomicoPublicacion());
                     if (registroApoyoEconomicoPubEvento) {
-                        logger.info("Se registraron los datos para el apoyo económico pago publicación evento correctamente.");
+                        logger.info(
+                                "Se registraron los datos para el apoyo económico pago publicación evento correctamente.");
                         registro = true;
                     }
                 } catch (Exception e) {
-                    logger.error("Ocurrió un error inesperado al guardar los datos de la solicitud para apoyo económico pago publicación evento.", e);
+                    logger.error(
+                            "Ocurrió un error inesperado al guardar los datos de la solicitud para apoyo económico pago publicación evento.",
+                            e);
                     registro = false;
                     throw e;
                 }
@@ -552,7 +602,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
             case "AV_COMI_PR":
                 try {
-                    boolean registroAvales = registrarAvalComitePrograma(idSolicitud, datosSolicitud.getDatosAvalComite());
+                    boolean registroAvales = registrarAvalComitePrograma(idSolicitud,
+                            datosSolicitud.getDatosAvalComite());
                     if (registroAvales) {
                         logger.info("Se registraron los datos para el aval comite de programa correctamente.");
                         registro = true;
@@ -567,7 +618,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             case "SO_BECA":
             case "SO_DESC":
                 try {
-                    boolean registroBeca = registrarSolicitudBecaDescuento(idSolicitud, datosSolicitud.getDatosSolicitudBeca());
+                    boolean registroBeca = registrarSolicitudBecaDescuento(idSolicitud,
+                            datosSolicitud.getDatosSolicitudBeca());
                     if (registroBeca) {
                         logger.info("Se registraron los datos para la solicitud de beca correctamente.");
                         registro = true;
@@ -579,11 +631,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 }
                 break;
 
-
             default:
                 logger.info("No se encontro el tipo de solicitud a registrar.");
                 registro = false;
-                throw new Exception("Tipo de solicitud no encontrado: " + tipoSolicitud); // Lanzar excepción para revertir la transacción
+                throw new Exception("Tipo de solicitud no encontrado: " + tipoSolicitud); // Lanzar excepción para
+                                                                                          // revertir la transacción
         }
         return registro;
     }
@@ -592,7 +644,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     public List<SolicitudPendientesAval> obtenerSolicitudesPendientes(String correo) throws Exception {
         List<SolicitudPendientesAval> solicitudes = new ArrayList<>();
         InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(correo);
-        List<Solicitudes> solicitudesPendientes = solicitudesRepository.findAllByIdTutorOrderByFechaModificacionAsc(infoTutor.getId(), ESTADO_SOLICITUD.RADICADA.getDescripcion());
+        List<Solicitudes> solicitudesPendientes = solicitudesRepository.findAllByIdTutorOrderByFechaModificacionAsc(
+                infoTutor.getId(), ESTADO_SOLICITUD.RADICADA.getDescripcion());
         for (Solicitudes solicitud : solicitudesPendientes) {
             TiposSolicitud tipoSolicitud = tipoSolicitudRepository.findById(solicitud.getTipoSolicitud().getId()).get();
             InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
@@ -602,9 +655,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitudPendiente.setRadicado(solicitud.getRadicado());
             solicitudPendiente.setCodigoSolicitud(tipoSolicitud.getCodigo());
             solicitudPendiente.setNombreTipoSolicitud(tipoSolicitud.getNombre());
-            solicitudPendiente.setAbreviatura(ABREVIATURA_SOLICITUD.valueOf(tipoSolicitud.getCodigo()).getDescripcion());
+            solicitudPendiente
+                    .setAbreviatura(ABREVIATURA_SOLICITUD.valueOf(tipoSolicitud.getCodigo()).getDescripcion());
             solicitudPendiente.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             solicitudPendiente.setFecha(solicitud.getFechaModificacion().toString());
             solicitudPendiente.setIdentificacionSolicitante(estudiante.getNumeroDocumento());
             solicitudes.add(solicitudPendiente);
@@ -617,7 +671,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         DatosGestionSolicitudResponse response = new DatosGestionSolicitudResponse();
         try {
             Optional<Solicitudes> solicitudOpt = solicitudesRepository.findById(idSolicitud);
-            if (solicitudOpt.isPresent()){
+            if (solicitudOpt.isPresent()) {
                 Solicitudes solicitud = solicitudOpt.get();
                 DatosComunSolicitud datosComun = new DatosComunSolicitud();
                 InformacionPersonalDto tutor = null;
@@ -633,7 +687,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     // Manejar otros casos donde el tutor es obligatorio
                     tutor = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdTutor().toString());
                 }
-                InformacionPersonalDto estudiante = gestionDocentesEstudiantesService.obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
+                InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
+                        .obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
                 datosComun.setTipoSolicitud(solicitud.getTipoSolicitud().getNombre());
                 datosComun.setRadicado(solicitud.getRadicado());
                 // Formatear la fecha y hora en el formato deseado
@@ -646,13 +701,13 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosComun.setCelularSolicitante(estudiante.getCelular());
                 datosComun.setTipoIdentSolicitante(estudiante.getTipoDocumento());
                 datosComun.setNumeroIdentSolicitante(estudiante.getNumeroDocumento());
-                //condicion para certificado de votación al no requerir tutor
+                // condicion para certificado de votación al no requerir tutor
                 if (tutor != null) {
                     datosComun.setNombreTutor(tutor.obtenerNombreCompleto());
                 }
                 datosComun.setRequiereFirmaDirector(solicitud.getRequiereFirmaDirector());
                 FirmaSolicitud firmaSolicitud = firmaSolicitudRepository.findBySolicitud(solicitud);
-                //condicion para certificado de votación al no requerir ningun tipo de firma
+                // condicion para certificado de votación al no requerir ningun tipo de firma
                 if (firmaSolicitud != null) {
                     datosComun.setFirmaSolicitante(firmaSolicitud.getFirmaEstudiante());
                     datosComun.setFirmaTutor(firmaSolicitud.getFirmaTutor());
@@ -668,17 +723,18 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosComun.setEstadoSolicitud(solicitud.getEstado());
                 response.setDatosComunSolicitud(datosComun);
                 switch (solicitud.getTipoSolicitud().getCodigo()) {
-                    case "AD_ASIG":                        
-                        AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository.findBySolicitud(solicitud);
+                    case "AD_ASIG":
+                        AdicionarAsignatura adicionarAsignatura = adicionarAsignaturaRepository
+                                .findBySolicitud(solicitud);
                         List<AsignaturaAdicionada> asignaturaAdicionadas = asignaturaAdicionadaRepository
-                                        .findByAdicionarAsignatura(adicionarAsignatura);                                                
+                                .findByAdicionarAsignatura(adicionarAsignatura);
                         DatosSolicitudAdicionCancelacionAsignatura datosAdicionAsignatura = new DatosSolicitudAdicionCancelacionAsignatura();
                         List<InfoAdicionCancelacion> lInfoAdiciones = new ArrayList<>();
-                        for (AsignaturaAdicionada asignaturasAdicionadas : asignaturaAdicionadas) {                            
+                        for (AsignaturaAdicionada asignaturasAdicionadas : asignaturaAdicionadas) {
                             InfoAdicionCancelacion info = new InfoAdicionCancelacion();
                             info.setNombreAsignatura(asignaturasAdicionadas.getNombreAsignatura());
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
-                                .obtenerTutor(asignaturasAdicionadas.getIdDocente().toString());
+                                    .obtenerTutor(asignaturasAdicionadas.getIdDocente().toString());
                             info.setDocenteAsignatura(infoDocente.obtenerNombreCompleto());
                             info.setGrupo(asignaturasAdicionadas.getGrupo());
                             lInfoAdiciones.add(info);
@@ -686,19 +742,19 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         datosAdicionAsignatura.setListaAsignaturas(lInfoAdiciones);
                         response.setDAdicionCancelacionAsignatura(datosAdicionAsignatura);
                         break;
-                    case "CA_ASIG":                        
+                    case "CA_ASIG":
                         CancelarAsignatura cancelarAsignatura = cancelarAsignaturaRepository.findBySolicitud(solicitud);
                         List<AsignaturaCancelada> asignaturaCanceladas = asignaturaCanceladaRepository
-                                        .findByCancelarAsignatura(cancelarAsignatura);                                                
+                                .findByCancelarAsignatura(cancelarAsignatura);
                         DatosSolicitudAdicionCancelacionAsignatura datosCancelacionAsignatura = new DatosSolicitudAdicionCancelacionAsignatura();
                         datosCancelacionAsignatura.setMotivo(cancelarAsignatura.getMotivo());
                         datosCancelacionAsignatura.setDocumentoAdjunto(cancelarAsignatura.getDocumentoAdjunto());
                         List<InfoAdicionCancelacion> lInfoCancelacion = new ArrayList<>();
-                        for (AsignaturaCancelada asignaturasCanceladas : asignaturaCanceladas) {                            
+                        for (AsignaturaCancelada asignaturasCanceladas : asignaturaCanceladas) {
                             InfoAdicionCancelacion info = new InfoAdicionCancelacion();
                             info.setNombreAsignatura(asignaturasCanceladas.getNombreAsignatura());
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
-                                .obtenerTutor(asignaturasCanceladas.getIdDocente().toString());
+                                    .obtenerTutor(asignaturasCanceladas.getIdDocente().toString());
                             info.setDocenteAsignatura(infoDocente.obtenerNombreCompleto());
                             info.setGrupo(asignaturasCanceladas.getGrupo());
                             lInfoCancelacion.add(info);
@@ -712,49 +768,50 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         Homologaciones homologacion = homologacionRepository.findBySolicitud(solicitud);
                         if (homologacion != null) {
                             List<AsignaturasHomologadas> asignaturasHomologadas = asignaturasHomologadasRepository
-                                .findAllByHomologacion(homologacion);
-                                List<DatosAsignaturaHomologar> datosAsignaturaHomologar = new ArrayList<>();
+                                    .findAllByHomologacion(homologacion);
+                            List<DatosAsignaturaHomologar> datosAsignaturaHomologar = new ArrayList<>();
 
-                                String programa = "";
-                                String institucion = "";
-                                for (AsignaturasHomologadas asignatura : asignaturasHomologadas) {
-                                    DatosAsignaturaHomologar datosAsignatura = new DatosAsignaturaHomologar();
-                                    AsignaturaExternaResponseDto asignaturaExternaDto = gestionAsignaturasService
+                            String programa = "";
+                            String institucion = "";
+                            for (AsignaturasHomologadas asignatura : asignaturasHomologadas) {
+                                DatosAsignaturaHomologar datosAsignatura = new DatosAsignaturaHomologar();
+                                AsignaturaExternaResponseDto asignaturaExternaDto = gestionAsignaturasService
                                         .obtenerAsignaturaExterna(asignatura.getAsignaturaExterna());
-                                    datosAsignatura.setCalificacion(asignatura.getCalificacionObtenida());
-                                    datosAsignatura.setCreditos(asignaturaExternaDto.getCreditos());
-                                    datosAsignatura.setIntensidadHoraria(asignaturaExternaDto.getIntensidadHoraria());
-                                    datosAsignatura.setNombreAsignatura(asignaturaExternaDto.getNombre());
-                                    programa = asignaturaExternaDto.getPrograma();
-                                    institucion = asignaturaExternaDto.getInstitucion();
-                                    datosAsignaturaHomologar.add(datosAsignatura);
-                                }
-                                List<String> datosAdjuntos = documentosAdjuntosHomologacionRepository
+                                datosAsignatura.setCalificacion(asignatura.getCalificacionObtenida());
+                                datosAsignatura.setCreditos(asignaturaExternaDto.getCreditos());
+                                datosAsignatura.setIntensidadHoraria(asignaturaExternaDto.getIntensidadHoraria());
+                                datosAsignatura.setNombreAsignatura(asignaturaExternaDto.getNombre());
+                                programa = asignaturaExternaDto.getPrograma();
+                                institucion = asignaturaExternaDto.getInstitucion();
+                                datosAsignaturaHomologar.add(datosAsignatura);
+                            }
+                            List<String> datosAdjuntos = documentosAdjuntosHomologacionRepository
                                     .findDocumentosByHomologacion(homologacion);
-                                datosHomologacion.setInstitutoProcedencia(institucion);
-                                datosHomologacion.setProgramaProcedencia(programa);
-                                datosHomologacion.setDatosAsignatura(datosAsignaturaHomologar);
-                                datosHomologacion.setDocumentosAdjuntos(datosAdjuntos);                                
-                                response.setDatosSolicitudHomologacion(datosHomologacion);
+                            datosHomologacion.setInstitutoProcedencia(institucion);
+                            datosHomologacion.setProgramaProcedencia(programa);
+                            datosHomologacion.setDatosAsignatura(datosAsignaturaHomologar);
+                            datosHomologacion.setDocumentosAdjuntos(datosAdjuntos);
+                            response.setDatosSolicitudHomologacion(datosHomologacion);
                         }
                         break;
                     case "AP_SEME":
                         AplazarSemestre aplazarSemestre = aplazarSemestreRepository.findBySolicitud(solicitud);
-                        if (aplazarSemestre != null){
+                        if (aplazarSemestre != null) {
                             DatosSolicitudAplazarSemestre datosAplazarS = new DatosSolicitudAplazarSemestre();
                             datosAplazarS.setSemestre(aplazarSemestre.getSemestre());
                             datosAplazarS.setMotivo(aplazarSemestre.getMotivo());
                             datosAplazarS.setDocumentoAdjunto(aplazarSemestre.getDocumentoAdjunto());
-                            response.setDatosSolicitudAplazarSemestre(datosAplazarS);                            
+                            response.setDatosSolicitudAplazarSemestre(datosAplazarS);
                         }
                         break;
                     case "CU_ASIG":
                         CursarAsignatura cursarAsignatura = cursarAsignaturaRepository.findBySolicitud(solicitud);
-                        List<DatosCursarAsignatura> datosCursarAsignaturaList = datosCursarAsignaturaRepository.findAllByCursarAsignatura(cursarAsignatura);
+                        List<DatosCursarAsignatura> datosCursarAsignaturaList = datosCursarAsignaturaRepository
+                                .findAllByCursarAsignatura(cursarAsignatura);
                         DatosSolicitudCursarAsignaturas datosSolicitudCursarAsignaturas = new DatosSolicitudCursarAsignaturas();
                         datosSolicitudCursarAsignaturas.setMotivo(cursarAsignatura.getMotivo());
                         List<DatosCursarAsignatura> listDatosCursarAsignaturas = datosCursarAsignaturaRepository
-                                                                        .findAllByCursarAsignatura(cursarAsignatura);
+                                .findAllByCursarAsignatura(cursarAsignatura);
                         List<DatosAsignaturaOtroPrograma> listAsignaturaOtroPrograma = new ArrayList<>();
                         List<String> documentosAdjuntos = new ArrayList<>();
                         for (DatosCursarAsignatura dCursarAsig : datosCursarAsignaturaList) {
@@ -762,8 +819,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         }
                         for (DatosCursarAsignatura infoDatosCursarAsig : listDatosCursarAsignaturas) {
                             DatosAsignaturaOtroPrograma infoAsigOtroPrograma = new DatosAsignaturaOtroPrograma();
-                            AsignaturaExternaResponseDto asignaturaExterna = gestionAsignaturasService.
-                                                                obtenerAsignaturaExterna(infoDatosCursarAsig.getIdAsignaturaExterna());
+                            AsignaturaExternaResponseDto asignaturaExterna = gestionAsignaturasService
+                                    .obtenerAsignaturaExterna(infoDatosCursarAsig.getIdAsignaturaExterna());
                             infoAsigOtroPrograma.setNombre(asignaturaExterna.getNombre());
                             infoAsigOtroPrograma.setCodigo(infoDatosCursarAsig.getCodigoAsignatura());
                             infoAsigOtroPrograma.setCreditos(asignaturaExterna.getCreditos());
@@ -773,23 +830,28 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             listAsignaturaOtroPrograma.add(infoAsigOtroPrograma);
                             documentosAdjuntos.add(asignaturaExterna.getContenidoProgramatico());
                         }
-                        datosSolicitudCursarAsignaturas.setDatosAsignaturaOtroProgramas(listAsignaturaOtroPrograma);                                                           
+                        datosSolicitudCursarAsignaturas.setDatosAsignaturaOtroProgramas(listAsignaturaOtroPrograma);
                         datosSolicitudCursarAsignaturas.setDocumentosAdjuntos(documentosAdjuntos);
                         response.setDatosSolicitudCursarAsignaturas(datosSolicitudCursarAsignaturas);
                         break;
 
                     case "AV_PASA_INV":
-                        AvalPasantiaInvestigacion avalPasantiaInvestigacion = avalPasantiaInvestigacionRepository.findBySolicitud(solicitud);                        
-                        if (avalPasantiaInvestigacion != null){
+                        AvalPasantiaInvestigacion avalPasantiaInvestigacion = avalPasantiaInvestigacionRepository
+                                .findBySolicitud(solicitud);
+                        if (avalPasantiaInvestigacion != null) {
                             AvalPasantiaInvResponse datosAvalPasantia = new AvalPasantiaInvResponse();
                             datosAvalPasantia.setLugarPasantia(avalPasantiaInvestigacion.getLugarPasantia());
-                            datosAvalPasantia.setFechaInicio(avalPasantiaInvestigacion.getFechaInicio().format(formatter));
+                            datosAvalPasantia
+                                    .setFechaInicio(avalPasantiaInvestigacion.getFechaInicio().format(formatter));
                             datosAvalPasantia.setFechaFin(avalPasantiaInvestigacion.getFechaFin().format(formatter));
-                            datosAvalPasantia.setUniversidadResidencia(avalPasantiaInvestigacion.getUniversidadResidencia());
-                            datosAvalPasantia.setGrupoUniversidadResidencia(avalPasantiaInvestigacion.getGrupoUniversidadResidencia());
-                            datosAvalPasantia.setNombreDocenteExterno(avalPasantiaInvestigacion.getNombreDocenteExterno());
-                            List<DocumentosAvalPasantia> documentosAvalPasantias = documentosAvalPasantiaRepository.
-                                    findAllByAvalPasantia(avalPasantiaInvestigacion);
+                            datosAvalPasantia
+                                    .setUniversidadResidencia(avalPasantiaInvestigacion.getUniversidadResidencia());
+                            datosAvalPasantia.setGrupoUniversidadResidencia(
+                                    avalPasantiaInvestigacion.getGrupoUniversidadResidencia());
+                            datosAvalPasantia
+                                    .setNombreDocenteExterno(avalPasantiaInvestigacion.getNombreDocenteExterno());
+                            List<DocumentosAvalPasantia> documentosAvalPasantias = documentosAvalPasantiaRepository
+                                    .findAllByAvalPasantia(avalPasantiaInvestigacion);
                             List<String> documentos = new ArrayList<>();
                             for (DocumentosAvalPasantia documento : documentosAvalPasantias) {
                                 documentos.add(documento.getDocumento());
@@ -800,13 +862,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         break;
 
                     case "AP_ECON_INV":
-                        ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoInvestigacionRepository.findBySolicitud(solicitud);
-                        if (apoyoEconomicoInvestigacion != null){
-                            ApoyoEconomicoRequest responseApoyoEconomico = apoyoEconomicoMapper.toDto(apoyoEconomicoInvestigacion);
-                            InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService.obtenerTutor(responseApoyoEconomico.getIdDirectorGrupo().toString());
+                        ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoInvestigacionRepository
+                                .findBySolicitud(solicitud);
+                        if (apoyoEconomicoInvestigacion != null) {
+                            ApoyoEconomicoRequest responseApoyoEconomico = apoyoEconomicoMapper
+                                    .toDto(apoyoEconomicoInvestigacion);
+                            InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
+                                    .obtenerTutor(responseApoyoEconomico.getIdDirectorGrupo().toString());
                             responseApoyoEconomico.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
-                            List<DocumentosApoyoEconomico> documentosApoyosEconomicos = documentosApoyoEconomicoRepository.
-                                    findAllByApoyoEconomicoInvestigacion(apoyoEconomicoInvestigacion);
+                            List<DocumentosApoyoEconomico> documentosApoyosEconomicos = documentosApoyoEconomicoRepository
+                                    .findAllByApoyoEconomicoInvestigacion(apoyoEconomicoInvestigacion);
                             List<String> documentos = new ArrayList<>();
                             for (DocumentosApoyoEconomico documento : documentosApoyosEconomicos) {
                                 documentos.add(documento.getDocumento());
@@ -817,36 +882,36 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         break;
 
                     case "RE_CRED_PR_DOC":
-                        List<ActividadesRealizadasPracticaDocente> actividadPracticaDocente = 
-                            actividadesRealizadasPracticaDocenteRepository.findBySolicitud(solicitud);                        
+                        List<ActividadesRealizadasPracticaDocente> actividadPracticaDocente = actividadesRealizadasPracticaDocenteRepository
+                                .findBySolicitud(solicitud);
                         List<DatosActividadDocenteResponse> infoActividadesDocentes = new ArrayList<>();
-                        
+
                         for (ActividadesRealizadasPracticaDocente actividad : actividadPracticaDocente) {
                             DatosActividadDocenteResponse datosActividadDocente = new DatosActividadDocenteResponse();
                             datosActividadDocente.setNombreActividad(actividad.getSubTiposSolicitud().getNombre());
                             datosActividadDocente.setHorasReconocer(actividad.getHorasReconocer());
 
-                            //Agregamos los documentos de la actividad 
-                            List<DocumentosActividadesRealizadas> documentos = 
-                                documentosActividadesRealizadasRepository
-                                    .findByActividadRealizadaAndSubTiposSolicitud(actividad, actividad.getSubTiposSolicitud());
+                            // Agregamos los documentos de la actividad
+                            List<DocumentosActividadesRealizadas> documentos = documentosActividadesRealizadasRepository
+                                    .findByActividadRealizadaAndSubTiposSolicitud(actividad,
+                                            actividad.getSubTiposSolicitud());
                             List<String> documentosAdjuntosActRealizadas = new ArrayList<>();
                             for (DocumentosActividadesRealizadas documento : documentos) {
                                 documentosAdjuntosActRealizadas.add(documento.getDocumento());
                             }
                             datosActividadDocente.setDocumentos(documentosAdjuntosActRealizadas);
 
-                            //Agregamos los enlaces de la actividad
-                            List<EnlacesActividadesRealizadas> enlaces = 
-                                enlacesActividadesRealizadasRepository
-                                    .findByActividadRealizadaAndSubTiposSolicitud(actividad, actividad.getSubTiposSolicitud());
+                            // Agregamos los enlaces de la actividad
+                            List<EnlacesActividadesRealizadas> enlaces = enlacesActividadesRealizadasRepository
+                                    .findByActividadRealizadaAndSubTiposSolicitud(actividad,
+                                            actividad.getSubTiposSolicitud());
                             List<String> enlacesAdjuntosActRealizadas = new ArrayList<>();
                             for (EnlacesActividadesRealizadas enlace : enlaces) {
                                 enlacesAdjuntosActRealizadas.add(enlace.getEnlace());
                             }
                             datosActividadDocente.setEnlaces(enlacesAdjuntosActRealizadas);
                             infoActividadesDocentes.add(datosActividadDocente);
-                        }                        
+                        }
                         response.setDatosActividadDocente(infoActividadesDocentes);
                         break;
 
@@ -866,8 +931,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     case "OT_ACTI_APO":
                     case "RE_CRED_PUB":
                         ReconocimientoCreditos reconocimientoCreditos = reconocimientoCreditosRepository
-                                    .findBySolicitudAndTipoReconocimiento(solicitud, solicitud.getTipoSolicitud().getCodigo());
-                        if (reconocimientoCreditos != null){
+                                .findBySolicitudAndTipoReconocimiento(solicitud,
+                                        solicitud.getTipoSolicitud().getCodigo());
+                        if (reconocimientoCreditos != null) {
                             ReconocimientoCreditosRequest reconocimientoCreditosRequest = new ReconocimientoCreditosRequest();
                             List<DocumentosRecCreditos> docsRecCreditos = documentosRecCreditosRepository
                                     .findAllByReconocimientoCreditos(reconocimientoCreditos);
@@ -880,17 +946,17 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             List<String> enlaces = new ArrayList<>();
                             for (EnlacesRecCreditos enlace : enlacesRecCreditosList) {
                                 enlaces.add(enlace.getDocumento());
-                            }                            
+                            }
                             reconocimientoCreditosRequest.setDocumentosAdjuntos(documentos);
                             reconocimientoCreditosRequest.setEnlacesAdjuntos(enlaces);
                             response.setDatosReconocimientoCreditos(reconocimientoCreditosRequest);
                         }
                         break;
-                    
+
                     case "AV_SEMI_ACT":
                         AvalSeminarioActualizacion avalSeminarioActualizacion = avalSeminarioActRepository
-                                    .findBySolicitud(solicitud);
-                        if (avalSeminarioActualizacion != null){
+                                .findBySolicitud(solicitud);
+                        if (avalSeminarioActualizacion != null) {
                             AvalSeminarioActRequest avalSeminarioActRequest = new AvalSeminarioActRequest();
                             List<DocumentosAvalSeminarioAct> docsAvalSeminario = dAvalSeminarioActRepository
                                     .findAllByAvalSeminarioActualizacion(avalSeminarioActualizacion);
@@ -904,14 +970,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         break;
 
                     case "AP_ECON_ASI":
-                        ApoyoEconomicoCongreso apoyoEconomicoCongreso = apoyoEconomicoCongresoRepository.findBySolicitud(solicitud);
-                        if (apoyoEconomicoCongreso != null){
-                            ApoyoEconomicoCongresoRequest responseApoyoEconomicoCongreso = apoyoEconomicoCongresoMapper.toDto(apoyoEconomicoCongreso);
+                        ApoyoEconomicoCongreso apoyoEconomicoCongreso = apoyoEconomicoCongresoRepository
+                                .findBySolicitud(solicitud);
+                        if (apoyoEconomicoCongreso != null) {
+                            ApoyoEconomicoCongresoRequest responseApoyoEconomicoCongreso = apoyoEconomicoCongresoMapper
+                                    .toDto(apoyoEconomicoCongreso);
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
-                                            .obtenerTutor(responseApoyoEconomicoCongreso.getIdDirectorGrupo().toString());
+                                    .obtenerTutor(responseApoyoEconomicoCongreso.getIdDirectorGrupo().toString());
                             responseApoyoEconomicoCongreso.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
-                            List<DocumentosApoyoEconomicoCongreso> documentosApoyosEconomicoCongreso = documentosApoyoEconomicoCongresoRepository.
-                                    findAllByApoyoEconomicoCongreso(apoyoEconomicoCongreso);
+                            List<DocumentosApoyoEconomicoCongreso> documentosApoyosEconomicoCongreso = documentosApoyoEconomicoCongresoRepository
+                                    .findAllByApoyoEconomicoCongreso(apoyoEconomicoCongreso);
                             List<String> documentos = new ArrayList<>();
                             for (DocumentosApoyoEconomicoCongreso documento : documentosApoyosEconomicoCongreso) {
                                 documentos.add(documento.getDocumento());
@@ -923,18 +991,21 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
                     case "PA_PUBL_EVE":
                         ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoRepository
-                                    .findBySolicitud(solicitud);
-                        if (apoyoEconomicoPublicacionEvento != null){
-                            ApoyoEconomicoPublicacionEventoRequest responseApoyoEconomicoPubEvento = apoyoEconomicoPublicacionEventoMapper.toDto(apoyoEconomicoPublicacionEvento);
+                                .findBySolicitud(solicitud);
+                        if (apoyoEconomicoPublicacionEvento != null) {
+                            ApoyoEconomicoPublicacionEventoRequest responseApoyoEconomicoPubEvento = apoyoEconomicoPublicacionEventoMapper
+                                    .toDto(apoyoEconomicoPublicacionEvento);
                             InformacionPersonalDto infoDocente = gestionDocentesEstudiantesService
-                                            .obtenerTutor(responseApoyoEconomicoPubEvento.getIdDirectorGrupo().toString());
+                                    .obtenerTutor(responseApoyoEconomicoPubEvento.getIdDirectorGrupo().toString());
                             responseApoyoEconomicoPubEvento.setNombreDirectorGrupo(infoDocente.obtenerNombreCompleto());
-                            if (responseApoyoEconomicoPubEvento.getFechaInicio()!=null){
-                                responseApoyoEconomicoPubEvento.setFechaInicio(localDateToString(apoyoEconomicoPublicacionEvento.getFechaInicio()));
-                                responseApoyoEconomicoPubEvento.setFechaFin(localDateToString(apoyoEconomicoPublicacionEvento.getFechaFin()));
+                            if (responseApoyoEconomicoPubEvento.getFechaInicio() != null) {
+                                responseApoyoEconomicoPubEvento.setFechaInicio(
+                                        localDateToString(apoyoEconomicoPublicacionEvento.getFechaInicio()));
+                                responseApoyoEconomicoPubEvento
+                                        .setFechaFin(localDateToString(apoyoEconomicoPublicacionEvento.getFechaFin()));
                             }
-                            List<DocumentosApoyoEconomicoPublicacionEvento> documentosApoyosEconomicoPubEvento = documentosApoyoEconomicoPublicacionEventoRepository.
-                                    findAllByApoyoEconomicoPublicacionEvento(apoyoEconomicoPublicacionEvento);
+                            List<DocumentosApoyoEconomicoPublicacionEvento> documentosApoyosEconomicoPubEvento = documentosApoyoEconomicoPublicacionEventoRepository
+                                    .findAllByApoyoEconomicoPublicacionEvento(apoyoEconomicoPublicacionEvento);
                             List<String> documentos = new ArrayList<>();
                             for (DocumentosApoyoEconomicoPublicacionEvento documento : documentosApoyosEconomicoPubEvento) {
                                 documentos.add(documento.getDocumento());
@@ -945,10 +1016,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                         break;
 
                     case "AV_COMI_PR":
-                        List<AvalComitePrograma> avalesComite = 
-                            avalComiteProgramaRepository.findBySolicitud(solicitud);                        
+                        List<AvalComitePrograma> avalesComite = avalComiteProgramaRepository.findBySolicitud(solicitud);
                         List<DatosAvalComiteResponse> infoAvales = new ArrayList<>();
-                        
+
                         for (AvalComitePrograma aval : avalesComite) {
                             DatosAvalComiteResponse datosAvales = new DatosAvalComiteResponse();
                             datosAvales.setNombreActividad(aval.getSubTiposSolicitud().getNombre());
@@ -957,12 +1027,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                             infoAvales.add(datosAvales);
                         }
                         response.setDatosAvalComite(infoAvales);
-                        break;     
-                        
+                        break;
+
                     case "SO_BECA":
                     case "SO_DESC":
-                        SolicitudBecaDescuento solicitudBeca = 
-                            solicitudBecaRepository.findBySolicitud(solicitud);                        
+                        SolicitudBecaDescuento solicitudBeca = solicitudBecaRepository.findBySolicitud(solicitud);
                         SolicitudBecaRequest solicitudBecaDto = new SolicitudBecaRequest();
                         solicitudBecaDto.setMotivo(solicitudBeca.getMotivo());
                         solicitudBecaDto.setTipo(solicitudBeca.getTipo());
@@ -985,7 +1054,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     }
 
     @Transactional
-    private Boolean registrarFirmaEstudiante(Solicitudes solicitud, SolicitudRequestDto datosSolicitud) throws Exception{
+    private Boolean registrarFirmaEstudiante(Solicitudes solicitud, SolicitudRequestDto datosSolicitud)
+            throws Exception {
         try {
             FirmaSolicitud firmaSolicitud = new FirmaSolicitud();
             firmaSolicitud.setSolicitud(solicitud);
@@ -997,15 +1067,15 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             firmaSolicitud.setPosXDirector(datosSolicitud.getPosXDirector());
             firmaSolicitud.setPosYDirector(datosSolicitud.getPosYDirector());
             firmaSolicitudRepository.save(firmaSolicitud);
-            return  Boolean.TRUE;
+            return Boolean.TRUE;
         } catch (Exception e) {
-            logger.error("Ocurrió un error inesperado al guardar la firma del estudiante.", e);            
+            logger.error("Ocurrió un error inesperado al guardar la firma del estudiante.", e);
             return Boolean.FALSE;
         }
     }
 
     @Override
-    public Boolean registrarFirmasPendientes(DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception {        
+    public Boolean registrarFirmasPendientes(DatosAvalarSolicitudDto dAvalarSolicitudDto) throws Exception {
         Boolean registroFirma = Boolean.FALSE;
         Solicitudes solicitud = solicitudesRepository.findById(dAvalarSolicitudDto.getIdSolicitud()).get();
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
@@ -1013,31 +1083,31 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         Boolean firmaDirector = dAvalarSolicitudDto.getFirmaDirector();
         solicitud.setDocumentoFirmado(dAvalarSolicitudDto.getDocumentoPdfSolicitud());
         solicitudesRepository.save(solicitud);
-        
+
         if (solicitud.getRequiereFirmaDirector()) {
             if (firmaTutor && firmaDirector) {
                 firmas.setFirmaTutor(firmaTutor);
                 firmas.setFirmaDirector(firmaDirector);
-                firmaSolicitudRepository.save(firmas);                
-                registroFirma = Boolean.TRUE;                
+                firmaSolicitudRepository.save(firmas);
+                registroFirma = Boolean.TRUE;
             } else if (firmaTutor) {
                 firmas.setFirmaTutor(firmaTutor);
                 firmaSolicitudRepository.save(firmas);
-                registroFirma = Boolean.TRUE;                
+                registroFirma = Boolean.TRUE;
             } else if (firmaDirector) {
                 firmas.setFirmaDirector(firmaDirector);
                 firmaSolicitudRepository.save(firmas);
-                registroFirma = Boolean.TRUE;                
+                registroFirma = Boolean.TRUE;
             }
         } else {
             if (firmaTutor) {
                 firmas.setFirmaTutor(firmaTutor);
-                firmaSolicitudRepository.save(firmas);                
+                firmaSolicitudRepository.save(firmas);
                 registroFirma = Boolean.TRUE;
             }
         }
-        if ((firmas.getFirmaTutor() && firmas.getFirmaDirector()) || 
-            (firmas.getFirmaTutor() && !solicitud.getRequiereFirmaDirector())) {
+        if ((firmas.getFirmaTutor() && firmas.getFirmaDirector()) ||
+                (firmas.getFirmaTutor() && !solicitud.getRequiereFirmaDirector())) {
             registrarHistoricoSolicitud(solicitud);
             solicitud.setEstado(ESTADO_SOLICITUD.AVALADA.getDescripcion());
             solicitud.setFechaModificacion(LocalDateTime.now());
@@ -1051,50 +1121,56 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
                     .obtenerInformacionEstudiantePorId(solicitud.getIdEstudiante());
             datosCorreo.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-            InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdTutor().toString());
+            InformacionPersonalDto infoTutor = gestionDocentesEstudiantesService
+                    .obtenerTutor(solicitud.getIdTutor().toString());
             datosCorreo.setNombreTutor(infoTutor.obtenerNombreCompleto());
             if (solicitud.getRequiereFirmaDirector()) {
-                InformacionPersonalDto infoDirector = gestionDocentesEstudiantesService.obtenerTutor(solicitud.getIdDirector().toString());
+                InformacionPersonalDto infoDirector = gestionDocentesEstudiantesService
+                        .obtenerTutor(solicitud.getIdDirector().toString());
                 datosCorreo.setNombreDirector(infoDirector.obtenerNombreCompleto());
             } else {
                 datosCorreo.setNombreDirector(null);
             }
-            CompletableFuture<Void> correoCoordiandor = enviarCorreoAsincrono(crearEmailRequest(crearDatosEnvioCorreo(solicitud, DESTINATARIO_CORREO.COORDINADOR)));
+            CompletableFuture<Void> correoCoordiandor = enviarCorreoAsincrono(
+                    crearEmailRequest(crearDatosEnvioCorreo(solicitud, DESTINATARIO_CORREO.COORDINADOR)));
         } else {
             registrarHistoricoSolicitud(solicitud);
         }
         return registroFirma;
     }
 
-    private boolean registrarAdicionAsignatura(Integer idSolicitud, List<InfoAdicionAsignaturaRequest> listaAsignaturas) throws Exception {
+    private boolean registrarAdicionAsignatura(Integer idSolicitud, List<InfoAdicionAsignaturaRequest> listaAsignaturas)
+            throws Exception {
         Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
         return adicionAsignaturaService.registrarAdicionAsignaturas(solicitud, listaAsignaturas);
     }
 
-    private boolean registrarCancelarAsignatura(Integer idSolicitud, CancelarAsignaturaRequest datosCancelarAsignatura) throws Exception {
+    private boolean registrarCancelarAsignatura(Integer idSolicitud, CancelarAsignaturaRequest datosCancelarAsignatura)
+            throws Exception {
         Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
         return adicionAsignaturaService.registrarCancelarAsignaturas(solicitud, datosCancelarAsignatura);
     }
 
     private boolean registrarAplazarSemestre(Integer idSolicitud, AplazarSemestreRequest datosAplazarSemestre) {
         boolean registro = false;
-        try{
+        try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
             AplazarSemestre aplazarSemestre = new AplazarSemestre();
             aplazarSemestre.setSolicitud(solicitud);
             aplazarSemestre.setSemestre(datosAplazarSemestre.getSemestre());
-            aplazarSemestre.setMotivo(datosAplazarSemestre.getMotivo());   
+            aplazarSemestre.setMotivo(datosAplazarSemestre.getMotivo());
             aplazarSemestre.setDocumentoAdjunto(datosAplazarSemestre.getDocumentoAdjunto());
             aplazarSemestreRepository.save(aplazarSemestre);
             registro = true;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos de aplazar semestre.", e);
             registro = false;
         }
         return registro;
     }
 
-    private boolean registrarCursarAsignatura(Integer idSolicitud, DatosSolicitudCursarAsignaturaDto datosCursarAsignaturaDto) {
+    private boolean registrarCursarAsignatura(Integer idSolicitud,
+            DatosSolicitudCursarAsignaturaDto datosCursarAsignaturaDto) {
         CursarAsignatura cursarAsignatura = new CursarAsignatura();
         try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
@@ -1104,10 +1180,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
             // Se procede a guardar la información de la asignatura externa a cursar
             List<AsignaturaExternaRequest> asignaturasExternasCursar = datosCursarAsignaturaDto
-                                                    .getDatosCursarAsignaturaDto().getListaAsignaturasCursar();
+                    .getDatosCursarAsignaturaDto().getListaAsignaturasCursar();
             for (AsignaturaExternaRequest infoAsignaturaExterna : asignaturasExternasCursar) {
                 AsignaturaExternaResponseDto info = registrarAsignaturasExternas(infoAsignaturaExterna);
-                // Procedemos a guardar la informacion de los datos de la solicitud asignatura a cursar
+                // Procedemos a guardar la informacion de los datos de la solicitud asignatura a
+                // cursar
                 DatosCursarAsignatura datosCursarAsignatura = new DatosCursarAsignatura();
                 datosCursarAsignatura.setCursarAsignatura(cursarAsignatura);
                 datosCursarAsignatura.setIdAsignaturaExterna(info.getIdAsignatura());
@@ -1119,23 +1196,26 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 datosCursarAsignatura.setEstado(ESTADO_SOLICITUD.PENDIENTE.getDescripcion());
                 datosCursarAsignaturaRepository.save(datosCursarAsignatura);
             }
-            
+
             // Procedemos a guardar los ducumentos adjuntos de la solicitud
             // Se suspende ya que no se tienen documentos adjuntos
-            /* for (String documento : datosCursarAsignaturaDto.getDocumentosAdjuntos()) {
-                DocumentosCursarAsignatura documentosCursarAsignatura = new DocumentosCursarAsignatura();
-                documentosCursarAsignatura.setCursarAsignatura(cursarAsignatura);
-                documentosCursarAsignatura.setDocumento(documento);
-                documentosCursarAsignaturaRepository.save(documentosCursarAsignatura);
-            } */
+            /*
+             * for (String documento : datosCursarAsignaturaDto.getDocumentosAdjuntos()) {
+             * DocumentosCursarAsignatura documentosCursarAsignatura = new
+             * DocumentosCursarAsignatura();
+             * documentosCursarAsignatura.setCursarAsignatura(cursarAsignatura);
+             * documentosCursarAsignatura.setDocumento(documento);
+             * documentosCursarAsignaturaRepository.save(documentosCursarAsignatura);
+             * }
+             */
 
         } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos de cursar asignaturas.", e);
-        }        
+        }
         return true;
     }
 
-    private AsignaturaExternaResponseDto registrarAsignaturasExternas(AsignaturaExternaRequest datosAsignatura){
+    private AsignaturaExternaResponseDto registrarAsignaturasExternas(AsignaturaExternaRequest datosAsignatura) {
         try {
             AsignaturaExternaDto asignaturaExternaDto = new AsignaturaExternaDto();
             asignaturaExternaDto.setInstitutoProcedencia(datosAsignatura.getInstitutoProcedencia());
@@ -1143,9 +1223,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             asignaturaExternaDto.setNombreAsignatura(datosAsignatura.getNombreAsignatura());
             asignaturaExternaDto.setNumeroCreditos(datosAsignatura.getNumeroCreditos());
             asignaturaExternaDto.setIntensidadHoraria(datosAsignatura.getIntensidadHoraria());
-            asignaturaExternaDto.setContenidoProgramatico(datosAsignatura.getContenidoProgramatico());            
+            asignaturaExternaDto.setContenidoProgramatico(datosAsignatura.getContenidoProgramatico());
             return gestionAsignaturasService.registrarAsignaturasExternas(asignaturaExternaDto);
-            
+
         } catch (Exception e) {
             System.out.println("Ocurrió un error al registrar la asignatura externa a cursar en otro programa, ");
             e.printStackTrace();
@@ -1153,23 +1233,25 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         }
     }
 
-    private boolean registrarAvalPasantiaInvestigacion(Integer idSolicitud, AvalPasantiaInvRequest avalPasantiaInvRequest) {
+    private boolean registrarAvalPasantiaInvestigacion(Integer idSolicitud,
+            AvalPasantiaInvRequest avalPasantiaInvRequest) {
         boolean registro = false;
-        try{
+        try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            AvalPasantiaInvestigacion avalPasantiaInvestigacion = avalPasantiaInvMapper.toEntity(avalPasantiaInvRequest);
+            AvalPasantiaInvestigacion avalPasantiaInvestigacion = avalPasantiaInvMapper
+                    .toEntity(avalPasantiaInvRequest);
             avalPasantiaInvestigacion.setSolicitud(solicitud);
-            avalPasantiaInvestigacion = avalPasantiaInvestigacionRepository.save(avalPasantiaInvestigacion);           
+            avalPasantiaInvestigacion = avalPasantiaInvestigacionRepository.save(avalPasantiaInvestigacion);
 
             // Procedemos a guardar los ducumentos adjuntos de la solicitud
             for (String documento : avalPasantiaInvRequest.getDocumentosAdjuntos()) {
                 DocumentosAvalPasantia documentosAvalPasantia = new DocumentosAvalPasantia();
                 documentosAvalPasantia.setAvalPasantia(avalPasantiaInvestigacion);
-                documentosAvalPasantia.setDocumento(documento);                
+                documentosAvalPasantia.setDocumento(documento);
                 documentosAvalPasantiaRepository.save(documentosAvalPasantia);
             }
             registro = true;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos de aval pasantia investigación.", e);
             registro = false;
         }
@@ -1178,9 +1260,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     private boolean registrarApoyoEconimico(Integer idSolicitud, ApoyoEconomicoRequest apoyoEconomicoRequest) {
         boolean registro = false;
-        try{
+        try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoMapper.toEntity(apoyoEconomicoRequest);
+            ApoyoEconomicoInvestigacion apoyoEconomicoInvestigacion = apoyoEconomicoMapper
+                    .toEntity(apoyoEconomicoRequest);
             apoyoEconomicoInvestigacion.setSolicitud(solicitud);
             apoyoEconomicoInvestigacion = apoyoEconomicoInvestigacionRepository.save(apoyoEconomicoInvestigacion);
 
@@ -1188,20 +1271,21 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             for (String documento : apoyoEconomicoRequest.getDocumentosAdjuntos()) {
                 DocumentosApoyoEconomico documentosApoyoEconomico = new DocumentosApoyoEconomico();
                 documentosApoyoEconomico.setApoyoEconomicoInvestigacion(apoyoEconomicoInvestigacion);
-                documentosApoyoEconomico.setDocumento(documento);                
+                documentosApoyoEconomico.setDocumento(documento);
                 documentosApoyoEconomicoRepository.save(documentosApoyoEconomico);
             }
             registro = true;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos de apoyo economico investigación.", e);
             registro = false;
         }
         return registro;
     }
 
-    private boolean registrarReconocimientoCreditos(Integer idSolicitud, ReconocimientoCreditosRequest recCreditosPasantiaRequest) {
+    private boolean registrarReconocimientoCreditos(Integer idSolicitud,
+            ReconocimientoCreditosRequest recCreditosPasantiaRequest) {
         boolean registro = false;
-        try{
+        try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
             ReconocimientoCreditos reconocimientoCreditos = new ReconocimientoCreditos();
             reconocimientoCreditos.setSolicitud(solicitud);
@@ -1224,7 +1308,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 enlacesRecCreditosRepository.save(enlacesRecCreditos);
             }
             registro = true;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos de reconocimiento de créditos.", e);
             registro = false;
         }
@@ -1233,10 +1317,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     private boolean registrarAvalSeminario(Integer idSolicitud, AvalSeminarioActRequest avalSeminarioActRequest) {
         boolean registro = false;
-        try{
+        try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
             AvalSeminarioActualizacion avalSeminarioActualizacion = new AvalSeminarioActualizacion();
-            avalSeminarioActualizacion.setSolicitud(solicitud);            
+            avalSeminarioActualizacion.setSolicitud(solicitud);
             avalSeminarioActualizacion = avalSeminarioActRepository.save(avalSeminarioActualizacion);
 
             // Procedemos a guardar los ducumentos adjuntos de la solicitud
@@ -1247,18 +1331,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 dAvalSeminarioActRepository.save(documentosAvalSeminarioAct);
             }
             registro = true;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos de aval seminario actualización.", e);
             registro = false;
         }
         return registro;
     }
 
-    private boolean registrarApoyoEconimicoCongreso(Integer idSolicitud, ApoyoEconomicoCongresoRequest apoyoEconomicoCongresoRequest) {
+    private boolean registrarApoyoEconimicoCongreso(Integer idSolicitud,
+            ApoyoEconomicoCongresoRequest apoyoEconomicoCongresoRequest) {
         boolean registro = false;
-        try{
+        try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            ApoyoEconomicoCongreso apoyoEconomicoCongreso = apoyoEconomicoCongresoMapper.toEntity(apoyoEconomicoCongresoRequest);
+            ApoyoEconomicoCongreso apoyoEconomicoCongreso = apoyoEconomicoCongresoMapper
+                    .toEntity(apoyoEconomicoCongresoRequest);
             apoyoEconomicoCongreso.setSolicitud(solicitud);
             apoyoEconomicoCongreso = apoyoEconomicoCongresoRepository.save(apoyoEconomicoCongreso);
 
@@ -1266,28 +1352,34 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             for (String documento : apoyoEconomicoCongresoRequest.getDocumentosAdjuntos()) {
                 DocumentosApoyoEconomicoCongreso documentosApoyoEconomicoCongreso = new DocumentosApoyoEconomicoCongreso();
                 documentosApoyoEconomicoCongreso.setApoyoEconomicoCongreso(apoyoEconomicoCongreso);
-                documentosApoyoEconomicoCongreso.setDocumento(documento);                
+                documentosApoyoEconomicoCongreso.setDocumento(documento);
                 documentosApoyoEconomicoCongresoRepository.save(documentosApoyoEconomicoCongreso);
             }
             registro = true;
-        } catch (Exception e){
-            logger.error("Ocurrió un error al intentar guardar los datos de apoyo económico asistencia al congreso.", e);
+        } catch (Exception e) {
+            logger.error("Ocurrió un error al intentar guardar los datos de apoyo económico asistencia al congreso.",
+                    e);
             registro = false;
         }
         return registro;
     }
 
-    private boolean registrarApoyoEconimicoPublicacionEvento(Integer idSolicitud, ApoyoEconomicoPublicacionEventoRequest apoyoEconomicoPublicacionEventoRequest) {
+    private boolean registrarApoyoEconimicoPublicacionEvento(Integer idSolicitud,
+            ApoyoEconomicoPublicacionEventoRequest apoyoEconomicoPublicacionEventoRequest) {
         boolean registro = false;
-        try{
+        try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
-            ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoMapper.toEntity(apoyoEconomicoPublicacionEventoRequest);
+            ApoyoEconomicoPublicacionEvento apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoMapper
+                    .toEntity(apoyoEconomicoPublicacionEventoRequest);
             apoyoEconomicoPublicacionEvento.setSolicitud(solicitud);
             if (apoyoEconomicoPublicacionEventoRequest.getFechaInicio() != null) {
-                apoyoEconomicoPublicacionEvento.setFechaInicio(stringToLocalDate(apoyoEconomicoPublicacionEventoRequest.getFechaInicio()));
-                apoyoEconomicoPublicacionEvento.setFechaFin(stringToLocalDate(apoyoEconomicoPublicacionEventoRequest.getFechaFin()));
+                apoyoEconomicoPublicacionEvento
+                        .setFechaInicio(stringToLocalDate(apoyoEconomicoPublicacionEventoRequest.getFechaInicio()));
+                apoyoEconomicoPublicacionEvento
+                        .setFechaFin(stringToLocalDate(apoyoEconomicoPublicacionEventoRequest.getFechaFin()));
             }
-            apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoRepository.save(apoyoEconomicoPublicacionEvento);
+            apoyoEconomicoPublicacionEvento = apoyoEconomicoPublicacionEventoRepository
+                    .save(apoyoEconomicoPublicacionEvento);
 
             // Procedemos a guardar los ducumentos adjuntos de la solicitud
             for (String documento : apoyoEconomicoPublicacionEventoRequest.getDocumentosAdjuntos()) {
@@ -1297,23 +1389,26 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                 documentosApoyoEconomicoPublicacionEventoRepository.save(documentosApoyoEconomicoPubEvento);
             }
             registro = true;
-        } catch (Exception e){
-            logger.error("Ocurrió un error al intentar guardar los datos de apoyo económico pago publicación evento.", e);
+        } catch (Exception e) {
+            logger.error("Ocurrió un error al intentar guardar los datos de apoyo económico pago publicación evento.",
+                    e);
             registro = false;
         }
         return registro;
     }
 
-    private boolean registrarActividadesPracticaDocente(Integer idSolicitud, List<DatosActividadDocenteRequest> infoActividadesDocente) {
+    private boolean registrarActividadesPracticaDocente(Integer idSolicitud,
+            List<DatosActividadDocenteRequest> infoActividadesDocente) {
         boolean registro = false;
-        try{            
-            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();            
-            
+        try {
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+
             for (DatosActividadDocenteRequest actividadDocente : infoActividadesDocente) {
 
                 ActividadesRealizadasPracticaDocente actPracticaDocente = new ActividadesRealizadasPracticaDocente();
                 actPracticaDocente.setSolicitud(solicitud);
-                SubTiposSolicitud subtipo = subTiposSolicitudRepository.findByCodigo(actividadDocente.getCodigoSubtipo());
+                SubTiposSolicitud subtipo = subTiposSolicitudRepository
+                        .findByCodigo(actividadDocente.getCodigoSubtipo());
                 actPracticaDocente.setSubTiposSolicitud(subtipo);
                 if (actividadDocente.getIntensidadHoraria() != null) {
                     actPracticaDocente.setIntensidadHoraria(actividadDocente.getIntensidadHoraria());
@@ -1340,9 +1435,9 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
                     enlaces.setEnlace(enlace);
                     enlacesActividadesRealizadasRepository.save(enlaces);
                 }
-            }            
+            }
             registro = true;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos de la práctiva actividad docente.", e);
             registro = false;
         }
@@ -1351,16 +1446,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     private boolean registrarAvalComitePrograma(Integer idSolicitud, List<AvalComiteRequest> datosAvalComite) {
         boolean registro = false;
-        try{            
-            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();            
-            
+        try {
+            Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
+
             for (AvalComiteRequest avales : datosAvalComite) {
 
                 AvalComitePrograma aval = new AvalComitePrograma();
                 aval.setSolicitud(solicitud);
                 SubTiposSolicitud subtipo = subTiposSolicitudRepository.findByCodigo(avales.getCodigoSubtipo());
-                aval.setSubTiposSolicitud(subtipo);                
-                aval.setIntensidadHoraria(avales.getIntensidadHoraria());                
+                aval.setSubTiposSolicitud(subtipo);
+                aval.setIntensidadHoraria(avales.getIntensidadHoraria());
                 aval.setHorasReconocer(avales.getHorasReconocer());
                 aval.setDescripcionActividad(avales.getDescripcionActividad());
                 aval.setDocumentoAdjunto(avales.getDocumentoAdjunto());
@@ -1368,10 +1463,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
                 // Guardar datos de la entidad
                 aval = avalComiteProgramaRepository.save(aval);
-                
-            }            
+
+            }
             registro = true;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos del aval comite de programa.", e);
             registro = false;
         }
@@ -1390,11 +1485,11 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         if (!solicitud.getEstado().equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())
                 && !solicitud.getEstado().equals(ESTADO_SOLICITUD.NO_APROBADA.getDescripcion())
                 && !solicitud.getEstado().equals(ESTADO_SOLICITUD.RECHAZADA.getDescripcion())
-                && !estado.equals("Avalada Tutor") 
+                && !estado.equals("Avalada Tutor")
                 && !estado.equals("Avalada Director")
                 && !estado.equals("En Coordinación")) {
             historico.setPdfBase64(solicitud.getDocumentoFirmado());
-        }                
+        }
         historico.setDescripcion(ESTADO_DESCRIPCION.getDescripcionPorCodigo(estado.toUpperCase().replace(" ", "_")));
         historico.setComentarios(solicitud.getComentario());
         historialEstadoSolicitudesRepository.save(historico);
@@ -1405,30 +1500,30 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         List<SolicitudHistoricoResponse> response = new ArrayList<>();
         Solicitudes solicitud = solicitudesRepository
                 .findByRadicado(radicado).orElse(null);
-        if(solicitud != null){
+        if (solicitud != null) {
             List<HistorialEstadoSolicitudes> historial = historialEstadoSolicitudesRepository
-                                .findBySolicitudOrderByFechaCreacionAsc(solicitud);
+                    .findBySolicitudOrderByFechaCreacionAsc(solicitud);
             SolicitudHistoricoResponse info;
             for (HistorialEstadoSolicitudes historico : historial) {
                 info = new SolicitudHistoricoResponse();
                 info.setRadicado(radicado);
                 info.setEstadoSolicitud(historico.getEstado());
                 info.setFechaHora(historico.getFechaCreacion().toString());
-                //info.setPdfBase64(historico.getPdfBase64());
+                // info.setPdfBase64(historico.getPdfBase64());
                 info.setDescripcion(historico.getDescripcion());
                 info.setComentarios(historico.getComentarios());
                 response.add(info);
-            }            
-               
+            }
+
         }
         return response;
     }
 
     @Override
     public List<SolicitudPendientesAval> obtenerDatosSolicitudPendientesCoordinador(String estado) throws Exception {
-        List<SolicitudPendientesAval> solicitudes = new ArrayList<>();  
-        List<Solicitudes> solicitudesPendientes = solicitudesRepository.
-                findByEstadoOrderByFechaModificacionAsc(ESTADO_SOLICITUD.getDescripcionPorCodigo(estado));
+        List<SolicitudPendientesAval> solicitudes = new ArrayList<>();
+        List<Solicitudes> solicitudesPendientes = solicitudesRepository
+                .findByEstadoOrderByFechaModificacionAsc(ESTADO_SOLICITUD.getDescripcionPorCodigo(estado));
         for (Solicitudes solicitud : solicitudesPendientes) {
             TiposSolicitud tipoSolicitud = tipoSolicitudRepository.findById(solicitud.getTipoSolicitud().getId()).get();
             InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
@@ -1437,11 +1532,12 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             solicitudPendiente.setIdSolicitud(solicitud.getId());
             solicitudPendiente.setCodigoSolicitud(tipoSolicitud.getCodigo());
             solicitudPendiente.setNombreTipoSolicitud(tipoSolicitud.getNombre());
-            solicitudPendiente.setAbreviatura(ABREVIATURA_SOLICITUD.valueOf(tipoSolicitud.getCodigo()).getDescripcion());
+            solicitudPendiente
+                    .setAbreviatura(ABREVIATURA_SOLICITUD.valueOf(tipoSolicitud.getCodigo()).getDescripcion());
             solicitudPendiente.setNombreEstudiante(estudiante.obtenerNombreCompleto());
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             solicitudPendiente.setFecha(solicitud.getFechaModificacion().toString());
-            solicitudPendiente.setIdentificacionSolicitante(estudiante.getNumeroDocumento());            
+            solicitudPendiente.setIdentificacionSolicitante(estudiante.getNumeroDocumento());
             solicitudes.add(solicitudPendiente);
         }
         return solicitudes;
@@ -1449,7 +1545,7 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     private boolean registrarSolicitudBecaDescuento(Integer idSolicitud, SolicitudBecaRequest datosSolicitudBeca) {
         boolean registro = false;
-        try{            
+        try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
             SolicitudBecaDescuento beca = new SolicitudBecaDescuento();
             beca.setSolicitud(solicitud);
@@ -1461,8 +1557,8 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
             // Guardar datos de la entidad
             beca = solicitudBecaRepository.save(beca);
-            registro = true;        
-        } catch (Exception e){
+            registro = true;
+        } catch (Exception e) {
             logger.error("Ocurrió un error al intentar guardar los datos de la solicitud de beca.", e);
             registro = false;
         }
@@ -1471,12 +1567,14 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     @Override
     public boolean rechazarSolicitud(RechazarSolicitudRequest rechazarSolicitudRequest) throws Exception {
-        Optional<Solicitudes> optionalSolicitud = solicitudesRepository.findById(rechazarSolicitudRequest.getIdSolicitud());
-        InformacionPersonalDto tutor = gestionDocentesEstudiantesService.obtenerTutor(rechazarSolicitudRequest.getEmailRevisor());
-        if (optionalSolicitud.isPresent()){
+        Optional<Solicitudes> optionalSolicitud = solicitudesRepository
+                .findById(rechazarSolicitudRequest.getIdSolicitud());
+        InformacionPersonalDto tutor = gestionDocentesEstudiantesService
+                .obtenerTutor(rechazarSolicitudRequest.getEmailRevisor());
+        if (optionalSolicitud.isPresent()) {
             Solicitudes solicitud = optionalSolicitud.get();
             String mensajeComentario = tutor.obtenerNombreCompleto() + " rechazó la solicutd indicando lo siguiente: ";
-            mensajeComentario+=rechazarSolicitudRequest.getComentario();
+            mensajeComentario += rechazarSolicitudRequest.getComentario();
             solicitud.setComentario(mensajeComentario);
             solicitud.setEstado(ESTADO_SOLICITUD.getDescripcionPorCodigo(rechazarSolicitudRequest.getEstado()));
             solicitud.setFechaModificacion(LocalDateTime.now());
@@ -1487,32 +1585,33 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         } else {
             return false;
         }
-        
+
     }
 
     private String validarEstadoHistorico(Solicitudes solicitud) {
         String estado = solicitud.getEstado();
         FirmaSolicitud firmas = firmaSolicitudRepository.findBySolicitud(solicitud);
-        List<HistorialEstadoSolicitudes> historico = historialEstadoSolicitudesRepository.findBySolicitudOrderByFechaCreacionAsc(solicitud);
+        List<HistorialEstadoSolicitudes> historico = historialEstadoSolicitudesRepository
+                .findBySolicitudOrderByFechaCreacionAsc(solicitud);
         if (estado.equals(ESTADO_SOLICITUD.RADICADA.getDescripcion())) {
-            if (firmas.getFirmaTutor() != null && firmas.getFirmaTutor()  
-                && firmas.getFirmaDirector()!=null && !firmas.getFirmaDirector()) {
+            if (firmas.getFirmaTutor() != null && firmas.getFirmaTutor()
+                    && firmas.getFirmaDirector() != null && !firmas.getFirmaDirector()) {
                 estado = "Avalada Tutor";
-            } else if (firmas.getFirmaDirector() != null && firmas.getFirmaDirector() 
-                && firmas.getFirmaTutor() != null && !firmas.getFirmaTutor()) {
+            } else if (firmas.getFirmaDirector() != null && firmas.getFirmaDirector()
+                    && firmas.getFirmaTutor() != null && !firmas.getFirmaTutor()) {
                 estado = "Avalada Director";
             } else {
                 String estadoFinal = "";
-                if (historico.size() > 1){
+                if (historico.size() > 1) {
                     estadoFinal = historico.get(historico.size() - 1).getEstado();
-                    if (estadoFinal.equals("Avalada Tutor")){
+                    if (estadoFinal.equals("Avalada Tutor")) {
                         estado = "Avalada Director";
-                    } else if (estadoFinal.equals("Avalada Director")){
+                    } else if (estadoFinal.equals("Avalada Director")) {
                         estado = "Avalada Tutor";
                     }
                 }
             }
-        } else if(estado.equals(ESTADO_SOLICITUD.AVALADA.getDescripcion())){
+        } else if (estado.equals(ESTADO_SOLICITUD.AVALADA.getDescripcion())) {
             estado = "En Coordinación";
         } else if (estado.equals(ESTADO_SOLICITUD.NO_AVALADA.getDescripcion())) {
             estado = solicitud.getIdTutor().equals(solicitud.getIdRevisor()) ? "No Avalada Tutor"
@@ -1521,53 +1620,58 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
             estado = "Rechazada Coordinador";
         }
         return estado;
-    }  
+    }
 
-    private EmailRequest crearEmailRequest(DatosEnvioCorreo datosCorreo) {        
+    private EmailRequest crearEmailRequest(DatosEnvioCorreo datosCorreo) {
         EmailRequest emailRequest = new EmailRequest();
         emailRequest.setDocumentos(new HashMap<>());
         ArrayList<String> correos = new ArrayList<>();
         String asunto = "";
-        String mensaje = "";        
-        if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.ESTUDIANTE.getDescripcion()){
+        String mensaje = "";
+        if (datosCorreo.getDirigidoA() == DESTINATARIO_CORREO.ESTUDIANTE.getDescripcion()) {
             correos.add(datosCorreo.getCorreoEstudiante());
             asunto = "Confirmación de radicación de solicitud";
-            mensaje = "Estimado/a " + datosCorreo.getNombreEstudiante() + ".<br>" 
-                +  "Le informamos que su solicitud ha sido registrada satisfactoriamente en nuestro sistema.<br>"
-                + "El código de seguimiento de su solicitud es: " + datosCorreo.getRadicado() + ".<br>"
-                + "Puede utilizar este código para consultar el estado de su trámite en cualquier momento.<br>";            
-        } else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.TUTOR.getDescripcion()) {
-            correos.add(datosCorreo.getCorreoTutor());        
+            mensaje = "Estimado/a " + datosCorreo.getNombreEstudiante() + ".<br>"
+                    + "Le informamos que su solicitud ha sido registrada satisfactoriamente en nuestro sistema.<br>"
+                    + "El código de seguimiento de su solicitud es: " + datosCorreo.getRadicado() + ".<br>"
+                    + "Puede utilizar este código para consultar el estado de su trámite en cualquier momento.<br>";
+        } else if (datosCorreo.getDirigidoA() == DESTINATARIO_CORREO.TUTOR.getDescripcion()) {
+            correos.add(datosCorreo.getCorreoTutor());
             asunto = "Solicitud de aval para " + datosCorreo.getNombreEstudiante();
             mensaje = "Estimado/a " + datosCorreo.getNombreTutor() + ".<br>" +
-                "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante() + " ha generado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
-                "Solicitamos su amable colaboración para revisar y firmar la solicitud.<br>" +
-                "<br>Agradecemos su pronta atención a este asunto.";
-        } else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.DIRECTOR.getDescripcion()) {
-            correos.add(datosCorreo.getCorreoDirector());        
+                    "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante()
+                    + " ha generado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
+                    "Solicitamos su amable colaboración para revisar y firmar la solicitud.<br>" +
+                    "<br>Agradecemos su pronta atención a este asunto.";
+        } else if (datosCorreo.getDirigidoA() == DESTINATARIO_CORREO.DIRECTOR.getDescripcion()) {
+            correos.add(datosCorreo.getCorreoDirector());
             asunto = "Solicitud de aval para " + datosCorreo.getNombreEstudiante();
             mensaje = "Estimado/a " + datosCorreo.getNombreDirector() + ".<br>" +
-                "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante() + " ha generado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
-                "Solicitamos su amable colaboración para revisar y firmar la solicitud.<br>" +
-                "<br>Agradecemos su pronta atención a este asunto.";                
-        }else if (datosCorreo.getDirigidoA()==DESTINATARIO_CORREO.COORDINADOR.getDescripcion()){
-            correos.add(datosCorreo.getCorreoCoordiandor());        
+                    "Por medio de este correo, le informo que " + datosCorreo.getNombreEstudiante()
+                    + " ha generado la solicitud de " + datosCorreo.getTipoSolicitud() + ".<br>" +
+                    "Solicitamos su amable colaboración para revisar y firmar la solicitud.<br>" +
+                    "<br>Agradecemos su pronta atención a este asunto.";
+        } else if (datosCorreo.getDirigidoA() == DESTINATARIO_CORREO.COORDINADOR.getDescripcion()) {
+            correos.add(datosCorreo.getCorreoCoordiandor());
             asunto = "Solicitud de aval a coordinación";
             mensaje = "Estimado/a " + datosCorreo.getNombreCoordinador() + ".<br>" +
-                "Por medio de la presente, se le informa que se ha registrado en el sistema una solicitud de " + datosCorreo.getTipoSolicitud() + " a nombre de " + datosCorreo.getNombreEstudiante() + ".<br>";
-                if (datosCorreo.getNombreDirector() != null){
-                    mensaje +="Esta solicitud ha sido debidamente firmada por el tutor " + datosCorreo.getNombreTutor() + " y el director " + datosCorreo.getNombreDirector() + ".<br>";
-                } else {
-                    mensaje +="Esta solicitud ha sido debidamente firmada por el tutor " + datosCorreo.getNombreTutor() + ".<br>";
-                }
-                mensaje+="<br>" +
-                "Solicitamos su amable autorización para continuar con el trámite correspondiente.<br>" +
-                "<br>Agradecemos su atención a este asunto.";
+                    "Por medio de la presente, se le informa que se ha registrado en el sistema una solicitud de "
+                    + datosCorreo.getTipoSolicitud() + " a nombre de " + datosCorreo.getNombreEstudiante() + ".<br>";
+            if (datosCorreo.getNombreDirector() != null) {
+                mensaje += "Esta solicitud ha sido debidamente firmada por el tutor " + datosCorreo.getNombreTutor()
+                        + " y el director " + datosCorreo.getNombreDirector() + ".<br>";
+            } else {
+                mensaje += "Esta solicitud ha sido debidamente firmada por el tutor " + datosCorreo.getNombreTutor()
+                        + ".<br>";
+            }
+            mensaje += "<br>" +
+                    "Solicitamos su amable autorización para continuar con el trámite correspondiente.<br>" +
+                    "<br>Agradecemos su atención a este asunto.";
         }
         emailRequest.setCorreos(correos);
         emailRequest.setAsunto(asunto);
-        emailRequest.setMensaje(mensaje);        
-        return emailRequest;        
+        emailRequest.setMensaje(mensaje);
+        return emailRequest;
     }
 
     // Método asíncrono para enviar el correo
@@ -1584,10 +1688,10 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         });
     }
 
-    private DatosEnvioCorreo crearDatosEnvioCorreo(Solicitudes registroSolicitud, DESTINATARIO_CORREO destinatario){
+    private DatosEnvioCorreo crearDatosEnvioCorreo(Solicitudes registroSolicitud, DESTINATARIO_CORREO destinatario) {
         DatosEnvioCorreo datosCorreo = new DatosEnvioCorreo();
         datosCorreo.setTipoSolicitud(registroSolicitud.getTipoSolicitud().getNombre());
-        datosCorreo.setRadicado(registroSolicitud.getRadicado());        
+        datosCorreo.setRadicado(registroSolicitud.getRadicado());
         InformacionPersonalDto estudiante = gestionDocentesEstudiantesService
                 .obtenerInformacionEstudiantePorId(registroSolicitud.getIdEstudiante());
         datosCorreo.setNombreEstudiante(estudiante.obtenerNombreCompleto());
@@ -1603,16 +1707,16 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
         } else {
             datosCorreo.setNombreDirector(null);
         }
-        if (destinatario.equals(DESTINATARIO_CORREO.ESTUDIANTE)){            
+        if (destinatario.equals(DESTINATARIO_CORREO.ESTUDIANTE)) {
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
             datosCorreo.setCorreoEstudiante(estudiante.getCorreo());
-        } else if(destinatario.equals(DESTINATARIO_CORREO.TUTOR)){
+        } else if (destinatario.equals(DESTINATARIO_CORREO.TUTOR)) {
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
             datosCorreo.setCorreoTutor(infoTutor.getCorreo());
-        } else if(destinatario.equals(DESTINATARIO_CORREO.DIRECTOR)){
+        } else if (destinatario.equals(DESTINATARIO_CORREO.DIRECTOR)) {
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
             datosCorreo.setCorreoDirector(infoDirector != null ? infoDirector.getCorreo() : null);
-        } else if(destinatario.equals(DESTINATARIO_CORREO.COORDINADOR)){
+        } else if (destinatario.equals(DESTINATARIO_CORREO.COORDINADOR)) {
             datosCorreo.setDirigidoA(destinatario.getDescripcion());
             datosCorreo.setNombreCoordinador(coordinadorRepository.obtenerNombreCompletoCoordinador());
             datosCorreo.setCorreoCoordiandor(coordinadorRepository.obtenerCorreoCoordinador());
@@ -1622,22 +1726,22 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
 
     @Override
     public Boolean actualizarSolicitud(Integer idSolicitud, String estado) {
-        try{
+        try {
             Solicitudes solicitud = solicitudesRepository.findById(idSolicitud).get();
             solicitud.setEstado(estado);
             solicitud.setFechaModificacion(LocalDateTime.now());
             solicitudesRepository.save(solicitud);
             registrarHistoricoSolicitud(solicitud);
             return true;
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Ocurrió un error al actualizar la solicitud.", e);
             return false;
-        }        
-    }        
+        }
+    }
 
     private String localDateToString(LocalDate fecha) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        
+
         // Convertir LocalDate a String en formato "dd/MM/yyyy"
         return fecha.format(formatter);
     }
@@ -1653,17 +1757,20 @@ public class GestionSolicitudesServiceImpl implements GestionSolicitudesService 
     }
 
     public FechaActualResponse obtenerFechaActual() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response = restTemplate.getForEntity(TIME_API_URL, Map.class);
+        // Usar la fecha local del sistema con zona horaria de Bogotá
+        // En lugar de llamar a una API externa que puede fallar
+        try {
+            java.time.ZoneId zonaBogota = java.time.ZoneId.of("America/Bogota");
+            java.time.LocalDate fechaActual = java.time.LocalDate.now(zonaBogota);
 
-        if (response.getBody() != null) {
-            String year = String.valueOf(response.getBody().get("year"));
-            String month = String.valueOf(response.getBody().get("month"));
-            String day = String.valueOf(response.getBody().get("day"));
+            String year = String.valueOf(fechaActual.getYear());
+            String month = String.valueOf(fechaActual.getMonthValue());
+            String day = String.valueOf(fechaActual.getDayOfMonth());
 
             return new FechaActualResponse(year, month, day);
-        }        
-        throw new RuntimeException("No se pudo obtener la fecha del servidor de tiempo.");
-
+        } catch (Exception e) {
+            logger.error("Error al obtener la fecha actual del sistema", e);
+            throw new RuntimeException("No se pudo obtener la fecha actual del sistema.");
+        }
     }
 }

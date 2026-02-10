@@ -13,7 +13,7 @@ import lombok.Data;
 
 @Data
 public class DatosGestionSolicitudResponse {
-    
+
     private DatosComunSolicitud datosComunSolicitud;
     private DatosSolicitudHomologacion datosSolicitudHomologacion;
     private DatosSolicitudAdicionCancelacionAsignatura dAdicionCancelacionAsignatura;
